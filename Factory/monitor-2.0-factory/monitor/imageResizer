@@ -1,0 +1,38 @@
+import sys
+from PIL import Image
+
+argv = sys.argv
+argc = len(argv)
+ 
+maxWidth = 600.0
+maxHeight = 400.0 
+
+if argc != 2:
+  sys.exit(-1)
+  
+filename = argv[1]
+
+ 
+# Open the image file.
+img = Image.open(filename)
+ 
+(imgWidth, imgHeight) = img.size
+imgWidth = float(imgWidth)
+imgHeight = float(imgHeight)
+
+if imgWidth > maxWidth or imgHeight > maxHeight:
+  if (imgWidth - maxWidth) > (imgHeight - maxHeight):
+    percent = maxWidth / imgWidth
+    imgHeight = int(imgHeight * percent)
+    imgWidth = int(maxWidth)
+  else:
+    percent = maxHeight / imgHeight
+    imgWidth = int(imgWidth * percent)
+    imgHeight = int(maxHeight)
+   
+  # Resize it.
+  img = img.resize((imgWidth, imgHeight), Image.BILINEAR)
+   
+  # Save it back to disk.
+  img.save(filename)
+

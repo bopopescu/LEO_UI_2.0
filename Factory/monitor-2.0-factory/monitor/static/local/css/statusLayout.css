@@ -1,0 +1,173 @@
+
+#zoomwrapper {
+          position: fixed;
+          z-index: 1;
+          background-color: white;
+          margin: 0;
+          border-top: 2px #dfd9c3 solid;
+          border-right: 2px #dfd9c3 solid;
+          box-sizing: border-box;
+          padding: 5px 25px 100px 25px;
+
+          border-top-right-radius: 8px;
+
+          display: -webkit-flexbox;
+          display: -ms-flexbox;
+          display: -webkit-flex;
+          display: flex;
+
+}
+
+#enablezoom {
+          border-radius: 8px;
+
+          background-color: #ffffff;
+          border: 1px #a0a0a0 solid;
+          padding: 5px;
+          margin-right: 25px;
+
+          height: 1.5em;
+
+          display: -webkit-flexbox;
+          display: -ms-flexbox;
+          display: -webkit-flex;
+          display: flex;
+          -webkit-flex-align: center;
+          -ms-flex-align: center;
+          -webkit-align-items: center;
+          align-items: center;
+          justify-content: center;
+}
+
+table.hlsl-statusBlock {
+          background-color: beige;
+          width:auto;
+          height:auto;
+          margin-left: auto;
+          margin-right: auto;
+          white-space: nowrap;
+          text-align: center;
+          border-radius: 25px;
+
+          /* style="width: 10%; height: 10%; background-color: beige; margin-left: auto; margin-right: auto;" border="7px" */
+}
+
+/* OLD
+table.hlsl-statusBlock {
+width: 10%;
+height: 10%;
+background-color: beige;
+margin-left: auto;
+margin-right: auto;
+border: 7px solid black;
+white-space: nowrap;
+text-align: center;
+}
+*/
+
+td.hlsl-statusBlock {
+          border:1px solid black;
+          text-align: center;
+          width: 30px;
+}
+
+td.hlsl-statusBlock-val {
+          text-align: center;
+          font-size: 18px;
+          line-height: 1em;
+          border:1px solid black;
+          vertical-align: middle;
+          /* " style="width: 15%; text-align: center; font-size: 34px;" */
+}
+
+img.hlsl-statusBlock-img {
+          display: block;
+          height: 30px;
+          width: 30px;
+          /* style="height:70px;width:70px" */
+}
+
+.device-unit {
+          position: relative;
+          margin: 0 auto;
+          max-height: 100%;
+          overflow: hidden;
+          transform: scale(1);
+          transform-origin: left top;
+          width: 100%;
+}
+
+div.hlsl-statusBlock {
+          min-width: 110px;
+          min-height: 72px;
+}
+
+div.hlsl-statusBlock > table {
+          width: 100%;
+          height: 100%;
+}
+
+[id^=wDispName] {
+          font-size: 15px;
+}
+
+[id^=wPropName] {
+          font-size: 15px;
+}
+
+.device-unit [id^=hlslImg] {
+          width: 245px;
+          height: auto;
+          position: absolute;
+          top: calc(15px);
+          left: calc(17% + 220px + 22.5px);
+          transform: translateX(-50%);
+          z-index: 1;
+}
+
+.device-unit [id^=wDiv]:nth-child(1) {
+          top: calc(15px);
+          left: 17%;
+}
+.device-unit [id^=wDiv]:nth-child(2) {
+          top: calc(15px + 72px + 15px); /*topMargin + heightOfBlock*Num + gutter*Num*/
+          left: 17%;
+}
+.device-unit [id^=wDiv]:nth-child(3) {
+          top: calc(15px + 144px + 30px);
+          left: 17%;
+}
+.device-unit [id^=wDiv]:nth-child(4) {
+          top: calc(15px + 216px + 45px);
+          left: 17%;
+}
+
+.device-unit [id^=wDiv]:nth-child(5) {
+          top: calc(15px + 216px + 45px);
+          left: calc(17% + 110px + 15px); /*leftMargin + widthOfBlock*Num + gutter*Num*/
+}
+
+.device-unit [id^=wDiv]:nth-child(6) {
+          top: calc(15px + 216px + 45px);
+          left: calc(17% + 220px + 30px); /*leftMargin + widthOfBlock*Num + gutter*Num*/
+}
+.device-unit [id^=wDiv]:nth-child(7) {
+          top: calc(15px + 216px + 45px);
+          left: calc(17% + 330px + 45px);
+}
+.device-unit [id^=wDiv]:nth-child(8) {
+          top: calc(15px + 144px + 30px);
+          left: calc(17% + 330px + 45px);
+}
+.device-unit [id^=wDiv]:nth-child(9) {
+          top: calc(15px + 72px + 15px); /*topMargin + heightOfBlock*Num + gutter*Num*/
+          left: calc(17% + 330px + 45px);
+}
+.device-unit [id^=wDiv]:nth-child(10) {
+          top: calc(15px);
+          left: calc(17% + 330px + 45px);
+}
+.device-unit [id^=wDiv]:nth-child(11) {
+          top: calc(15px + 216px + 45px);
+          left: calc(17% + 330px + 45px);
+}

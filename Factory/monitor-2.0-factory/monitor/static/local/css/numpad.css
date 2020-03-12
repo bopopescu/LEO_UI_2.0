@@ -1,0 +1,38 @@
+.numpad {
+  text-align: center;
+  cursor: none;
+}
+
+.numpad .title {
+  font-size: 1.4em !important;
+  padding-right: 8px;
+}
+
+.numpad .unit {
+  font-size: 1.4em !important;
+  padding-left: 8px;
+}
+
+.numpad table {
+  margin: 0 auto; /* or margin: 0 auto 0 auto */
+  border-spacing: 0px;
+  border-collapse: collapse;
+}
+
+.numpad td { 
+  padding: 4px 2px;
+}
+
+.numpad input[type=text] {
+  width: 240px;
+}
+
+.numpad .singleWidth {
+  width: 60px;
+  cursor: none;
+}
+
+.numpad .specialWidth {
+  width: 120px;
+  cursor: none;
+}

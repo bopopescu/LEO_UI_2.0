@@ -1,0 +1,41 @@
+/*! This is the common css for the pageAnalysis and pageExport pages */
+
+/* ==========================================================================
+   logsection
+   ========================================================================== */
+
+
+.logsection {
+  background-color: #fefefe;
+  padding-bottom: 4px;
+  border-bottom: 2px solid #dfd9c3;
+}
+
+
+.logsectiontable {
+  background-color: #fefefe;
+  margin: 10px 10px 0px 10px;
+  text-align: left;
+}
+
+.loglist {
+  margin-top: 5px;
+}
+
+.logsection .samesizebutton {
+  width: 11em;
+  font-size:.8em
+  margin-top: 1px;
+}
+
+.logsection .samesizeweekbutton {
+  width:9em;
+  font-size:.8em
+  margin-top: 1px;
+}
+
+.progress-box {
+  width: 50%;
+  min-width: 250px;
+  margin: auto;
+}

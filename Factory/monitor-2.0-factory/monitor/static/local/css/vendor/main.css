@@ -1,0 +1,21 @@
+@import url(//fonts.googleapis.com/css?family=Lato);
+
+body {
+          font-family: 'Lato';
+}
+
+#main-container {
+          margin: 10px;
+          width: 1800px;
+          max-width: 100%;
+}
+
+.api-buttons > a {
+          margin: 0 2px 0 0 !important;
+          text-decoration: none !important;
+}
+
+.price {
+          font-size: 25px !important;
+          line-height: 26px !important;
+}

@@ -1,0 +1,52 @@
+#snoozeInfoDiv {
+    display:none;
+    color: white;
+    border:2px solid white;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: calc(50% + 75px);
+    border-radius: 8px;
+    font-size: 24px;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+/*    width: 100%;   */ /* Allows centering of "sub-DIVs */
+}
+
+#snoozeCountDownDiv {
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+
+    font-weight: 600;
+    height: 50px;
+    width: 420px;
+    top: 50%;
+    left: 50%;
+    color: white;
+    position: static;
+    background: #FF0033;
+    border: none;
+    border-radius: 8px;
+    line-height: 50px;
+}
+
+#snoozeInfoBtnDiv {
+    z-index: 2;
+}
+
+.snoozeInfoBtn {
+    font-weight: 600;
+    height: 50px;
+    width: 420px;
+    top: 50%;
+    left: 50%;
+    color: white;
+    position: static;
+    background: #FF0033;
+    border: none;
+}

@@ -1,0 +1,74 @@
+.keypad {
+  text-align: center;
+  cursor: none;
+}
+
+.keypad div {
+  margin: 0 auto; /* or margin: 0 auto 0 auto */
+  text-align: left;
+}
+
+.keypad .rowspacer {
+  height: 5px;
+}
+
+.keypad .singleWidth {
+  font-size: 1.75em !important;
+  width: 70px;
+  height: 70px;
+  padding-left: 20px;
+  text-align: center;
+}
+
+.keypad .spaceWidth {
+  height: 70px;
+  width: 500px;
+}
+
+.keypad .okCancelWidth {
+  font-size: 1.25em !important;
+  height: 70px;
+}
+
+.keypad input[type=button] {
+  font-size: 1.25em !important;
+  height: 70px;
+  cursor: none;
+}
+
+.keypad .ui-button .ui-button-text {
+  font-size: 1.25em !important;
+  line-height: 2.5em;  /* Centers text vertically ... */
+  height: 52px;
+  padding-left: 10px;
+  cursor: none;
+}
+
+.keypad .title {
+  font-size: 2.00em !important;
+  padding-right: 15px;
+}
+
+.keypad .endspacer0 {
+  display: inline-block;
+  width: 26px;
+}
+.keypad .endspacer1 {
+  display: inline-block;
+  width: 30px;
+}
+.keypad .endspacer2 {
+  display: inline-block;
+  width: 20px;
+}
+
+.keypad .endspacer3 {
+  display: inline-block;
+  width: 15px;
+}
+.keypad .endspacer4 {
+  display: inline-block;
+  width: 25px;
+}
+
+

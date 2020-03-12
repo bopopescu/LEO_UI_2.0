@@ -1,0 +1,63 @@
+
+<style>
+#AuditTrailAccordion {
+  margin: 10px;
+}
+
+</style>
+
+<div id="AuditTrailAccordion" class="accordion">
+  <h3 id="AuditTrailTitle">LEO Audit Trail</h3>
+    <div><div id="AuditTrailEntries"></div></div>
+</div>
+
+<script>
+
+var AuditTrailEntries = []
+
+$("#AuditTrailEntries").proptable({ name: 'AuditTrailEntries',
+  data: AuditTrailEntries,
+  columns: [{ readonly: true, header: 'Date/Time', size: 40},
+            { readonly: true, header: 'Description' }]
+});
+
+function getAuditTrail() {
+  pageWaiting();
+  pageXHR = postJson({"jsonrpc":"2.0","id":"AuditTrailEntries","method":"getAuditTrailEntries"},
+    function(data) {
+
+      var result = data;
+
+      pageWaiting('done');
+      if (result.length == 0) {
+        while(AuditTrailEntries.length > 0) { AuditTrailEntries.pop(); }
+      }
+      else if ((AuditTrailEntries.length == 0) || (result[0].date != AuditTrailEntries[0])) {
+        while(AuditTrailEntries.length > 0) { AuditTrailEntries.pop(); }
+        for (key in result) {
+          auditTrailRec = result[key];
+          var d = utcToLocalDate(auditTrailRec.dbTimestamp)
+          var s = dateToString(d);
+          AuditTrailEntries.push([s, auditTrailRec.auditDescription]);
+        }
+      }
+      $("#AuditTrailEntries").proptable('render');
+    },
+    jsonError
+    );
+}
+
+$( "#AuditTrailAccordion" ).accordion( { heightStyle: "content",
+{% if ctx.localhost %}
+  animate: false
+{% else %}
+  animate: true
+{% endif %}
+
+ } );
+
+getAuditTrail();
+
+//# sourceURL=pageAuditTrail.html
+</script>
+

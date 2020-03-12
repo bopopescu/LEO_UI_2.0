@@ -1,0 +1,515 @@
+/* This is used by the html tag */
+
+html, .js {
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  background: #ffffff;
+  font-size: 16px;
+}
+
+body {
+  min-width:600px;
+  height: 100%;
+  overflow: hidden;
+}
+
+article, aside, figure, footer, hgroup, menu, nav, section { 
+  display: block; 
+}
+
+#headertable {
+  background: #2a652a;
+  color: #ffffff;
+  width: 100%; 
+  border-collapse: separate;
+  border-spacing: 0.5em;
+}
+
+#timeupdate, #sessionInfo {
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 0 5px;
+}
+
+#commError {
+  z-index: 30000; 
+  position: absolute;
+  border: 1px solid #beb58e;
+  background-color: #eee5be;
+  font-weight: bold;
+  left: 220px;
+  text-align: center;
+  padding: 2px 20px;
+  display: none;
+}
+
+.sitename {
+  font-weight: bold;
+  font-size: 24px !important;
+  overflow: hidden;
+  max-height: 65px;
+  text-align: center;
+}
+
+section {
+  height: 100%;
+  overflow:hidden;
+}
+
+
+article {
+  width: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  position: relative;
+}
+
+
+#content {
+  width: 100%;
+}
+
+.ui-dialog-titlebar-close {
+  visibility: hidden;
+}
+
+/* Allow Font Awesome Icons in lieu of jQuery UI and only apply when using a FA icon */
+.ui-icon[class*=" icon-"] {
+  /* Remove the jQuery UI Icon */
+  background: none repeat scroll 0 0 transparent;
+  /* Remove the jQuery UI Text Indent */
+  text-indent: 0px; 
+  width: auto;
+  height: auto;
+}
+
+/* Allow use of icon-large to be properly aligned */
+.ui-icon.icon-large {
+  margin-top: -0.75em;
+}
+
+.ui-button-icon-only .ui-icon[class*=" icon-"] {
+  margin-left: -16px;
+  margin-top: -16px;
+}
+
+.fs2x {
+  font-size: 2em;
+}
+
+/*Shared*/
+select {
+  background-color: white;
+}
+select option {
+  background-color: white;
+}
+
+  .nice-select {
+    display: inline-block !important;
+    vertical-align: middle;
+    float: none !important;
+}
+table:not(.conf__table) .nice-select {
+    width: 100% !important;
+    font-size: 18px;
+}
+.nice-select .list {
+    width: 100%;
+    -webkit-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
+}
+.nice-select .option.focus, .nice-select .option.selected.focus {
+    background-color: #f6f6f6 !important;
+}
+.nice-select .list:hover .option:not(:hover):nth-child(even) {
+    background-color: #f6f6f6 !important;
+}
+.nice-select.open .list {
+    position: fixed;
+    width: calc(70%);
+    min-height: 150px;
+    max-height: 50%;
+    overflow: auto;
+    -webkit-transform: translate(-50%, -50%) !important;
+        -ms-transform: translate(-50%, -50%) !important;
+            transform: translate(-50%, -50%) !important;
+    -moz-box-shadow: 0px 0px 2000px 2000px rgba(68,68,68,0.7);
+    -webkit-box-shadow: 0px 0px 2000px 2000px rgba(68,68,68,0.7);
+            box-shadow: 0px 0px 2000px 2000px rgba(68,68,68,0.7);
+    -moz-box-shadow: 0px 0px 100vmax 100vmax rgba(68,68,68,0.7);
+    -webkit-box-shadow: 0px 0px 100vmax 100vmax rgba(68,68,68,0.7);
+            box-shadow: 0px 0px 100vmax 100vmax rgba(68,68,68,0.7);
+    top: 50%;
+    left: 50%;
+    border: 5px solid #FFF;
+}
+.nice-select.open .list:before {
+    content:"";
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.nice-select .option {
+    line-height: 60px !important;
+    min-height: 60px !important;
+}
+.nice-select .option:nth-child(even) {
+    background-color: #f6f6f6 !important;
+}
+.nice-select .option:not(.focus):hover {
+    background-color: #286090 !important;
+    color: #FFF;
+}
+
+.proptable {
+  width: 100%;
+}
+.proptable select {
+  min-height: 2em;
+}
+/*Sidebar*/
+nav {
+  float: left;
+  height: 100%;
+  background-color: #dfd9c3;
+  text-align: left;
+  width: 150px;
+}
+
+.sidebar__list .navbutton {
+  width: 140px;
+  max-height: 140px;
+  margin-top: 5px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1 auto;
+          flex: 1 1 auto;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  background-size: contain;
+  margin-right: 0;
+}
+.sidebar__list .navbutton
+{
+    position:relative;
+    -webkit-box-shadow:-1px 2px 4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.2) inset;
+       -moz-box-shadow:-1px 2px 4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.2) inset;
+            box-shadow:-1px 2px 4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.2) inset;
+    -webkit-transition: all 2s ease-out;
+    -moz-transition: all 0.2s ease-out;
+    -o-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+}
+.sidebar__list .navbutton.nav-alarm--active {
+    background: #ff0033;
+    color: #FFF;
+}
+.sidebar__list .navbutton.nav-alarm--active.ui-state-hover {
+    background: #cc0028 url("huntertheme/images/ui-bg_highlight-hard_100_fafaf4_1x100.png") 50% 50% repeat-x;
+    color: #ff0033;
+}
+.sidebar__list .navbutton.nav-alarm--active.ui-state-active {
+    background: #fafaf4 url("huntertheme/images/ui-bg_highlight-hard_100_fafaf4_1x100.png") 50% 50% repeat-x;
+    font-weight: bold;
+    color: #ff0033;
+}
+.sidebar__list .navbutton:before, .sidebar__list .navbutton:after
+{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    -webkit-box-shadow:0 0 20px rgba(0,0,0,0.8);
+    -moz-box-shadow:0 0 20px rgba(0,0,0,0.8);
+    box-shadow:0 0 20px rgba(0,0,0,0.8);
+    top:0;
+    bottom:0;
+    left:10px;
+    right:10px;
+    -moz-border-radius:100px / 10px;
+    border-radius:100px / 10px;
+}
+.sidebar__list .navbutton:after
+{
+    right:10px;
+    left:auto;
+    -webkit-transform:skew(8deg) rotate(3deg);
+       -moz-transform:skew(8deg) rotate(3deg);
+        -ms-transform:skew(8deg) rotate(3deg);
+         -o-transform:skew(8deg) rotate(3deg);
+            transform:skew(8deg) rotate(3deg);
+}
+.sidebar__logged-in .sidebar__list .navbutton .icon {
+  font-size: 1.6em;
+}
+@media all and (min-height: 640px) {
+  .sidebar__logged-in .sidebar__list .navbutton .icon {
+    font-size: 2em;
+  }
+}
+.sidebar__list .navbutton .icon {
+  font-size: 2em;
+  margin-top: 0;
+  padding: 0 1rem;
+  position: relative;
+  top: initial;
+  left: initial;  
+}
+.sidebar__list .navbutton .icon-lock:before {
+    display: inline-block;
+    width: 0.66em;
+}
+.sidebar__list .navbutton .ui-button-text {
+  padding: 0;
+}
+.sidebar__list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-flow: column nowrap;
+            flex-flow: column nowrap;
+    float: right;
+    height: 100%;
+    margin-right: 0;
+}
+
+/*Alarms*/
+.proptable div[class*="readonly"]::before {
+  content: "";
+  background-color: inherit;
+  display: block;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+
+/*Devices*/
+#deviceMain {
+  margin: 10px;
+}
+
+#pageDeviceSelect .nice-select {
+  width: 400px;
+}
+
+#deviceMain #tabContent {
+  background-color: #f7f4f0;
+}
+#DevStatusTabs {
+  overflow: hidden;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+}
+
+#DevStatusTabs li {
+  float: left;
+  margin: 0 0 0 0;
+  position: relative;
+}
+
+#DevStatusTabs li { 
+  /* Makes a horizontal row */
+  float: left; 
+  
+  /* So the psueudo elements can be
+     abs. positioned inside */
+  position: relative; 
+}
+#DevStatusTabs a { 
+  /* Make them block level
+     and only as wide as they need */
+  float: left; 
+  padding: 10px 40px; 
+  text-decoration: none;
+  
+  /* Default colors */ 
+  color: white;
+  background: #787572; 
+  border: 4px solid #787572;
+  
+  /* Only round the top corners */
+  -webkit-border-top-left-radius: 15px;
+  -webkit-border-top-right-radius: 15px;
+  -moz-border-radius-topleft: 15px;
+  -moz-border-radius-topright: 15px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px; 
+}
+#DevStatusTabs #current {
+  /* Highest, active tab is on top */
+  z-index: 3;
+}
+#DevStatusTabs #current a { 
+  /* Colors when tab is active */
+  background: #f7f4f0; 
+  color: black; 
+  font-weight: bold;
+  border-bottom-color: #f7f4f0;
+  border: 4px solid #787572;
+  border-bottom-color: #f7f4f0;
+}
+#DevStatusTabs li:before, #DevStatusTabs li:after, 
+#DevStatusTabs li a:before, #DevStatusTabs li a:after {
+  /* All pseudo elements are 
+     abs. positioned and on bottom */
+  position: absolute;
+  bottom: 0;
+}
+/* Only the first, last, and active
+   tabs need pseudo elements at all */
+#DevStatusTabs li:last-child:after,   #DevStatusTabs li:last-child a:after,
+#DevStatusTabs li:first-child:before, #DevStatusTabs li:first-child a:before,
+#DevStatusTabs #current:after,   #DevStatusTabs #current:before, 
+#DevStatusTabs #current a:after, #DevStatusTabs #current a:before {
+  content: "";
+}
+#DevStatusTabs #current:before, #DevStatusTabs #current:after {
+  background: #787572; 
+  
+  /* Squares below circles */
+  z-index: 1;
+}
+/* Squares */
+#DevStatusTabs li:before, #DevStatusTabs li:after {
+  background: #787572;
+  width: 10px;
+  height: 10px;
+}
+#DevStatusTabs li:before {
+  left: -10px;      
+}
+#DevStatusTabs li:after { 
+  right: -10px;
+}
+/* Circles */
+#DevStatusTabs li a:after, #DevStatusTabs li a:before {
+  width: 20px; 
+  height: 20px;
+  /* Circles are circular */
+  border-radius:         10px;
+  background: #FFF;
+  
+  /* Circles over squares */
+  z-index: 2;
+}
+#DevStatusTabs.forEmailServers li a:after, #DevStatusTabs.forEmailServers li a:before {
+    background: transparent;
+}
+#DevStatusTabs #current a:after, #DevStatusTabs #current a:before {
+  background: #787572;
+}
+/* First and last tabs have different
+   outside color needs */
+#DevStatusTabs li:first-child#current a:before {
+  background: #787572;
+}
+#DevStatusTabs li:last-child#current a:after {
+  background: #FFF; 
+}
+#DevStatusTabs.forEmailServers li:last-child#current a:after {
+  background: transparent;
+}
+#DevStatusTabs li a:before {
+  left: -20px;
+}
+#DevStatusTabs li a:after {
+  right: -20px;
+}
+#tabs-icons .ui-tabs-nav .ui-icon {
+    display: inline-block;
+}
+
+.deviceTable {
+  width: 100%;
+}
+/*Data Logs*/
+.logsection {
+  margin: 10px;
+}
+
+.logsectiontable {
+  margin-bottom: 1rem;
+}
+
+.loglist .edittable {
+  width: 100%;
+}
+/*Configuration*/
+.conf__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 1em;  
+}
+.conf__table tr {
+  width: 100%;
+}
+.conf__table td:first-child:not(:last-child) {
+  width: 250px;
+}
+.conf__table td input[type='text'],
+.conf__table td input[type='password'] {
+  height: 2em;
+  min-width: 250px;
+  width: 100%;
+}
+.conf__table td input[type='checkbox'] {
+  height: auto;
+}
+.conf__table td textarea {
+  width: 100%;
+}
+.emailReceive__table {
+    text-align: center;
+    width: 100%;
+}
+.emailReceive__table tr {
+    width: 100%;
+}
+.emailReceive__table tr td {
+    padding: 10px 5px;
+}
+.emailReceive__table td:first-child:not(:last-child) {
+  width: 60px;
+}
+.emailReceive__table button {
+    font-size: 12px !important;
+}
+.emailReceive__table button .ui-icon {
+    display: none !important;
+}
+.emailReceive__table button .ui-button-text {
+    padding-left: .5em !important;
+    padding-right: .5em !important;
+}
+/*Files*/
+#uploadAccordion {
+  margin: 10px;
+}
+
+/*Service*/
+#serviceAccordion {
+  margin: 10px;
+}
+
+/*Login*/
+.logincontent {
+  max-width: 730px;
+  padding: 15px;
+  margin: 0 auto;
+}

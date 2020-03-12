@@ -1,0 +1,15 @@
+{
+  "size": { "w": 700, "h": 300 },
+  "image": { "name": "background.png" },
+  "instruments": [
+    { "type": "statusBlock", "x": 5, "y": 5,  "device": "*", "property": "SP", "image":"coldTemperatureBulb.png", "css": {"background-color": "beige"}  },
+    { "type": "statusBlock", "x": 5, "y": 5,  "device": "*", "property": "T1 TEMP", "image":"coldTemperatureBulb.png", "css": {"background-color": "beige"}  },
+    { "type": "statusBlock", "x": 5, "y": 30, "device": "*", "property": "T2 TEMP", "image":"coldTemperatureBulb.png", "css": {"background-color": "beige"}  },
+    { "type": "statusBlock", "x": 5, "y": 80, "device": "*", "property": "DOOR", "image":"digitalSwitch.png", "css": {"background-color": "beige"}  },
+    { "type": "statusBlock", "x": 55, "y": 5, "device": "*", "property": "COMP RLY", "image":"snowFlake.png", "css": {"visibility": "hidden"}  },
+    { "type": "statusBlock", "x": 55, "y": 30, "device": "*", "property": "AUX RLY", "image":"fan.png", "css": {"visibility": "hidden"}  },
+    { "type": "statusBlock", "x": 55, "y": 5, "device": "*", "property": "DEFROST", "image":"snowFlake.png", "css": {"visibility": "hidden"}  },
+    { "type": "statusBlock", "x": 4, "y": 4, "device": "*", "property": "STANDBY", "image":"digitalSwitch.png", "css": {"background-color": "beige"}  },
+	    { "type": "statusBlock", "x": 1, "y": 1, "device": "*", "property": "T1 TEMP", "image":"coldTemperatureBulb.png", "css": {"background-color": "beige"} }
+  ]
+}

@@ -1,0 +1,147 @@
+<style>
+#statusAccordion {
+  margin: 12px;
+}
+
+
+</style>
+<div id="NewstatusAccordion">
+    <h1 id="E2 Title">E2 Status</h3>
+    <div class="E2OnlineStatus E2OfflineError">
+        <h2><p style="color:red;text-align: center;">E2 OFFLINE</p></h2>
+    </div>
+    <div class="E2AppHeaders E2OfflineHide" style="display: none;">
+      <h2 id="enhSuctionHeader">Enhanced Suction</h3>
+          <div id="enhSuction"></div>
+          <br>
+      <h2 id="condenserHeader">Condenser</h3>
+          <div id="condenser"></div>
+          <br>
+      <h2 id="circuitHeader">Standard Circuits</h3>
+          <div id="E2Status"></div>
+          <br>
+    </div>
+</div>
+
+
+<script>
+
+var enhSuction = []
+var condenser = []
+var E2Status = []
+
+$(".E2OfflineError").hide();
+
+$("#enhSuction").proptable({ name: 'enhSuction',
+  data: enhSuction,
+  columns: [{ readonly: true, header: 'NAME'},
+            { readonly: true, header: 'PRESSURE'},
+            { readonly: true, header: 'SETPT' },
+            { readonly: true, header: 'PHASE LOSS'},
+            { readonly: true, header: 'CAPACITY' }]
+});
+
+$("#condenser").proptable({ name: 'condenser',
+  data: condenser,
+  columns: [{ readonly: true, header: 'NAME'},
+            { readonly: true, header: 'PRESSURE'},
+            { readonly: true, header: 'SETPT'},
+            { readonly: true, header: 'CAPACITY'}]
+});
+
+$("#E2Status").proptable({ name: 'E2Status',
+  data: E2Status,
+  columns: [{ readonly: true, header: 'CIRCUIT NAME'},
+            { readonly: true, header: 'STATE'},
+            { readonly: true, header: 'TEMP'},
+            { readonly: true, header: 'SETPT'},
+            { readonly: true, header: 'REF'},
+            { readonly: true, header: 'DEF' }]
+});
+
+
+function updateStatusScreen() {
+  pageXHR = postJson({"jsonrpc":"2.0","id":"E2Status","method":"getE2StatusScreenData",
+    "params":[{ objType: "E2Network" }]},
+    function(data) {
+
+      var result = data;
+
+      if ( data != null ) {
+        $(".E2OfflineError").hide();
+        $(".E2OfflineHide").show();
+
+        for (devName in result) {
+          E2Obj = result[devName]
+
+//          console.log( "E2Obj = ", E2Obj )
+//          console.log( "data.dictAppsByName = ", E2Obj.dictAppsByName )
+//          console.log( "data.online = ", E2Obj.online )
+          dictApps = E2Obj.dictAppsByName;
+
+          // Handle for Enhanced Suction
+          while(enhSuction.length > 0) { enhSuction.pop(); }
+          for (key in dictApps) {
+            objApp = dictApps[key]
+            if (objApp['appType'] == 162) {
+              objProps = objApp['props']
+              // console.log( "EnhSuction ONLY Name = ", objProps['Name']['value'] )
+              enhSuction.push([objProps['Name']['value'],objProps['FILTERED PRES']['value'],objProps['SUCT PRES SETPT']['value'],objProps['PHASE LOSS']['value'],objProps['PERCENT USED']['value']]);
+            }
+          }
+          $("#enhSuction").proptable('render');
+
+          // Handle for Condenser Control
+          while(condenser.length > 0) { condenser.pop(); }
+          for (key in dictApps) {
+            objApp = dictApps[key]
+            if (objApp['appType'] == 129) {
+              objProps = objApp['props']
+              // console.log( "Condenser ONLY Name = ", objProps['Name']['value'] )
+              condenser.push([objProps['Name']['value'],objProps['CTRL VAL OUT']['value'],objProps['CTRL VAL STPT']['value'],objProps['CONTROL PID']['value']]);
+            }
+          }
+          $("#condenser").proptable('render');
+
+
+          // Circuit Control values
+          while(E2Status.length > 0) { E2Status.pop(); }
+          for (key in dictApps) {
+            objApp = dictApps[key]
+            if (objApp['appType'] == 131) {
+              objProps = objApp['props']
+              // console.log( "CKTS ONLY Name = ", objProps['Name']['value'] )
+              E2Status.push([objProps['Name']['value'],objProps['CIRCUIT STATE']['value'],objProps['CONTROL TEMP']['value'],objProps['ACTIVE SETPT']['value'],objProps['REFRIG SOLENOID']['value'],objProps['DEFROST']['value']]);
+            }
+          }
+          $("#E2Status").proptable('render');
+        }
+    }
+    else {
+        $(".E2OfflineError").show();
+        $(".E2OfflineHide").hide();
+    }
+
+      pageSetTimeout(function() { updateStatusScreen(); }, 10000);
+
+    },
+    jsonError
+    );
+}
+
+
+$( "#statusAccordion" ).accordion( { heightStyle: "content",
+ {% if ctx.localhost %}
+    animate: false
+ {% else %}
+    animate: true
+ {% endif %}
+
+  } );
+
+updateStatusScreen();
+
+//# sourceURL=E2status.html
+
+</script>
+

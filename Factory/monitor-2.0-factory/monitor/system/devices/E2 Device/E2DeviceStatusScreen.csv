@@ -1,0 +1,21 @@
+Status Screen Data,,,,
+AppHeader,Suction Control,,,
+AppType,Enhanced Suction,162,,
+SglStatus,App Name,Name,,
+SglStatus,Suction Pressure =,FILTERED PRES,,
+SglStatus,Suction Set Point =,SUCT PRES SETPT,,
+DblStatus,Phase Loss =,PHASE LOSS,Capacity =,PERCENT USED
+SectHeader,Compressor Stages,,,
+StagesStatus,16,NumCompressorsProperty,COMP**,
+AppHeader,Condenser Control,,,
+AppType,Condenser,129,,
+SglStatus,App Name,Name,,
+SglStatus,Control Pressure = ,CTRL VAL OUT,,
+SglStatus,Pressure Set Point,CTRL VAL STPT,,
+DblStatus,Phase Loss =,PHASE LOSS,Capacity =,CONTROL PID
+SectHeader,Condenser Fans,,,
+StagesStatus,16,NumFansProperty,FAN OUT*,,,
+AppHeader,Circuit Control,,,,,
+AppType,StandardCircuit,131,,,,
+MultiTitle,Circuit Name,State,Temp,SetPt,REF,DEF
+MultiValue,Name,CIRCUIT STATE,CONTROL TEMP,ACTIVE SETPT,REFRIG SOLENOID,DEFROST

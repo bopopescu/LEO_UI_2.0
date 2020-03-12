@@ -1,0 +1,145 @@
+<style>
+#serviceAccordian{
+  margin: 10px;
+}
+</style>
+
+<div id="serviceAccordion" class="accordion">
+    <h3 id="serviceButtons">Technician Actions</h3>
+    <div>
+      <table>
+        <tr> <td><button id="ToNetworkStatus" style="margin-bottom:20px">Network Status</button></td> </tr>
+        <tr> <td><button id="ToE2AlarmLog" style="margin-bottom:20px">E2 Alarm Log</button></td> </tr>
+        <tr> <td><button id="ToEmailHistoryLog" style="margin-bottom:20px">Email History Log</button></td> </tr>
+        <tr> <td><button id="ToAuditLog" style="margin-bottom:20px">LEO Audit Log</button></td> </tr>
+        <tr> <td><button id="ResetToFactoryDefaults" style="margin-bottom:20px">Reset to Factory Defaults</button></td> </tr>
+        <tr> <td><button id="RebootSystem" style="margin-bottom:20px">Reboot System</button></td> </tr>
+        <!-- <tr> <td><button id="ToTestPage" style="margin-bottom:20px">Test Page</button></td> </tr> -->
+      </table>
+    </div>
+</div>
+
+<div id="ResetToFactoryConfirmDialog" title="Factory Reset">
+  <table style="width: 90%">
+    <tr><td>This will reset ALL settings back to their factory defaults.</td></tr>
+    <tr><td></td></tr>
+    <tr><td>Do you wish to continue with this function?</td></tr>
+  </table>
+</div>
+
+<div id="RebootSystemConfirmDialog" title="Reboot System">
+  <table style="width: 90%">
+    <tr><td>This will simply REBOOT the system. NO settings will be changed.</td></tr>
+    <tr><td></td></tr>
+    <tr><td>Do you wish to continue with this function?</td></tr>
+  </table>
+</div>
+
+<script>
+  pageWaiting('done')
+  var activeDeviceTypes = {{activeDeviceTypes|safe }};
+
+  // Hide the E2 button for the E2 Alarm logs if there are no E2s defined in the system.
+  if ( activeDeviceTypes.indexOf("E2 Device") < 0 ) {
+    document.getElementById('ToE2AlarmLog').style.display = 'none';
+  }
+
+$('#ToNetworkStatus').button({icons: { primary: "icon icon-check"}}).click(function (event) {
+  pageWaiting();
+  pageNetworkStatus();
+  event.preventDefault();
+  });
+
+$('#ToE2AlarmLog').button({icons: { primary: "icon icon-bell"}}).click(function (event) {
+  pageWaiting();
+  pageE2AlarmLog();
+  event.preventDefault();
+  });
+
+$('#ToEmailHistoryLog').button({icons: { primary: "icon icon-globe"}}).click(function (event) {
+  pageEmailHistory();
+  event.preventDefault();
+  });
+
+$('#ToAuditLog').button({icons: { primary: "icon icon-file-text-o"}}).click(function (event) {
+  pageAuditTrail();
+  event.preventDefault();
+  });
+
+$('#ResetToFactoryDefaults').button({icons: { primary: "icon icon-info-circle"}}).click(function (event) {
+  $("#ResetToFactoryConfirmDialog").dialog( "open" );
+  event.preventDefault();
+  });
+
+$('#ToTestPage').button({icons: { primary: "icon icon-file-text-o"}}).click(function (event) {
+  pageTestPage();
+  event.preventDefault();
+  });
+
+
+
+// Dialog Box Factory Reseet confirmation
+  $(function() {
+
+    $("#ResetToFactoryConfirmDialog").dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        draggable: false,
+        width: "auto",
+        buttons: {
+            "Yes - Clear ALL Settings and Reboot": function() { pageWaiting(); ResetToFactorySettings();$(this).dialog( "close" );  },
+            "No - Do Nothing": function() { $(this).dialog( "close" ); },
+          }
+     });
+
+  });
+
+  function ResetToFactorySettings() {
+    pageXHR = postJson({"jsonrpc":"2.0","id":"factoryreset","method":"factoryreset", "resetType":2},
+      function(data) {
+        setTimeout(function() { pageWaiting('done');}, 10000);
+      }, jsonError);
+      event.preventDefault();
+  }
+
+$('#RebootSystem').button({icons: { primary: "icon icon-info-circle"}}).click(function (event) {
+  $("#RebootSystemConfirmDialog").dialog( "open" );
+  event.preventDefault();
+  });
+
+  // Dialog Box Reboot System confirmation
+  $(function() {
+
+    $("#RebootSystemConfirmDialog").dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        draggable: false,
+        width: "auto",
+        buttons: {
+            "Yes - Reboot The System": function() { pageWaiting(); RebootSystem();$(this).dialog( "close" ); },
+            "No - Do Nothing": function() { $(this).dialog( "close" ); },
+          }
+     });
+
+  });
+
+  function RebootSystem() {
+    pageXHR = postJson({"jsonrpc":"2.0","id":"restartSystem","method":"restartSystem",
+      "params":[{"rebootType": "rebooted system from web interface", "rebootUser": "{{session.username}}" }] },
+      function(data) { setTimeout(function() { pageWaiting('done');}, 15000); }, jsonError);
+      event.preventDefault();
+	  location.reload();
+  }
+
+$( "#serviceAccordion" ).accordion( { heightStyle: "content",
+ {% if ctx.localhost %}
+    animate: false
+ {% else %}
+    animate: true
+ {% endif %}
+  } );
+
+//# sourceURL=pageService.html
+</script>

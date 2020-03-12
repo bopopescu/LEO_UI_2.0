@@ -1,0 +1,62 @@
+<!-- Standard Display page for LAE AR2-5C14W-BG devices. -->
+
+
+<html>
+ <script src="/static/local/js/statusLayout.js"></script>
+  <script src="/static/local/js/laeDevices.js"></script>
+    <link href="/static/local/css/laedevices.css" rel="stylesheet" />
+   <meta http-equiv="refresh" content="160" />
+<body>
+
+<div class = "ControllerTable" id="StatusTable">
+
+    <table id = "ctltbl" class="ctltbl" align="left" border="1px"  ><tbody>
+
+    <tr><th bgcolor="#2a652a" border="1px" margin="0px" align="center" font-color="white"><font color="white">Case Name </font></th></font><td align="center" id = "caseName"></td></tr>
+    <tr><th bgcolor="#2a652a" border="1px" margin="0px" align="center" style="font-color:white"><font color="white">Set Point </font></th></font><td align="center" id="wValue0" ></td></tr>
+    <tr><th bgcolor="#2a652a" border="1px" margin="0px" align="center" style="font-color:white"><font color="white">Case Temp </font></th></font><td align="center" id="wValue11" ></td></tr>
+    <tr><th bgcolor="#2a652a" border="1px" margin="0px" align="center" style="font-color:white"><font color="white">Case State </font></th></font><td align="center" id="caseVal" ></td></tr>
+    <tr><th bgcolor="#2a652a" border="1px" margin="0px" align="center"><font color="white"> &nbsp Controller Model &nbsp </font></th></font><td align="center" id ="deviceName" >&nbsp EVCO-EV3224 &nbsp </td></tr>
+	</tbody></table><br><br><br>
+
+	<img id="deviceImage" left="40px" src="static/uimg/sitemap/EVCO-EV3224.png" height="250" width="230" position="relative">
+</div>
+
+
+<div class="ControllerTable" id="InputOutputTable" float="left">
+
+    <table class="inptbl"  border="1px"   >
+    <th bgcolor="#2a652a" border="1px"  align="center"><font color="white">Input</font></th><th bgcolor="#2a652a" border="1px" margin="0px" align="center"><font color="white">Function</font></th><th bgcolor="#2a652a" border="1px" margin="0px" align="center"><font color="white">Value</font></th>
+    <tr><td border="1px"  align="center" id ="wPropName1"></td><td border="1px"  align="center" id ="wDispName1"></td><td border="1px"  align="center" id ="wValue1"></td></tr>
+    <tr><td border="1px"  align="center" id ="wPropName2"></td><td border="1px"  align="center" id ="wDispName2"></td><td border="1px"  align="center" id ="wValue2"></td></tr>
+    <tr><td border="1px"  align="center" id ="wPropName3"></td><td border="1px"  align="center" id ="wDispName3"></td><td border="1px"  align="center" id ="wValue3"></td></tr>
+    <tr><td border="1px"  align="center" id ="wPropName4"></td><td border="1px"  align="center" id ="wDispName4"></td><td border="1px"  align="center" id ="wValue4"></td></tr>
+    <tr><td border="1px"  align="center" id ="wPropName5"></td><td border="1px"  align="center" id ="wDispName5"></td><td border="1px"  align="center" id ="wValue5"></td></tr>
+    </table>
+
+    <table class="otptbl" align="left" border="1px" margin="100px" >
+    <th bgcolor="#2a652a" border="1px"  align="center"  color="white"><font color="white">Output </font></th><th bgcolor="#2a652a" border="1px" margin="0px" align="center"><font color="white">Function</font></th><th bgcolor="#2a652a" border="1px" margin="0px" align="center"><font color="white">Value</font></th>
+    <tr><td border="1px"  align="center" id ="wPropName6"></td><td border="1px"  align="center" id ="wDispName6"></td><td border="1px"  align="center" id ="wValue6"></td></tr>
+    <tr><td border="1px"  align="center" id ="wPropName7"></td><td border="1px"  align="center" id ="wDispName7"></td><td border="1px"  align="center" id ="wValue7"></td></tr>
+    <tr><td border="1px"  align="center" id ="wPropName8"></td><td border="1px"  align="center" id ="wDispName8"></td><td border="1px"  align="center" id ="wValue8"></td></tr>
+    <tr><td border="1px"  align="center" id ="wPropName9"></td><td border="1px"  align="center" id ="wDispName9"></td><td border="1px"  align="center" id ="wValue9"></td></tr>
+    </table>
+
+     <table class ="otptbl1" id="manualDefrostTbl" width="300px"  align="left" border="1px"  clear="both">
+     <th bgcolor="#2a652a" border="1px"  align="center" colspan= 3><font color="white" >Activate Manual Defrost </font></th>
+     <tr><td td border="1px"  align="center"><button id="manualDefrostOn">  &nbsp &nbsp &nbsp START &nbsp &nbsp &nbsp </button></td></tr>
+     </table>
+
+
+</div>
+
+</body>
+<script>
+var pageDevicesShowAlarmBitStatus = false;
+
+$("#CustomDeviceConfigureDiv").html( '<img src="static/devPluginUI/EVCO-EV3224/EVCO-EV3224.png" style="margin-left:10px;margin-top:10px" alt="">' );
+
+</script>
+
+</html>
+

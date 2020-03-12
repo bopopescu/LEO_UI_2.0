@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+
+<style>
+#zoomwrapper {
+  position: fixed;
+          z-index: 1;
+  background-color: white;
+  margin: 0;
+  border-top: 2px #dfd9c3 solid;
+  border-right: 2px #dfd9c3 solid;
+  box-sizing: border-box;
+  padding: 5px 25px 100px 25px;
+
+  border-top-right-radius: 8px;
+
+  display: -webkit-flexbox;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+
+}
+
+{% if mobileBrowser %}
+#enablezoom {
+          border-radius: 8px;
+
+          background-color: #ffffff;
+          border: 1px #a0a0a0 solid;
+          padding: 5px;
+          margin-right: 25px;
+
+  height: 1.5em;
+
+  display: -webkit-flexbox;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  justify-content: center;
+}
+{% endif %}
+
+#zoomoutbutton {
+          /*font-size: 0.8em;*/
+          position:relative;
+  margin: 0;
+}
+
+</style>
+
+<div id="sitemap" style="position: absolute; overflow: hidden; transform-origin: left top; top: 0px; left: 0px; transform: scale(1);"> </div>
+
+<div id='zoomwrapper'>
+
+
+{% if session.can_edit_system %}
+<!--
+<input type="checkbox" id="enableEdit"><label for="enableEdit">Edit</label>
+&nbsp;
+<button id='addTool' class="editTools">Add</button>
+&nbsp;
+<button id='deleteTool' class="editTools">Delete</button>
+&nbsp;
+<button id='alignTool' class="editTools">Align</button>
+&nbsp;
+&nbsp;
+<input type="checkbox" id="enableSelect" class="editTools"><label for="enableSelect">Select</label>
+&nbsp;
+-->
+{% endif %}
+
+{% if mobileBrowser %}
+<div id='enablezoom'><input type="checkbox" id="enablezoomcheckbox"><label for="enablezoomcheckbox">&nbsp;<b>Enable Zoom</b></label></div>
+{% endif %}
+<button id='zoomoutbutton'>Zoom Out</button>
+</div> <!-- zoomwrapper -->
+
+<script>
+
+(function() {
+
+  pageArticleNoOverflow();
+  // console.log("Starting pageTestStatus.html")
+
+  var sitemapdir = 'static/uimg/sitemap/';
+
+  var $sitemap = $('#sitemap');
+  var sitemapHeight = 0;
+  var sitemapWidth = 0;
+  var instruments = [];
+  var zoominfo = { zoomlist: [], default: {h: 0, w: 0}, view: {h: 0, w: 0, m: 1},
+    push: function(x, y, m) {
+      this.zoomlist.push({x: x, y: y, m: m });
+      return this.current();
+    },
+    pop: function() {
+      if (this.zoomlist.length > 0)
+        this.zoomlist.pop();
+      return this.current();
+    },
+    current: function() {
+      if (this.zoomlist.length > 0)
+        var cur = this.zoomlist[this.zoomlist.length - 1]
+      else
+        var cur = {x: 0, y: 0, m: 1 };
+      var view = this.view;
+      var ret = {
+              x: cur.x * view.w * cur.m,
+              y: cur.y * view.h * cur.m,
+              w: view.w * cur.m,
+              h: view.h * cur.m,
+              m: cur.m}
+      return ret;
+    },
+    isfullzoom: function() { return this.zoomlist.length == 0; },
+    getBestFitMultiplier: function(width, height, w, h) {
+      var m = 1;
+      var a = w / h;
+      if ((width / a) < height) m = width / w; else m = height / h;
+      return m;
+    },
+  }
+
+  function getArticleHeight(articleHeight) {
+    var $zoomwrapper = $('#zoomwrapper');
+    return articleHeight - $zoomwrapper.height();
+  }
+
+
+//*************************************************************************
+
+  var mode = 'view';
+  var zoomMode = 'zoom';
+
+{% if not mobileBrowser %}
+  {% if session.can_edit_system %}
+/*
+  $('.editTools').disable();
+
+  $('#enableEdit').button().click(function() {
+    if ($('#enableEdit').is(":checked")) {
+      mode = 'edit';
+      $('.editTools').enable().button('refresh');
+    } else {
+      mode = 'view';
+      zoomMode = 'zoom';
+      $('#enableSelect').prop('checked', false);
+      $('.editTools').disable().button('refresh');
+    }
+  });
+
+  $('#enableSelect').button().click(function() {
+    if ($('#enableSelect').is(":checked")) {
+      zoomMode = 'select';
+    } else {
+      zoomMode = 'zoom';
+    }
+  });
+
+  $('#addTool').button();
+  $('#deleteTool').button();
+  $('#alignTool').button();
+  */
+  {% endif %}
+{% endif %}
+
+
+
+
+  function selectEvent(x1, y1, x2, y2) {
+
+{% if not mobileBrowser %}
+  {% if session.can_edit_system %}
+    alert('selectEvent')
+  {% endif %}
+{% endif %}
+  }
+
+  function instrumentActivate(deviceName) {
+    if (mode == 'view')
+      pageDeviceRedirect(deviceName);
+    //else    // mode = 'edit'
+    //    ;  // this is where the
+
+  }
+
+//*************************************************************************
+
+  $sitemap.selection({
+    css: {border: '1px solid rgba(232, 207, 172, 0.8)', backgroundColor: 'rgba(232, 207, 172, 0.4)', zIndex: 1000       },
+    onSelect: function(x1, y1, x2, y2) {
+      if (zoomMode == 'zoom')
+        zoomEvent(x1, y1, x2, y2);
+      else
+          selectEvent(x1, y1, x2, y2);
+    },
+  });
+
+  function zoomEvent(x1, y1, x2, y2) {
+    $('#zoomoutbutton').enable();
+
+    x1 = Math.max(x1, 0);
+    y1 = Math.max(y1, 0);
+
+    var current = zoominfo.current();
+    var $article = $('#article');
+
+    var articleWidth = $article.width();
+    var articleHeight = getArticleHeight($article.height());
+
+    var m = zoominfo.getBestFitMultiplier(articleWidth, articleHeight, x2-x1, y2-y1) * current.m;
+    var x = (current.x + x1) / current.w;
+    var y = (current.y + y1) / current.h;
+
+    var current = zoominfo.push(x, y, m)
+    for (var idx = 0; idx < instruments.length; idx++)
+      instruments[idx].reposition(current.x, current.y, current.w, current.h, current.m);
+  }
+
+
+  function positionZoomWrapper() {
+    var $article = $('#article');
+    var articleoffset = $article.offset();
+    var articlebottom = articleoffset.top + $article.height() - 5;
+
+    var $zoomwrapper = $('#zoomwrapper');
+    $zoomwrapper.offset({ top: articlebottom - $zoomwrapper.height() - 5, left: articleoffset.left });
+  }
+
+
+  pageResize = function($article, articleHeight, articleWidth) {
+    positionZoomWrapper();
+
+    if (zoominfo.default.w == 0 || zoominfo.default.h == 0)
+      return;
+
+    $sitemap.width(articleWidth);
+    $sitemap.height(articleHeight);
+
+    articleHeight = getArticleHeight(articleHeight);
+
+    var m = zoominfo.getBestFitMultiplier(articleWidth, articleHeight, zoominfo.default.w, zoominfo.default.h);
+
+    zoominfo.view.w = zoominfo.default.w * m
+    zoominfo.view.h = zoominfo.default.h * m
+    zoominfo.view.m = m;
+
+    var current = zoominfo.current();
+    for (var idx = 0; idx < instruments.length; idx++)
+      instruments[idx].reposition(current.x, current.y, current.w, current.h, current.m);
+  }
+
+
+{% if mobileBrowser %}
+  $('#enablezoom').click(function(e) {
+    var $cb = $(this).first();
+    var c = ! $cb.is(':checked');
+    $cb.prop('checked', c);
+  });
+
+  $('#enablezoomcheckbox').change(function(e) {
+    var c = $(this).is(':checked');
+    $sitemap.data('selection').settings.touchEnabled = c;
+  }).click(function(e) { e.stopPropagation(); });
+{% endif %}
+
+  $('#zoomoutbutton').button({icons: { primary: "icon icon-search-minus"}}).disable();
+  $('#zoomoutbutton').click(function(event) {
+                    event.preventDefault();
+
+    var current = zoominfo.pop();
+    for (var idx = 0; idx < instruments.length; idx++)
+      instruments[idx].reposition(current.x, current.y, current.w, current.h, current.m);
+
+    if (zoominfo.isfullzoom())
+      $(this).disable();
+          });
+
+
+  function startDataCollection() {
+    var params = [];
+
+    for (var idx = 0; idx < instruments.length; idx++) {
+      valueList = instruments[idx].getValueList();
+      if (valueList != null)
+        params.push(valueList);
+    }
+
+    // console.log("getMultiDeviceInfo->", params )
+    pageXHR = postJson({"jsonrpc":"2.0","id":"getMultiDeviceInfo","method":"getMultiDeviceInfo","params": [ params ]},
+      function(data) {
+        if (data == null || data.result == null) return;
+
+        var result = data.result;
+
+        for (var idx = 0; idx < instruments.length; idx++)
+          instruments[idx].updateValues(result);
+
+        pageSetTimeout(function() { startDataCollection(); }, 10000);
+      },
+      jsonError
+      );
+  }
+
+
+
+  var init = function(data) {
+
+    Object.keys(data).forEach(function (key) {
+      var val = data[key];
+
+      if (key == 'size') {
+        zoominfo.default.w = val.w;
+        zoominfo.default.h = val.h;
+      } else if (key == 'instruments') {
+        for (var idx = 0; idx < val.length; idx++)
+          instruments.push(instrumentFactory(val[idx]));
+      }
+
+    });
+
+    for (var idx = 0; idx < instruments.length; idx++)
+      instruments[idx].initialize($sitemap);
+
+    // This is a hack for IE 11
+    setTimeout(function() { resizeArticle(); startDataCollection(); }, 1);
+
+    pageWaiting("done")
+  }
+
+  pageXHR = $.ajax({type: "GET", url: sitemapdir + "init.json?nocache=" + (new Date()).getTime(), // eliminates caching
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: init,
+      error: function() { $sitemap.html('No initialization file found.'); }
+
+  });
+
+
+//*************************************************************************
+
+  function instrImage(params) {
+    this.params = params;
+    this.$el = null;
+
+    this.reposition = function(x, y, w, h, m) {
+      this.$el.width(Math.round(w * this.params.w / 100.0));
+      this.$el.height(Math.round(h * this.params.h / 100.0));
+
+      var left = Math.round(w * this.params.x / 100.0 - x);
+      var top = Math.round(h * this.params.y / 100.0 - y);
+      this.$el.css( { left: left.toString() + "px", top: top.toString() + "px" } );
+    }
+
+    this.initialize = function($parent) {
+      this.$el = $('<image src="' + sitemapdir + this.params.name + '" style="position: absolute; z-index: -1;" />');
+      $parent.append(this.$el);
+    }
+
+    this.getValueList = function(result) { return null; }
+    this.updateValues = function(result) {}
+  }
+
+  function instrLabel(params) {
+    this.params = params;
+    this.defaultFontSize = 14;
+
+    this.reposition = function(x, y, w, h, m) {
+      var left = Math.round(w * this.params.x / 100.0 - x);
+      var top = Math.round(h * this.params.y / 100.0 - y);
+      var fontSize = this.defaultFontSize * m;
+      this.$el.css( { left: left.toString() + "px", top: top.toString() + "px", fontSize: fontSize + "px" } );
+    }
+
+    this.initialize = function($parent) {
+      this.$el = $('<div style="position: absolute; z-index: 1;" >' + params.text +  '</div>');
+      this.$el.css(params.css);
+      this.defaultFontSize = parseFloat(this.$el.css('font-size'));
+      $parent.append(this.$el);
+      this.$el.click(function() { instrumentActivate(deviceName); });
+      this.$el.show();
+    }
+
+    this.getValueList = function(result) { return null; }
+    this.updateValues = function(result) {}
+  }
+
+  function instrE2CaseState(params) {
+    this.params = params;
+    this.defaultWidth = 0;
+    this.defaultHeight = 0;
+
+    this.reposition = function(x, y, w, h, m) {
+      this.$el.width(Math.round(this.params.w / 100.0 * w));
+      this.$el.height(Math.round(this.params.h / 100.0 * h));
+      var left = Math.round(w * this.params.x / 100.0 - x);
+      var top = Math.round(h * this.params.y / 100.0 - y);
+      this.$el.css( { left: left.toString() + "px", top: top.toString() + "px" } );
+    }
+
+    this.initialize = function($parent) {
+      this.$el = $('<div style="position: absolute; z-index: 1; cursor: pointer; border: 1px solid black;" >&nbsp;</div>');
+      this.$el.css(this.params.css);
+      $parent.append(this.$el);
+
+      this.defaultWidth = this.$el.width();
+      this.defaultHeight = this.$el.height();
+
+      this.$el.hide();
+
+      var deviceName = this.params.device;
+    }
+
+    this.getValueList = function() {
+      return { device: params.device, values : ['Name','CASE TEMP STPT'] };
+    }
+
+    this.updateValues = function(result) {
+      // console.log( "Update Values->", this )
+
+      this.$el.fadeTo('slow', 1.0);
+
+      var device = result[params.device];
+      if (device != null) {
+
+        var online = true;
+        if (device.deviceInfo.online != 'undefined')
+          online = device.deviceInfo.online;
+
+        if (!online) {
+          // offline
+          this.$el.css( { "backgroundColor": "gray" } ).fadeTo('slow', 0.1).fadeTo('slow', 1.0);
+        }
+        else {
+          this.$el.css( { "backgroundColor": "green" } );
+        }
+        this.$el.attr('title', this.params.device + '-' + device.values['CASE TEMP STPT'].value);
+      }
+      this.$el.show();
+    }
+  }
+
+  //
+  // STATUS BLOCK
+  //
+  function instrStatusBlock(params) {
+    this.params = params;
+    this.defaultWidth = 0;
+    this.defaultHeight = 0;
+
+    // console.log( "instrStatusBlock->", params )
+
+    this.reposition = function(x, y, w, h, m) {
+      this.$el.width(Math.round(this.params.w / 100.0 * w));
+      this.$el.height(Math.round(this.params.h / 100.0 * h));
+      var left = Math.round(w * this.params.x / 100.0 - x);
+      var top = Math.round(h * this.params.y / 100.0 - y);
+      this.$el.css( { left: left.toString() + "px", top: top.toString() + "px" } );
+    }
+
+    this.initialize = function($parent) {
+      this.$el = $('<div style="position: absolute; z-index: 1; cursor: pointer; border: 1px solid black;" >&nbsp;</div>');
+      this.$el.css(this.params.css);
+      $parent.append(this.$el);
+
+      this.defaultWidth = this.$el.width();
+      this.defaultHeight = this.$el.height();
+
+      this.$el.hide();
+
+      var deviceName = this.params.device;
+      // On status screen, disable page transitions.
+      // this.$el.click(function() { instrumentActivate(deviceName); });
+    }
+
+    this.getValueList = function() {
+      return { device: params.device, values : [ params.properties ] };
+    }
+
+    this.updateValues = function(result) {
+      // console.log( "Update Values->", this )
+
+      this.$el.fadeTo('slow', 1.0);
+
+      var device = result[params.device];
+      if (device != null) {
+
+        var online = true;
+        if (device.deviceInfo.online != 'undefined')
+          online = device.deviceInfo.online;
+
+        if (!online) {
+          // offline
+          this.$el.css( { "backgroundColor": "gray" } ).fadeTo('slow', 0.1).fadeTo('slow', 1.0);
+        } else {
+          this.$el.css( { "backgroundColor": "green" } );
+        }
+        this.$el.attr('title', this.params.device + '-' + device.values['CASE TEMP STPT'].value);
+      }
+      this.$el.show();
+    }
+  }
+
+  instrumentFactory = function(params) {
+    switch(params.type) {
+      case 'image':
+        return new instrImage(params);
+      case 'label':
+        return new instrLabel(params);
+      case 'e2CaseState':
+        return new instrE2CaseState(params);
+      case 'statusBlock':
+        return new instrStatusBlock(params);
+    }
+  }
+
+
+
+}());
+
+//# sourceURL=pageTestStatus.html
+</script>
+

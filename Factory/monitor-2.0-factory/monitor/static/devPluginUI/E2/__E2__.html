@@ -1,0 +1,1386 @@
+<!-- This web page will be nested in the devices page for an E2 device -->
+
+<div id="deviceInformationTable">
+  <div class="E2OfflineStatus E2OfflineStatusShow">
+      <br>
+      <h2><p style="color:red;text-align: center;">E2 OFFLINE</p></h2>
+  </div>
+  <div class="E2DataNotReady E2DataNotReadyShow">
+      <br>
+      <h2><p style="color:royalblue;text-align: center;">Retrieving Data. Please Standby.</p></h2>
+  </div>
+  <div class="E2AppHeaders E2AppHeadersShow" style="display: none;">
+    <h2 id="circuitHeader">Standard Circuits</h2>
+        <table id="stdCircuit" class="deviceTable"></table>
+    <h2 id="xmcircuitHeader">XM Circuits</h2>
+        <table id="xmCircuit" class="deviceTable"></table>
+    <h2 id="enhSuctionHeader">Enhanced Suction</h2>
+        <table id="enhSuction" class="deviceTable"></table>
+    <h2 id="stdSuctionHeader">Suction Control</h2>
+        <table id="stdSuction" class="deviceTable"></table>
+    <h2 id="condenserHeader">Condenser</h2>
+        <table id="condenser" class="deviceTable"></table>
+    <h2 id="AHUHeader">AHU</h2>
+        <table id="AHU" class="deviceTable"></table>
+    <h2 id="ArtcRTUHeader">RTUs/ARTCs</h2>
+        <table id="ArtcRTU" class="deviceTable"></table>
+    <h2 id="ZoneHeader">Zones</h2>
+        <table id="Zone" class="deviceTable"></table>
+    <h2 id="HeatCoolHeader">Heat/Cool Control</h2>
+        <table id ="HeatCool" class="deviceTable"></table>
+    <h2 id="LightingHeader">Lighting Circuits</h2>
+        <table id="Lighting" class="deviceTable"></table>
+    <h2 id="TimeScheduleHeader">Time Schedules</h2>
+        <table id="TimeSchedule" class="deviceTable"></table>
+    <h2 id="AnalogSensorHeader">Analog Sensor Control</h2>
+        <table id="AnalogSensor" class="deviceTable"></table>
+    <h2 id="DigitalSensorHeader">Digital Sensor Control</h2>
+        <table id="DigitalSensor" class="deviceTable"></table>
+    <h2 id="RLDSHeader">RLDS</h2>
+        <table id="RLDS" class="deviceTable"></table>
+    <br><br>
+  </div>
+</div>
+
+<script>
+
+var enhSucComps = []
+var enhSucStatPropTblObj = []
+var stdSucComps = []
+var stdSucStatPropTblObj = []
+var condenser = []
+var E2AppInfo = []
+var E2Status = []
+var E2StaticCellInfo = []
+var _E2PropTableRender = true
+
+// TODO FUTURE OR YAML - var E2AppHeaders = [ { '162' : 'Enhanced Suction', 'hdrDivId':'enhSuctionHeader', 'statDivId':'enhSuction', 'appDivId':'enhSucStatus' } ]
+
+// console.log("Hit __E2__")
+
+// By default, do not show E2 Offline or waiting
+$(".E2OfflineStatusShow").hide();
+$(".E2DataNotReadyShow").hide();
+
+/**
+ * Return a timestamp with the format "m/d/yy h:MM:ss TT"
+ * @type {Date}
+ */
+
+// This funciton simply displays hours, minutes and seconds for timing purposes.
+function hlTiming() {
+// Create a date object with the current time
+  var now = new Date();
+
+// Create an array with the current hour, minute and second
+  var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
+
+// If seconds and minutes are less than 10, add a zero
+  for ( var i = 1; i < 3; i++ ) {
+    if ( time[i] < 10 ) {
+      time[i] = "0" + time[i];
+    }
+  }
+
+// Return the formatted string
+//  console.log( "hlTime: ", time.join(":") );
+  return time.join(":");
+}
+
+// This function will be called whenever the user selects a new device on the pageDevices page.
+// It allows us to sync up this page with the pageDevices page - if needed.
+function _funcNewDeviceName(deviceNameIn) {
+  // Start new device information.
+//  console.log("__E2__ - CALL (2) initE2DeviceInfo. Time:", hlTiming() );
+//  initE2DeviceInfo(deviceNameIn)
+}
+
+// This function will be called instead of the pageDevices getOutputStatus.
+// It allows us to sync up this page with the pageDevices page
+function _funcNewValueData() {
+//   console.log("__E2__ - Hello from _funcNewValueData. Time:", hlTiming() );
+}
+
+function createDynamicProptables() {
+//  console.log( "__E2__ - Hit createDynamicProptables. Time:", hlTiming() )
+  if ( E2AppInfo != null ) {
+
+
+    // Standard Ciruit - ONLY 1 Table for all circuits
+    if ( E2AppInfo['cellTypeAppList'][131].length > 0 ) {
+
+      appTypeDivID = "#stdCircuit"  // Must match DIV name above in HTML above.
+      appDivId = "stdCircuitStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Circuit Name'},
+                  { readonly: true, header: 'State'},
+                  { readonly: true, header: 'Temp'},
+                  { readonly: true, header: 'SETPT'},
+                  { readonly: true, header: 'REF'},
+                  { readonly: true, header: 'DEF' }]
+      });
+    }
+    else {
+      $('#circuitHeader').hide();
+    }
+
+
+    // XM Ciruit - ONLY 1 Table for all circuits
+    if ( E2AppInfo['cellTypeAppList'][399].length > 0 ) {
+
+      appTypeDivID = "#xmCircuit"  // Must match DIV name above in HTML above.
+      appDivId = "xmCircuitStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Circuit Name'},
+                  { readonly: true, header: 'State'},
+                  { readonly: true, header: 'Temp'},
+                  { readonly: true, header: 'SETPT'},
+                  { readonly: true, header: 'REF'},
+                  { readonly: true, header: 'DEF' }]
+      });
+    }
+    else {
+      $('#xmcircuitHeader').hide();
+    }
+
+
+    // Enhanced Suction Control
+    var appIdx;
+    var numApps = E2AppInfo['cellTypeAppList'][162].length
+    if ( numApps > 0 ) {
+      for ( appIdx = 0; appIdx < numApps; ++appIdx ) {
+        // set up names for Enhanced suction group status
+        appTypeDivID = "#enhSuction"  // Must match DIV name above in HTML above.
+        appDivId = "enhSucStatus"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the status proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable('init', { name: appDivId,
+          data: null,
+          columns: [{ readonly: true, header: 'Name'},
+                    { readonly: true, header: 'Pressure'},
+                    { readonly: true, header: 'SETPT' },
+                    { readonly: true, header: 'Phase Loss'},
+                    { readonly: true, header: 'Capacity' } ]
+        });
+
+  //      console.log( "Create proptable:", propTableID )
+
+        // set up names for Enhanced suction group status
+        appDivId = "enhSucComps"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the comps proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div><br></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // compressor proptable layout
+        $(propTableID).proptable('init', { name: appDivId,
+          data: null,
+          columns:[ { readonly: true, header: 'C1' }, { readonly: true, header: 'C2' }, { readonly: true, header: 'C3' }, { readonly: true, header: 'C4' },
+                    { readonly: true, header: 'C5' }, { readonly: true, header: 'C6' }, { readonly: true, header: 'C7' }, { readonly: true, header: 'C8' },
+                    { readonly: true, header: 'C9' }, { readonly: true, header: 'C10'}, { readonly: true, header: 'C11'}, { readonly: true, header: 'C12'},
+                    { readonly: true, header: 'C13'}, { readonly: true, header: 'C14'}, { readonly: true, header: 'C15'}, { readonly: true, header: 'C16'} ]
+        });
+
+  //      console.log( "Create proptable:", propTableID )
+      }
+    }
+    else {
+      $('#enhSuctionHeader').hide();
+    }
+
+
+    // Standard Suction Control
+    var numApps = E2AppInfo['cellTypeAppList'][128].length
+    if ( numApps > 0 ) {
+      for ( appIdx = 0; appIdx < numApps; ++appIdx ) {
+        // set up names for Standard suction Control group status
+        appTypeDivID = "#stdSuction"  // Must match DIV name above in HTML above.
+        appDivId = "stdSucStatus"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the status proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable('init', { name: appDivId,
+          data: null,
+          columns: [{ readonly: true, header: 'Name'},
+                    { readonly: true, header: 'Pressure'},
+                    { readonly: true, header: 'SETPT' },
+                    { readonly: true, header: 'Phase Loss'},
+                    { readonly: true, header: 'Capacity' } ]
+        });
+
+  //      console.log( "Create proptable:", propTableID )
+
+        // set up names for standard suction control group status
+        appDivId = "stdSucComps"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the comps proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div><br></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // compressor proptable layout
+        $(propTableID).proptable('init', { name: appDivId,
+          data: null,
+          columns:[ { readonly: true, header: 'C1' }, { readonly: true, header: 'C2' }, { readonly: true, header: 'C3' }, { readonly: true, header: 'C4' },
+                    { readonly: true, header: 'C5' }, { readonly: true, header: 'C6' }, { readonly: true, header: 'C7' }, { readonly: true, header: 'C8' },
+                    { readonly: true, header: 'C9' }, { readonly: true, header: 'C10'}, { readonly: true, header: 'C11'}, { readonly: true, header: 'C12'},
+                    { readonly: true, header: 'C13'}, { readonly: true, header: 'C14'}, { readonly: true, header: 'C15'}, { readonly: true, header: 'C16'} ]
+        });
+
+  //      console.log( "Create proptable:", propTableID )
+      }
+    }
+    else {
+      $('#stdSuctionHeader').hide();
+    }
+
+
+    // Condenser Control
+    var numApps = E2AppInfo['cellTypeAppList'][129].length
+    if ( numApps > 0 ) {
+      for ( appIdx = 0; appIdx < E2AppInfo['cellTypeAppList'][129].length; ++appIdx ) {
+        // set up names for condenser Control status
+        appTypeDivID = "#condenser" // Must match DIV name above in HTML above.
+        appDivId = "condStatus"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the status proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable({ name: appDivId,
+          data: null,
+          columns: [{ readonly: true, header: 'Name'},
+                    { readonly: true, header: 'Cond Type'},
+                    { readonly: true, header: 'Control Type'},
+                    { readonly: true, header: 'Fan Type'},
+                    { readonly: true, header: 'OAT'}]
+                    });
+
+//      console.log( "Create proptable:", propTableID )
+
+        // set up names for condenser control additional status
+        appDivId = "condInputs"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the status proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable({ name: appDivId,
+          data: null,
+          columns: [{ readonly: true, header: 'Liq LVL'},
+                    { readonly: true, header: 'Press'},
+                    { readonly: true, header: 'Press SETPT'},
+                    { readonly: true, header: 'Temp'},
+                    { readonly: true, header: 'Temp SETPT'},
+                    { readonly: true, header: 'Discharge'}]
+                    });
+
+//      console.log( "Create proptable:", propTableID )
+
+        // set up names for condenser control additional status
+        appDivId = "condOutputs"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the status proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable({ name: appDivId,
+          data: null,
+          columns: [{ readonly: true, header: 'Capacity'},
+                    { readonly: true, header: 'Split'},
+                    { readonly: true, header: 'Evap Pump1'},
+                    { readonly: true, header: 'Evap Pump2'},
+                    { readonly: true, header: 'VS Fan'}]
+                    });
+
+//      console.log( "Create proptable:", propTableID )
+
+        // set up names for condenser control status
+        appDivId = "condFans"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the fans proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div><br></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable('init', { name: appDivId,
+          data: null,
+          columns:[ { readonly: true, header: 'F1' }, { readonly: true, header: 'F2' }, { readonly: true, header: 'F3' }, { readonly: true, header: 'F4' },
+                    { readonly: true, header: 'F5' }, { readonly: true, header: 'F6' }, { readonly: true, header: 'F7' }, { readonly: true, header: 'F8' },
+                    { readonly: true, header: 'F9' }, { readonly: true, header: 'F10'}, { readonly: true, header: 'F11'}, { readonly: true, header: 'F12'} ]
+        });
+  //      console.log( "Create proptable:", propTableID )
+      }
+    }
+    else {
+      $('#condenserHeader').hide();
+    }
+
+
+    // AHU - ONLY 1 Table for all
+    if ( E2AppInfo['cellTypeAppList'][134].length > 0 ) {
+
+      appTypeDivID = "#AHU"  // Must match DIV name above in HTML above.
+      appDivId = "AHUStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Name'},
+                  { readonly: true, header: 'Space Temp'},
+                  { readonly: true, header: 'Occupany'},
+                  { readonly: true, header: 'Setpoint'},
+                  { readonly: true, header: 'Fan'},
+                  { readonly: true, header: 'Heat On'},
+                  { readonly: true, header: 'Cool On'}
+                  ]
+      });
+    }
+    else {
+      $('#AHUHeader').hide();
+    }
+
+
+    // ARTC/RTU - ONLY 1 Table for all
+    if ( E2AppInfo['cellTypeAppList'][142].length > 0 ) {
+      appTypeDivID = "#ArtcRTU"  // Must match DIV name above in HTML above.
+      appDivId = "ArtcRTUStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'RTU Name'},
+                  { readonly: true, header: 'Space Temp'},
+                  { readonly: true, header: 'Occupancy'},
+                  { readonly: true, header: 'Fan'},
+                  { readonly: true, header: 'Heat1'},
+                  { readonly: true, header: 'Heat2'},
+                  { readonly: true, header: 'Cool1'},
+                  { readonly: true, header: 'Cool2' },
+                  { readonly: true, header: 'Status' }
+                  ]
+      });
+    }
+    else {
+      $('#ArtcRTUHeader').hide();
+    }
+
+
+    // AHU ZONE - ONLY 1 Table for all
+    if ( E2AppInfo['cellTypeAppList'][135].length > 0 ) {
+
+      appTypeDivID = "#Zone"  // Must match DIV name above in HTML above.
+      appDivId = "ZoneStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Name'},
+                  { readonly: true, header: 'Zone Temp'},
+                  { readonly: true, header: 'Zone Humidity'},
+                  { readonly: true, header: 'Occupancy'},
+                  { readonly: true, header: 'Cool SP'},
+                  { readonly: true, header: 'Heat SP'}
+                  ]
+      });
+    }
+    else {
+      $('#ZoneHeader').hide();
+    }
+
+
+    // HeatCool Control
+    var numApps = E2AppInfo['cellTypeAppList'][85].length
+    if ( numApps > 0 ) {
+      for ( appIdx = 0; appIdx < E2AppInfo['cellTypeAppList'][85].length; ++appIdx ) {
+        // set up names for HeatCool Control status
+        appTypeDivID = "#HeatCool" // Must match DIV name above in HTML above.
+        appDivId = "HeatCoolStatus"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the status proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable({ name: appDivId,
+          data: null,
+          columns: [
+                    { readonly: true, header: 'Name'},
+                    { readonly: true, header: 'Phase Loss'},
+                    { readonly: true, header: 'Space Temp'},
+                    { readonly: true, header: 'SETPT'},
+                    { readonly: true, header: 'Heat/Cool'},
+                    { readonly: true, header: 'OCC State'},
+                    { readonly: true, header: 'Fan'}]
+                    });
+
+//      console.log( "Create proptable:", propTableID )
+
+        // set up names for HeatCool Control status
+
+        appDivId = "HeatStage"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the Heat Stages proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div><br></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable('init', { name: appDivId,
+          data: null,
+
+          columns:[ { readonly: true, header: 'HT STG1' }, { readonly: true, header: 'HT STG2' }, { readonly: true, header: 'HT STG3' }, { readonly: true, header: 'HT STG4' },
+                    { readonly: true, header: 'HT STG5' }, { readonly: true, header: 'HT STG6' }, { readonly: true, header: 'HT STG7' }, { readonly: true, header: 'HT STG8' }
+                     ]
+        });
+  //      console.log( "Create proptable:", propTableID )
+  // set up names for HeatCool Control status
+        appDivId = "CoolStage"+appIdx.toString();
+        propTableID = "#"+appDivId
+
+        // Add DIV for the Cool Stages proptable
+        strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div><br></td></tr>"
+        $(appTypeDivID).append(strHtmlInsert)
+
+        // proptable layout
+        $(propTableID).proptable('init', { name: appDivId,
+          data: null,
+          columns:[ { readonly: true, header: 'CL STG1' }, { readonly: true, header: 'CL STG2' }, { readonly: true, header: 'CL STG3' }, { readonly: true, header: 'CL STG4' },
+                    { readonly: true, header: 'CL STG5' }, { readonly: true, header: 'CL STG6' }, { readonly: true, header: 'CL STG7' }, { readonly: true, header: 'CL STG8' }]
+        });
+  
+      }
+    }
+    else {
+      $('#HeatCoolHeader').hide();
+    }
+
+
+    // Lighting - ONLY 1 Table for all
+    if ( E2AppInfo['cellTypeAppList'][98].length > 0 ) {
+
+      appTypeDivID = "#Lighting"  // Must match DIV name above in HTML above.
+      appDivId = "LightingStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Name'},
+                  { readonly: true, header: 'Lights'},
+                  { readonly: true, header: 'Sched Output'}
+                  ]
+      });
+    }
+    else {
+      $('#LightingHeader').hide();
+    }
+
+
+    // Time Schedule- ONLY 1 Table for all
+    if ( E2AppInfo['cellTypeAppList'][80].length > 0 ) {
+
+      appTypeDivID = "#TimeSchedule"  // Must match DIV name above in HTML above.
+      appDivId = "TimeScheduleStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Name'},
+                  { readonly: true, header: 'Output'},
+                  { readonly: true, header: 'Sched Output'},
+                  { readonly: true, header: 'Bypass State'}
+                  ]
+      });
+    }
+    else {
+      $('#TimeScheduleHeader').hide();
+    }
+
+
+    // Analog Sensor Control- ONLY 1 Table for all
+    if ( E2AppInfo['cellTypeAppList'][94].length > 0 ) {
+
+      appTypeDivID = "#AnalogSensor"  // Must match DIV name above in HTML above.
+      appDivId = "AnalogSensorStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Name'},
+                  { readonly: true, header: 'Control Value'},
+                  { readonly: true, header: 'Command Out'}
+                  ]
+      });
+    }
+    else {
+      $('#AnalogSensorHeader').hide();
+    }
+
+
+    // Digital Sensor Control - ONLY 1 Table for all
+    if ( E2AppInfo['cellTypeAppList'][96].length > 0 ) {
+
+      appTypeDivID = "#DigitalSensor"  // Must match DIV name above in HTML above.
+      appDivId = "DigitalSensorStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Name'},
+                  { readonly: true, header: 'Control Value'},
+                  { readonly: true, header: 'Command Out'}
+                  ]
+      });
+    }
+    else {
+      $('#DigitalSensorHeader').hide();
+    }
+
+
+    // RLDS Control
+    if ( E2AppInfo['cellTypeAppList'][342].length > 0 ) {
+
+      appTypeDivID = "#RLDS"  // Must match DIV name above in HTML above.
+      appDivId = "RLDSStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+      // proptable RLDS Devivce Status
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Alarm'},
+                  { readonly: true, header: 'Online Status'},
+                  { readonly: true, header: 'Mode'},
+                  { readonly: true, header: 'State'}
+                  ]
+      });
+
+      appDivId = "RLDSZoneStatus";
+      propTableID = "#"+appDivId
+
+      // Add DIV for the status proptable
+      strHtmlInsert = "<br><tr><td><div id=\""+appDivId+"\"></div></td></tr>"
+      $(appTypeDivID).append(strHtmlInsert)
+
+            // proptable multiple zone layout
+      $(propTableID).proptable('init', { name: appDivId,
+        data: null,
+        columns: [{ readonly: true, header: 'Name'},
+                  { readonly: true, header: 'PPM'}
+                  ]
+      });
+    }
+    else {
+      $('#RLDSHeader').hide();
+    }
+  }
+}
+
+
+function _funcRefreshValues(deviceNameIn) {
+//  console.log( "__E2__ - Hit _funcRefreshValues: ", deviceNameIn, "Time: ", hlTiming() )
+//  console.log( "__E2__ - Hit _funcRefreshValues Online: ", _deviceOnline, "Name", deviceNameIn )
+  returnRefreshRate = 10000 // How often should pageDevices call _funcRefreshValues?
+
+  $("#DeviceStatus").hide();  // Always hide the controller status from pageDevices.html when showing E2 status.
+
+  // We will handle the hiding of status sections from the variable _deviceOnline set in pageDevice.html
+  // console.log( "E2 deviceonline:", _deviceOnline )
+  if ( _deviceOnline != null ) {
+    if ( _deviceOnline > 0 ) {
+      // online
+      $(".E2OfflineStatusShow").hide();
+      $(".E2AppHeadersShow").show();
+    } else {
+      $(".E2OfflineStatusShow").show();
+      $(".E2AppHeadersShow").hide();
+    }
+  } else {
+    // unknown. Assume offline
+    $(".E2OfflineStatusShow").show();
+    $(".E2AppHeadersShow").hide();
+  }
+
+  pageXHR = postJson({"jsonrpc":"2.0","id":"E2Status+99","method":"getDeviceDataValues","params":deviceNameIn},
+    function(data) {
+
+      var result = data;
+      // console.log( "funcRefresh->", data )
+      if ( Object.keys( result ).length > 0 ) {
+
+        var appIdx;
+
+        // Got valid data. Make sure "waiting" div is hidden.
+        $(".E2DataNotReadyShow").hide();
+
+
+        // STANDARD CIRCUIT
+        appNameList = E2AppInfo['cellTypeAppList'][131];
+        if ( appNameList.length > 0 ) {
+          // Standard Circuits are done differently. One single prop table contains list of standard circuit applications.
+          propTableID = "#stdCircuitStatus";              // Must match appDivId in createDynamicProptables
+          stdCircuitProps = ['Name', 'CIRCUIT STATE', 'CONTROL TEMP', 'ACTIVE SETPT', 'REFRIG SOLENOID', 'DEFROST'];
+
+          propVals = [];
+          var iRow = 0;
+          // We want to color code a few properties. Defrost = orange when on.
+          // Find the index of the defrost property.
+          iDefrost = stdCircuitProps.indexOf( 'DEFROST' );
+
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, stdCircuitProps, result ) );
+            //console.log(propVals)
+
+            if ( propVals[iRow][iDefrost] == "On" ) {
+              // Put the value in orange.
+              $(propTableID).proptable('setCustomCss', iRow, iDefrost, defrostOncss );
+            }
+            else if ( propVals[iRow][iDefrost] == "Off" ) {
+              $(propTableID).proptable('setCustomCss', iRow, iDefrost, defrostOffcss );
+            }
+            iRow = iRow + 1;
+          }
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        // XM CIRCUIT
+        appNameList = E2AppInfo['cellTypeAppList'][399];
+        if ( appNameList.length > 0 ) {
+          // XM Circuits are done differently. One single prop table contains list of xm circuit applications.
+          propTableID = "#xmCircuitStatus";              // Must match appDivId in createDynamicProptables
+          xmCircuitProps = ['Name', 'CIRCUIT STATE', 'CONTROL TEMP', 'ACTIVE SETPT', 'REFRIG ACT', 'DEFROST ACT'];
+
+          propVals = [];
+          var iRow = 0;
+          // We want to color code a few properties. Defrost = orange when on.
+          // Find the index of the defrost property.
+          iDefrost = xmCircuitProps.indexOf( 'DEFROST ACT' );
+
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, xmCircuitProps, result ) );
+
+            if ( propVals[iRow][iDefrost] == "On" ) {
+              // Put the value in orange.
+              $(propTableID).proptable('setCustomCss', iRow, iDefrost, defrostOncss );
+            }
+            else if ( propVals[iRow][iDefrost] == "Off" ) {
+              $(propTableID).proptable('setCustomCss', iRow, iDefrost, defrostOffcss );
+            }
+            iRow = iRow + 1;
+          }
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        // ENHANCED SUCTION GROUPS
+        appNameList = E2AppInfo['cellTypeAppList'][162]
+        if ( appNameList.length > 0 ) {
+          enhSucProps = [ 'Name', 'FILTERED PRES', 'CUR PRES SETPT', 'PHASE LOSS', 'PERCENT USED' ];
+          enhSucCompProps = ['STAGE OUT1', 'STAGE OUT2', 'STAGE OUT3', 'STAGE OUT4', 'STAGE OUT5', 'STAGE OUT6',
+                             'STAGE OUT7', 'STAGE OUT8', 'STAGE OUT9', 'STAGE OUT10', 'STAGE OUT11', 'STAGE OUT12',
+                             'STAGE OUT13', 'STAGE OUT14', 'STAGE OUT15', 'STAGE OUT16' ];
+  //        console.log( "AppNameList = ", appNameList, "Length = ", appNameList.length )
+
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            strAppIdx = appIdx.toString()
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            propVals = [];
+            propVals.push( buildPropList( appName, enhSucProps, result ) )
+//            console.log( "PropVals:", propVals )
+
+            // Push all control values to update the proptable.
+            propTableID = "#enhSucStatus"+strAppIdx         // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propVals );
+            $(propTableID).proptable('render');
+
+            // Fill the propVals with all the COMPRESSOR STATE values for the properties in the props list.
+            propVals = buildPropList( appName, enhSucCompProps, result )
+            propValData = [];
+            propValData.push( propVals )
+            $(propTableID).proptable('render');
+
+            // Push all control values to update the proptable.
+            propTableID = "#enhSucComps"+strAppIdx         // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propValData );
+
+            // Set colors for off / on
+            var stageOncss = { backgroundColor: '#B6E69D' };
+            var stageOffcss = { backgroundColor: '#D4D8D6' };
+            var stageNonecss = { backgroundColor: '#FFFFFF' };
+
+            // Determine number of compressors used
+            numActiveCompsProp = appName + ":" + 'Number - Stages'
+            numActiveComps = result[numActiveCompsProp]
+            startActiveCompPropIndex = 0
+            lastCompActivePropIndex = numActiveComps + startActiveCompPropIndex
+
+            // Loop through ALL stage related columns - make them green (on), white (off) or hidden.
+            for ( var iCol = startActiveCompPropIndex; iCol < startActiveCompPropIndex + 16; iCol++ ) {
+
+              if ( iCol >= lastCompActivePropIndex ) {
+                // Configure hidden for unused columns of compressors
+                $(propTableID).proptable('addColumnOption', iCol, 'hidden', true );
+              }
+              else if ( propVals[iCol] == "On" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, stageOncss );
+              }
+              else if ( propVals[iCol] == "Off" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, stageOffcss );
+              }
+              else if ( propVals[iCol] == "Notact" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, stageNonecss );
+              }
+            }
+            $(propTableID).proptable('render');
+          }
+        }
+
+
+        // STANDARD SUCTION CONTROL GROUPS
+        appNameList = E2AppInfo['cellTypeAppList'][128]
+        if ( appNameList.length > 0 ) {
+          stdSucProps = [ 'Name', 'SUCT PRES OUT', 'CUR PRESS SETPT', 'PHASE LOSS', 'PERCENT USED' ];
+          stdSucCompProps = ['COMP1', 'COMP2', 'COMP3', 'COMP4', 'COMP5', 'COMP6',
+                             'COMP7', 'COMP8', 'COMP9', 'COMP10', 'COMP11', 'COMP12',
+                             'COMP13', 'COMP14', 'COMP15', 'COMP16' ];
+  //        console.log( "AppNameList = ", appNameList, "Length = ", appNameList.length )
+
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            strAppIdx = appIdx.toString()
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            propVals = [];
+            propVals.push( buildPropList( appName, stdSucProps, result ) )
+//            console.log( "PropVals:", propVals )
+
+            // Push all control values to update the proptable.
+            propTableID = "#stdSucStatus"+strAppIdx         // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propVals );
+            $(propTableID).proptable('render');
+
+            // Fill the propVals with all the COMPRESSOR STATE values for the properties in the props list.
+            propVals = buildPropList( appName, stdSucCompProps, result )
+            propValData = [];
+            propValData.push( propVals )
+            $(propTableID).proptable('render');
+
+            // Push all control values to update the proptable.
+            propTableID = "#stdSucComps"+strAppIdx         // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propValData );
+
+            // Set colors for off / on
+            var stageOncss = { backgroundColor: '#B6E69D' };
+            var stageOffcss = { backgroundColor: '#D4D8D6' };
+            var stageNonecss = { backgroundColor: '#FFFFFF' };
+
+            // Determine number of compressors used
+            numActiveCompsProp = appName + ":" + 'Num of Stages'
+            numActiveComps = result[numActiveCompsProp]
+            startActiveCompPropIndex = 0
+            lastCompActivePropIndex = numActiveComps + startActiveCompPropIndex
+
+            // Loop through ALL stage related columns - make them green (on), white (off) or hidden.
+            for ( var iCol = startActiveCompPropIndex; iCol < startActiveCompPropIndex + 16; iCol++ ) {
+
+              if ( iCol >= lastCompActivePropIndex ) {
+                // Configure hidden for unused columns of compressors
+                $(propTableID).proptable('addColumnOption', iCol, 'hidden', true );
+              }
+              else if ( propVals[iCol] == "On" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, stageOncss );
+              }
+              else if ( propVals[iCol] == "Off" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, stageOffcss );
+              }
+              else if ( propVals[iCol] == "Notact" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, stageNonecss );
+              }
+            }
+            $(propTableID).proptable('render');
+          }
+        }
+
+
+        // CONDENSER
+        appNameList = E2AppInfo['cellTypeAppList'][129]
+        if ( appNameList.length > 0 ) {
+          condProps = [ 'Name', 'Condenser Type', 'Control Type', 'Fan Type', 'AMB TEMP IN' ];
+          condInputsProps = [ 'LIQUID LEVEL','CTRL VAL OUT', 'CTRL VAL STPT', 'T CTRL VAL OUT', 'T CTRL VAL STPT', 'DISCHARGE OUT' ];
+          condOutputsProps = [ 'CONTROL PID', 'SPLIT VALVE', 'EVAP PUMP1', 'EVAP PUMP2', 'VS FAN OUT' ];
+          condFanProps = ['FAN OUT1', 'FAN OUT2', 'FAN OUT3', 'FAN OUT4', 'FAN OUT5', 'FAN OUT6',
+                          'FAN OUT7', 'FAN OUT8', 'FAN OUT9', 'FAN OUT10', 'FAN OUT11', 'FAN OUT12' ];
+  //        console.log( "AppNameList = ", appNameList, "Length = ", appNameList.length )
+
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            strAppIdx = appIdx.toString()
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            propVals = [];
+            propVals.push( buildPropList( appName, condProps, result ) )
+//            console.log( "PropVals:", propVals )
+
+            // Push all control values to update the proptable.
+            propTableID = "#condStatus"+strAppIdx               // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propVals );
+            $(propTableID).proptable('render');
+
+            // Fill the propVals with all the status values for the properties in the props list.
+            propVals = [];
+            propVals.push( buildPropList( appName, condInputsProps, result ) )
+//            console.log( "PropVals:", propVals )
+
+            // Push all control values to update the proptable.
+            propTableID = "#condInputs"+strAppIdx               // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propVals );
+            $(propTableID).proptable('render');
+
+            // Fill the propVals with all the status values for the properties in the props list.
+            propVals = [];
+            propVals.push( buildPropList( appName, condOutputsProps, result ) )
+//            console.log( "PropVals:", propVals )
+
+            // Push all control values to update the proptable.
+            propTableID = "#condOutputs"+strAppIdx               // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propVals );
+            $(propTableID).proptable('render');
+
+            // Fill the propVals with all the CONDENSER STATE values for the properties in the props list.
+            propVals = buildPropList( appName, condFanProps, result )
+            propValData = [];
+            propValData.push( propVals )
+
+            // Push all control values to update the proptable.
+            propTableID = "#condFans"+strAppIdx             // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propValData );
+            $(propTableID).proptable('render');
+
+            // Set colors for off / on
+            var fanOncss = { backgroundColor: '#B6E69D' };
+            var fanOffcss = { backgroundColor: '#D4D8D6' };
+            var fanNonecss = { backgroundColor: '#FFFFFF' };
+
+            // Determine number of fans used
+            numActiveFansProp = appName + ":" + 'Number of Fans'
+            numActiveFans = result[numActiveFansProp]
+            startActiveFanPropIndex = 0
+            lastFanActivePropIndex = numActiveFans + startActiveFanPropIndex
+
+            // Loop through ALL fan related columns - make them green (on), white (off) or hidden.
+            for ( var iCol = startActiveFanPropIndex; iCol < startActiveFanPropIndex + 12; iCol++ ) {
+
+              if ( iCol >= lastFanActivePropIndex ) {
+                // Configure hidden for unused columns of fans
+                $(propTableID).proptable('addColumnOption', iCol, 'hidden', true );
+              }
+              else if ( propVals[iCol] == "On" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, fanOncss );
+              }
+              else if ( propVals[iCol] == "Off" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, fanOffcss );
+              }
+              else if ( propVals[iCol] == "Notact" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, fanNonecss );
+              }
+            }
+            $(propTableID).proptable('render');
+          }
+        }
+
+
+        // AHU
+        appNameList = E2AppInfo['cellTypeAppList'][134]
+        if ( appNameList.length > 0 ) {
+          // Standard Circuits are done differently. One single prop table contains list of standard circuit applications.
+          propTableID = "#AHUStatus"               // Must match appDivId in createDynamicProptables
+          appProps = ['Name', 'SPACE TEMP OUT', 'OCC STATE', 'ACTIVE SETPT',  'FAN STATUS', 'HEAT STAGE1', 'COOL STAGE1'];
+
+          propVals = [];
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, appProps, result ) )
+          }
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        // ARTC/RTUS
+        appNameList = E2AppInfo['cellTypeAppList'][142]
+        if ( appNameList.length > 0 ) {
+          // Standard Circuits are done differently. One single prop table contains list of standard circuit applications.
+          propTableID = "#ArtcRTUStatus"               // Must match appDivId in createDynamicProptables
+          appProps = ['Name', 'CONTROL TEMP', 'OCCUPANCY', 'FAN', 'HEAT1', 'HEAT2', 'COOL1', 'COOL2', 'GEN STATUS'];
+
+          propVals = [];
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, appProps, result ) )
+          }
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        // AHU ZONE
+        appNameList = E2AppInfo['cellTypeAppList'][135]
+        if ( appNameList.length > 0 ) {
+          // Standard Circuits are done differently. One single prop table contains list of standard circuit applications.
+          propTableID = "#ZoneStatus"               // Must match appDivId in createDynamicProptables
+          appProps = ['Name', 'ZONE TEMP OUT', 'ZONE HUM OUT', 'OCC STATE', 'ACTIVE CL STPT', 'ACTIVE HT STPT'];
+
+          propVals = [];
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, appProps, result ) )
+          }
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        //Heat Cool CONTROL
+        appNameList = E2AppInfo['cellTypeAppList'][85]
+        if ( appNameList.length > 0 ) {
+          HeatCoolProps = [ 'Name','AC PHASE LOSS','SPACE TEMP','2059','HEAT/COOL Mode','OCC STATE','FAN OUT'];
+          HeatStageProps = ['HEAT STAGE1', 'HEAT STAGE2', 'HEAT STAGE3', 'HEAT STAGE4', 'HEAT STAGE5', 'HEAT STAGE6',
+                          'HEAT STAGE7', 'HEAT STAGE8'];
+          CoolStageProps = ['COOL STAGE1', 'COOL STAGE2', 'COOL STAGE3', 'COOL STAGE4', 'COOL STAGE5','COOL STAGE6',
+                          'COOL STAGE7', 'COOL STAGE8'];
+  //        console.log( "AppNameList = ", appNameList, "Length = ", appNameList.length )
+
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            strAppIdx = appIdx.toString()
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            propVals = [];
+            propVals.push( buildPropList( appName, HeatCoolProps, result ) )
+//            console.log( "PropVals:", propVals )
+
+            // Push all control values to update the proptable.
+            propTableID = "#HeatCoolStatus"+strAppIdx               // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propVals );
+            $(propTableID).proptable('render');
+
+            // Set colors for off / on
+            var fanOncss = { backgroundColor: '#B6E69D' };
+            var fanOffcss = { backgroundColor: '#D4D8D6' };
+            var fanNonecss = { backgroundColor: '#FFFFFF' };
+
+            // Fill the propVals with all the Heat Stage values for the properties in the props list.
+
+            propVals = buildPropList( appName, HeatStageProps, result )
+            propValData = [];
+            propValData.push( propVals )
+
+            // Push all control values to update the proptable.
+
+            propTableID = "#HeatStage"+strAppIdx             // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID).proptable('loadData', propValData );
+            $(propTableID).proptable('render');
+
+            // Determine number of Heat Stages used
+
+            numActiveFansProp = appName + ":" + 'Stages of Heat'
+            numActiveFans = result[numActiveFansProp]
+            startActiveFanPropIndex = 0
+            lastFanActivePropIndex = numActiveFans + startActiveFanPropIndex
+
+            // Loop through ALL Heat Stage related columns - make them green (on), white (off) or hidden.
+
+            for ( var iCol = startActiveFanPropIndex; iCol < startActiveFanPropIndex + 8; iCol++ ) {
+
+              if ( iCol >= lastFanActivePropIndex ) {
+                // Configure hidden for unused columns of fans
+                $(propTableID).proptable('addColumnOption', iCol, 'hidden', true );
+              }
+              else if ( propVals[iCol] == "On" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, fanOncss );
+              }
+              else if ( propVals[iCol] == "Off" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, fanOffcss );
+              }
+              else if ( propVals[iCol] == "Notact" ) {
+                $(propTableID).proptable('setCustomCss', 0, iCol, fanNonecss );
+              }
+            }
+            $(propTableID).proptable('render');
+
+            propVals1 = buildPropList( appName, CoolStageProps, result )
+            propValData1 = [];
+            propValData1.push( propVals1 )
+
+            // Push all control values to update the proptable.
+            propTableID1 = "#CoolStage"+strAppIdx             // Must match appDivId in createDynamicProptables
+//            console.log( "propTableID = ", propTableID )
+            $(propTableID1).proptable('loadData', propValData1 );
+            $(propTableID1).proptable('render');
+
+            numActiveFansProp1 = appName + ":" + 'Stages of Cool'
+            numActiveFans1 = result[numActiveFansProp1]
+            startActiveFanPropIndex1 = 0
+            lastFanActivePropIndex1 = numActiveFans1 + startActiveFanPropIndex1
+
+            // Loop through ALL Cool Stage columns - make them green (on), white (off) or hidden.
+            for ( var iCol = startActiveFanPropIndex1; iCol < startActiveFanPropIndex1 + 8; iCol++ ) {
+
+              if ( iCol >= lastFanActivePropIndex1 ) {
+                // Configure hidden for unused columns of fans
+                $(propTableID1).proptable('addColumnOption', iCol, 'hidden', true );
+              }
+              else if ( propVals1[iCol] == "On" ) {
+                $(propTableID1).proptable('setCustomCss', 0, iCol, fanOncss );
+              }
+              else if ( propVals1[iCol] == "Off" ) {
+                $(propTableID1).proptable('setCustomCss', 0, iCol, fanOffcss );
+              }
+              else if ( propVals1[iCol] == "Notact" ) {
+                $(propTableID1).proptable('setCustomCss', 0, iCol, fanNonecss );
+              }
+            }
+            $(propTableID).proptable('render');
+          }
+        }
+
+
+        // Lighting
+        appNameList = E2AppInfo['cellTypeAppList'][98]
+        if ( appNameList.length > 0 ) {
+          // Standard Circuits are done differently. One single prop table contains list of standard circuit applications.
+          propTableID = "#LightingStatus"               // Must match appDivId in createDynamicProptables
+          appProps = ['Name', 'LIGHTS OUTPUT', 'ACTIVE SCHED' ];
+
+          propVals = [];
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, appProps, result ) )
+          }
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        // Time Schedule
+        appNameList = E2AppInfo['cellTypeAppList'][80]
+        if ( appNameList.length > 0 ) {
+          // Standard Circuits are done differently. One single prop table contains list of standard circuit applications.
+          propTableID = "#TimeScheduleStatus"               // Must match appDivId in createDynamicProptables
+          appProps = ['Name', 'OUTPUT', 'SCHED OUTPUT', 'BYPASS STATE' ];
+
+          propVals = [];
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, appProps, result ) )
+          }
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        // Analog Sensor Control
+        appNameList = E2AppInfo['cellTypeAppList'][94]
+        if ( appNameList.length > 0 ) {
+          // Standard Circuits are done differently. One single prop table contains list of standard circuit applications.
+          propTableID = "#AnalogSensorStatus"               // Must match appDivId in createDynamicProptables
+          appProps = ['Name', 'CONTROL VALUE', 'COMMAND OUT' ];
+
+          propVals = [];
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            //console.log(appName)
+            appName = appName.replace('"','');
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, appProps, result ) )
+          }
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        // Digital Sensor Control
+        appNameList = E2AppInfo['cellTypeAppList'][96]
+        if ( appNameList.length > 0 ) {
+          // Standard Circuits are done differently. One single prop table contains list of standard circuit applications.
+          propTableID = "#DigitalSensorStatus"               // Must match appDivId in createDynamicProptables
+          appProps = ['Name', 'CONTROL VALUE', 'COMMAND OUT' ];
+          appName = appName.replace('"','');
+          propVals = [];
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, appProps, result ) )
+          }
+          // console.log("DIG propVals =", propVals)
+          // debugger;
+          $(propTableID).proptable('loadData', propVals );
+          $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+
+
+        // RLDS
+        appNameList = E2AppInfo['cellTypeAppList'][342];
+        if ( appNameList.length > 0 ) {
+          // debugger;
+          for (appIdx = 0; appIdx < appNameList.length; appIdx++ ) {
+            appName = appNameList[appIdx];
+            appName = appName.replace('"','');
+            propTableID = "#RLDSStatus";               // Must match appDivId in createDynamicProptables
+            appProps = ['ALARM', 'COMM STATUS', 'Mode', 'State' ];
+            var devAlarmActiveCol = 0;
+            var devOnlineCol = 1;
+
+            propVals = [];
+            // Fill the propVals with all the status values for the properties in the props list.
+            // Push all control values to update the proptable.
+            propVals.push( buildPropList( appName, appProps, result ) );
+            // console.log( "propVals=", propVals );
+
+            if ( propVals[0][devAlarmActiveCol] == "On" ) {
+              $(propTableID).proptable('setCustomCss', 0, devAlarmActiveCol, alarmcss );
+            }
+            else if ( propVals[0][devAlarmActiveCol] == ".." ) {
+                $(propTableID).proptable('setCustomCss', 0, devAlarmActiveCol, goodalarmcss );
+            }
+            else if ( propVals[0][devAlarmActiveCol] == "Notact" ) {
+                $(propTableID).proptable('setCustomCss', 0, devAlarmActiveCol, noalarmcss );
+              }
+            }
+
+            if ( propVals[0][devOnlineCol] === "Online" ) {
+              $(propTableID).proptable('setCustomCss', 0, devOnlineCol, goodalarmcss );
+            }
+            else {
+                $(propTableID).proptable('setCustomCss', 0, devOnlineCol, alarmcss );
+            }
+            $(propTableID).proptable('loadData', propVals );
+            $(propTableID).proptable('render');     // Render after all data is filled.
+
+            // Determine number of zones
+            strNumZones = appName + ":" + '7024';
+            numZones = result[strNumZones];
+            // console.log( "NumZones:", numZones );
+
+            // Loop through ALL zone rows for this app
+            propTableID = "#RLDSZoneStatus";// Must match appDivId in createDynamicProptables
+            propVals = [];
+            for ( var i = 0; i < numZones; ++ i ) {
+              PPMpropName = "CONCENTRATION" + (i+1).toString();
+              // Zone names are every 3 starting at 7050 (e.g. 7050, 7053, 7056, etc)
+              ZONEpropName = "70" + (50+(i*3)).toString();              // console.log("ZONEpropName",ZONEpropName );
+              appProps = [ZONEpropName, PPMpropName];
+              // Fill the propVals with all the status values for the properties in the props list.
+              // Push all control values to update the proptable.
+              propVals.push( buildPropList( appName, appProps, result ) )
+            }
+            // console.log( "ZONES propVals=", propVals )
+            $(propTableID).proptable('loadData', propVals );
+            $(propTableID).proptable('render');     // Render after all data is filled.
+        }
+      }
+      else {
+        // If the E2 is online AND E2 data is not ready yet. Show this instead of blank table headers.
+        if ( _deviceOnline === true ) {
+          $(".E2DataNotReadyShow").show();
+          $(".E2OfflineStatusShow").hide();
+          $(".E2AppHeadersShow").hide();
+        }
+      }
+    },
+    jsonError
+    );
+    return ( returnRefreshRate )
+}
+
+function buildPropList( appName, inPropNameList, getDeviceDataValuesList ) {
+
+//  console.log( "buildPropList- appName:", appName );
+  propList = [];
+  for (var propIdx = 0; propIdx < inPropNameList.length; propIdx++) {
+    propPath = appName + ":" + inPropNameList[propIdx]
+//      console.log("PropPath:", propPath, "PropValue:", getDeviceDataValuesList[propPath] )
+    displayValue = getDisplayValueByType( _valueDescriptions[propPath], getDeviceDataValuesList[propPath] );
+    if ( displayValue == null ) {
+      displayValue = "None"
+    }
+    propList[propIdx] = displayValue
+  }
+console.log(propList)
+  return( propList )
+}
+
+$( "#statusAccordion" ).accordion( { heightStyle: "content", animate: true } );
+
+// Initializes E2AppInfo and proptable structures and then updates the screen.
+function initE2DeviceInfo(deviceNameIn) {
+//  console.log("__E2__ - HIT initE2DeviceInfo", hlTiming() );
+  pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameIn + "4","method":"getE2StatusScreenData","params":[{"reqType":"E2AppInfo","E2DevNames":deviceNameIn}] },
+    function(data) {
+
+      var result = data;
+      E2AppInfo = result.E2AppInfo
+      // Determine if E2AppInfo is empty.
+      if ( Object.keys( E2AppInfo ).length > 0 ) {
+        createDynamicProptables()
+      }
+      else {
+        // Hide app "divs"
+//      $(".E2OfflineStatusShow").hide();
+//      $(".E2AppHeadersShow").hide();
+
+      }
+    },
+  jsonError
+  );
+}
+
+
+// We need to override the default logging setup due to the fact that the _valuedescriptions are
+// NOT for every app and point (apps), but instead just properties for each app TYPE.
+// So in this function, we need to expand this list of names out. Hopefully it won't take too long...
+//
+// loggedValues is defined in pageDevices - where it is filled properly
+
+function configureLogging() {
+
+  var loggingList = []
+
+  // This is specific to E2. We want to display the app name and the property - since in the
+  // E2 there are multiple app names in a single device.
+ // console.log("__E2__ - configureLogging. Logs:", loggedValues, "Time:", hlTiming() );
+  for (var key in _outputData) {
+    var valueDesc = _valueDescriptions[key];
+    if (valueDesc.unitType != 'string') {
+      var state = (loggedValues.indexOf(key) !== -1);
+      loggingList.push([key, key, state]);
+    }
+  }
+
+  $("#configureLoggingTable").proptable({ name: 'configureLoggingTable',
+    data: loggingList,
+    columns: [{ hidden: true},
+              { readonly: true, header: 'Value'},
+              { type: 'checkbox', header: 'Logged'}]
+  });
+
+  $("#configureLoggingTable").proptable('render');
+}
+
+//console.log("__E2__ - CALL (1) initE2DeviceInfo" );
+initE2DeviceInfo(deviceName)
+
+//# sourceURL=__E2__.html
+</script>

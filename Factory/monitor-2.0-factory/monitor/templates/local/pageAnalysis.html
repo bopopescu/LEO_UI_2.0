@@ -1,0 +1,803 @@
+
+<style>
+
+#graph-container {
+          margin: 10px auto 0px auto;
+          background: #fff;
+}
+
+.analoglegend {
+  font-size: 0.8em;
+}
+
+.analoggraph {
+          width: 100%;
+          height: 350px;
+          font-size: 14px;
+          line-height: 1.2em;
+}
+
+.digitallegend {
+  font-size: 0.8em;
+}
+
+.digitalgraph {
+          width: 100%;
+          height: 100px;
+          font-size: 14px;
+          line-height: 1.2em;
+}
+
+#zoomwrapper {
+  position: fixed;
+          z-index: 1;
+  background-color: white;
+  margin: 0;
+  border-top: 2px #dfd9c3 solid;
+  border-right: 2px #dfd9c3 solid;
+  box-sizing: border-box;
+  padding: 5px 25px 100px 25px;
+
+  border-top-right-radius: 8px;
+
+  display: -webkit-flexbox;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+
+}
+
+#enablezoom {
+          border-radius: 8px;
+
+          background-color: #ffffff;
+          border: 1px #a0a0a0 solid;
+          padding: 5px;
+          margin-right: 25px;
+
+  height: 1.5em;
+
+  display: -webkit-flexbox;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  justify-content: center;
+}
+
+#zoomoutbutton {
+          position:relative;
+  margin: 0;
+}
+
+/*! This is the common css for the pageAnalysis and pageExport pages */
+<link rel="stylesheet" href="static/local/css/leoLog.css">
+
+</style>
+
+<div class="logsection">
+  <table class="logsectiontable">
+    <tr>
+      <th style="border-bottom: 1px solid #dfd9c3;">Values</th>
+      <th>&nbsp;</th>
+      <th style="border-bottom: 1px solid #dfd9c3;">Week</th>
+    </tr>
+    <tr>
+      <td>
+        <div id="logListButtons">
+          <table>
+            <td><button id="add" class="samesizebutton" >Add</button></td>
+            <td><button id="delete" class="samesizebutton" >Remove</button></td>
+            <td><button id="clear" class="samesizebutton" >Remove All</button></td>
+          </table>
+        </div>
+      </td>
+      <td>&nbsp;</td>
+      <td>
+        <div id="dateUpdateButton" style="vertical-align:top">
+          <table>
+            <td><button id="previous" class="samesizeweekbutton" style="height:3em;width:2em" ></button></td>
+            <td><input id="datepicker" style="width:7em"></td>
+            <td><button id="next" class="samesizeweekbutton" style="height:3em;width:2em">&nbsp;</button></td>
+            <td><button id="update" class="samesizeweekbutton" style="height:3em;width:7em;">Graph</button></td>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div id="logList" class="loglist"></div>
+</div>
+
+<div id='zoomwrapper'>
+<div id='enablezoom'><input type="checkbox" id="enablezoomcheckbox"><label for="enablezoomcheckbox">&nbsp;<b>Enable Zoom</b></label></div>
+<button id='zoomoutbutton'>Zoom Out</button>
+</div>
+
+<div id="graph-container" />
+<div id="progressBox" class="progress-box">
+  <div id="buildingProgress"><div id="buildingProgressLabel">&nbsp;Building:&nbsp;Waiting...</div></div>
+  <div id="transferProgress"><div id="transferProgressLabel">&nbsp;Transfer:&nbsp;Waiting...</div></div>
+</div>
+
+
+<div id="colorPickerDialog"><div id="colorPicker"></div></div>
+<br/>&nbsp;
+<br/>&nbsp;
+<script>
+
+/////////////////////////////// Handle the list
+var loggedDevices = []
+var loggedValues = []
+var deviceName = "{{deviceName}}"
+var allLoggedValues = {{allLoggedValues|tojson}}
+
+  pageWaiting('done')
+
+  for (var deviceName in allLoggedValues){
+      loggedDevices.push( deviceName )
+      loggedValues[deviceName] = [];
+
+      for (var val in allLoggedValues[deviceName]) {
+          var key = allLoggedValues[deviceName][val].key
+          var value = allLoggedValues[deviceName][val].displayName
+          var loggedParameterKV = {}
+          loggedParameterKV[key] = value
+          loggedValues[deviceName].push( loggedParameterKV )
+      }
+  }
+
+var logCache = {};
+function logCacheKey(deviceName, valueName) { return deviceName + '_' + valueName; }
+
+var logList = [];
+
+var _col;
+var _val;
+
+$("#colorPickerDialog").dialog({
+  modal: true,
+  autoOpen: false,
+  resizable: false,
+  draggable: false,
+  width: "auto",
+  buttons: {
+    "Cancel": function() {
+      $( this ).dialog("close");
+    }
+  },
+  close: function() {
+    window.scrollTo(0,0);
+  }
+});
+
+function updateSelectListTouchSelect() {
+  {% if ctx.osKeybd %}
+    $('table select').niceSelect();
+  {% endif %}
+}
+
+
+var colorClick = function(id, row, col, val) {
+  _row = row;
+  _col = col;
+  var title = logList[row][col-2] + ' - ' + logList[row][col-1];
+          $('#colorPicker').colorpicker("val", val);
+          $("#colorPickerDialog").dialog("option", "title", title);
+          $("#colorPickerDialog").dialog("open");
+          setTimeout(function(){ updateSelectListTouchSelect(); }, 500);
+}
+
+$('#colorPicker').colorpicker().on('change.color', function(evt, color) {
+            logList[_row][_col] = color;
+            $("#logList").edittable('render');
+            setTimeout(function(){ updateSelectListTouchSelect(); }, 500);
+    sessionStorage.analysis_logList = JSON.stringify(logList);
+          $("#colorPickerDialog").dialog("close");
+          }).css({ margin: '0 auto' });
+
+
+$("#logList").edittable({ name: 'loglist',
+  data: logList,
+  columns: [{ type: 'checkbox', header: ''},
+            { type: 'select', options: loggedDevices, header: 'Device'},
+            { type: 'select', options: loggedValues[loggedDevices[0]], header: 'Value'},
+            { type: 'color', header: 'Color', click: colorClick }],
+  change: function(row, col, val) {
+    if (col == 1) {
+      col++;
+      logList[row][col] = Object.keys(loggedValues[val][0])[0];
+      var $sel = $("#logList");
+      $sel.edittable('setCustomOptions', row, col, loggedValues[val]);
+      $sel.edittable('render');
+      setTimeout(function(){ updateSelectListTouchSelect(); }, 500);
+    }
+    sessionStorage.analysis_logList = JSON.stringify(logList);
+  }
+})
+
+$("#previous").button({icons: { primary: "icon icon-chevron-left"}}).click(function( event ) {
+  var date = $("#datepicker").datepicker("getDate");
+  date.setTime(date.getTime() + ((24*60*60*1000) * -7));
+  $("#datepicker").datepicker('setDate', date);
+
+  sessionStorage.analysis_date = $("#datepicker").val(); logCache = {};
+});
+
+$("#next").button({icons: { secondary: "icon icon-chevron-right"}}).click(function( event ) {
+  var date = $("#datepicker").datepicker("getDate");
+  date.setTime(date.getTime() + ((24*60*60*1000) * 7));
+
+  if (date > new Date)
+    $("#datepicker").datepicker('setDate', 'today');
+  else
+    $("#datepicker").datepicker('setDate', date);
+
+  sessionStorage.analysis_date = $("#datepicker").val(); logCache = {};
+});
+
+function checkButtons() {
+
+  if (logList.length > 0) {
+    $("#clear,#delete,#update").enable();
+  } else {
+    $("#clear,#delete,#update").disable();
+  }
+}
+
+$("#clear").button({icons: { primary: "icon icon-trash"}}).click(function(event) {
+    while(logList.length > 0) { logList.pop(); }
+    $("#logList").edittable('render');
+    setTimeout(function(){ updateSelectListTouchSelect(); }, 500);
+    sessionStorage.analysis_logList = JSON.stringify(logList);
+    resizeArticle();
+    checkButtons();
+  });
+
+function addDefaultLoggedValue() {
+  if (loggedDevices.length > 0) {
+    var key = loggedDevices[0];
+    var optionNum = 0;
+
+    var logListLength = logList.length;
+    if (logListLength > 0) {
+      var previousLogListItem = logList[logListLength - 1];
+      key = previousLogListItem[1];
+      var lastOption = previousLogListItem[2];
+      var list = loggedValues[key];
+      for (var idx = 0; idx < list.length; idx++) {
+        if (Object.keys(list[idx])[0] == lastOption) {
+          optionNum = idx + 1;
+          break;
+        }
+      }
+
+      if (optionNum >= loggedValues[key].length)
+        optionNum = loggedValues[key].length - 1;
+    }
+
+    var option = Object.keys(loggedValues[key][optionNum])[0];
+
+    var color = 0;
+    while ((color & 0xff0000) < 0x20 && (color & 0xff00) < 0x20 && (color & 0xff) < 0x20) color = Math.round(Math.random() * 0x1000000);
+
+    logList.push([false, key, option, '#' + color.toString(16)]);
+    var $sel = $("#logList");
+    $sel.edittable('setCustomOptions', logList.length - 1, 2, loggedValues[key]);
+    $sel.edittable('render');
+    setTimeout(function(){ updateSelectListTouchSelect(); }, 500);
+    sessionStorage.analysis_logList = JSON.stringify(logList);;
+    resizeArticle();
+  }
+  checkButtons();
+}
+
+$("#add").button({icons: { primary: "icon icon-plus"}}).click(function(event) {
+    if (loggedDevices.length == 0) {
+      alert("No values are logged.");
+    } else {
+      addDefaultLoggedValue();
+    }
+    checkButtons();
+  });
+
+$("#delete").button({icons: { primary: "icon icon-trash"}}).click(function(event) {
+    var idx = 0;
+    while (idx < logList.length) {
+      if (logList[idx][0]) logList.splice(idx, 1); else idx++;
+    }
+    $("#logList").edittable('render');
+    setTimeout(function(){ updateSelectListTouchSelect(); }, 500);
+    sessionStorage.analysis_logList = JSON.stringify(logList);
+    resizeArticle();
+    checkButtons();
+  });
+
+var _$analogGraph = null;
+var _$digitalGraph = [];
+
+$("#update").button({icons: { primary: "icon icon-line-chart"}}).click(function( event ) {
+
+  var createLogJsonRequest = function(includeAllCached) {
+    var request = [];
+    var uniqueKeys = [];
+
+    for (var idx = 0; idx < logList.length; idx++) {
+      var deviceName = logList[idx][1];
+      var valueName = logList[idx][2];
+      var key = logCacheKey(deviceName, valueName);
+
+      if (uniqueKeys.indexOf(key) !== -1)
+        continue;
+      uniqueKeys.push(key);
+
+      if (!includeAllCached)
+        if (key in logCache)
+          continue;
+      request.push( { 'deviceName': deviceName, 'valueName': valueName } );
+    }
+    return request;
+  }
+
+  var convertToFlotData = function(result) {
+
+    var getFlotNumericByTypeFromString = function(valueDescription, value) {
+      if (value == "None") return null;
+      if (value != null) {
+        switch(valueDescription.dataType) {
+          case "float":
+            var newValue = getDisplayUnitValue(valueDescription.unitType, parseFloat(value));
+            if ("significantDigits" in valueDescription)
+              return newValue.toFixed(valueDescription.significantDigits);
+            return newValue;
+          case "list":
+            return valueDescription.dataList[value.toString()];
+          case "int":
+            return parseInt(value).toString();
+          case "bool":
+            switch (value) {
+              case "True":
+                return 1;
+              case "False":
+                return 0;
+              default:
+                return parseInt(value).toString();
+            }
+        }
+      }
+      return value;
+    }
+
+    for (var idx = 0; idx < result.logs.length; idx++) {
+      var dataSet = result.logs[idx];
+      var deviceName = dataSet["deviceName"];
+      var valueName = dataSet["valueName"];
+      var key = logCacheKey(deviceName, valueName);
+      // convert the dataset to something else
+      var dt = dataSet.data = JSON.parse(dataSet.data);
+      var flotdata = [];
+      var valueDescription = dataSet["valueDescription"];
+      if (valueDescription.dataType == "bool") {
+        var prevNumeric = null;
+        for (var row = 0; row < dt.length; row++) {
+          var numeric = getFlotNumericByTypeFromString(valueDescription, dt[row][1]);
+
+          if ((numeric != null) && (prevNumeric != null) && (prevNumeric != numeric))
+            flotdata.push([utcToLocalDate(dt[row][0]).getTime(), prevNumeric]);
+
+          flotdata.push([utcToLocalDate(dt[row][0]).getTime(), numeric]);
+          prevNumeric = numeric;
+        }
+      } else {
+        for (var row = 0; row < dt.length; row++) {
+          flotdata.push([utcToLocalDate(dt[row][0]).getTime(), getFlotNumericByTypeFromString(valueDescription, dt[row][1]) ]);
+        }
+      }
+      dataSet.data = flotdata;
+      logCache[key] = dataSet;
+    }
+  }
+
+  var getNameForValue = function(deviceName, valueName) {
+    var list = loggedValues[deviceName];
+    for (var idx = 0; idx < list.length; idx++) {
+      if (valueName in list[idx])
+        return deviceName + '-->' + list[idx][valueName];
+    }
+  }
+
+  var displayChart = function($graphContainer) {
+
+    $("#progressBox").hide();
+    $graphContainer.empty();
+    $graphContainer.width($("#article").width() - 80);
+
+    var uniqueKeys = [];
+
+    var digitaldata = [];
+    var digitalticks = [];
+
+    var analogdata = [];
+    var zoomlist = [];
+
+
+    // read from the cache and initiate jflot
+    for (idx = 0; idx < logList.length; idx++) {
+      var deviceName = logList[idx][1];
+      var valueName = logList[idx][2];
+      var key = logCacheKey(deviceName, valueName);
+
+      if (uniqueKeys.indexOf(key) === -1) {
+        uniqueKeys.push(key);
+        if (key in logCache) {
+          if (logCache[key].valueDescription.dataType == "bool") {
+            digitaldata.push({ data: logCache[key].data, color: logList[idx][3], label: getNameForValue(deviceName,valueName) });
+
+            dataList = logCache[key].valueDescription.dataList;
+            if (dataList != null)
+              digitalticks.push([[0,dataList.false],[1,dataList.true]]);
+            else
+              digitalticks.push([[0,'False'],[1,'True']]);
+          }
+          else
+            analogdata.push({ data: logCache[key].data, color: logList[idx][3], label: getNameForValue(deviceName,valueName) });
+        }
+      }
+    }
+
+    _$analogGraph = null;
+    _$digitalGraph = [];
+
+    var touchEnabled = $('#enablezoomcheckbox').is(':checked');
+
+    var analogOptions = {
+                    series: { lines: { show: true }, shadowSize: 0 },
+                    xaxis: { mode: "time", timeformat: "%m/%d<br>%H:%M:%S", timezone: "browser",
+                    },
+                    yaxis: { labelWidth: 40 },
+      selection: { mode: "xy", touchEnabled: touchEnabled },
+      legend:{ show: false }
+          };
+
+    var digitalOptions = {
+                    series: { lines: { show: true }, shadowSize: 0 },
+                    xaxis: { mode: "time", timeformat: "%m/%d<br>%H:%M:%S", timezone: "browser" },
+                    yaxis: { min: -0.1, max: 1.1, labelWidth: 40 },
+      selection: { mode: "xy", touchEnabled: touchEnabled },
+      legend:{ show: false }
+    };
+
+    if (analogdata.length > 0) {
+      var $analogLegend = $('<div/>').addClass('analoglegend');
+
+      for (var idx = 0; idx < analogdata.length; idx++) {
+        if (((idx % 4) == 0) && (idx > 0))
+          $analogLegend.append($('<br/>'));
+        $analogLegend.append($('<span/>').html('&nbsp;&nbsp;&nbsp;&nbsp;').css({backgroundColor: analogdata[idx].color}))
+        .append($('<span/>').text(' ' + analogdata[idx].label))
+        .append($('<span/>').html('&nbsp;&nbsp;&nbsp;'));
+
+      }
+
+
+      $graphContainer.append($analogLegend);
+
+      _$analogGraph = $('<div/>').prop('id', 'analoggraph').addClass('analoggraph');
+      $graphContainer.append(_$analogGraph);
+
+          $.plot(_$analogGraph, analogdata, analogOptions);
+
+      _$analogGraph.bind("plotselected", function(event, ranges) {
+
+        // clamp the zooming to prevent eternal zoom
+        if (ranges.xaxis.to - ranges.xaxis.from < 0.00001) ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+        if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+
+        zoomlist.push(ranges);
+        $('#zoomoutbutton').enable();
+        positionZoom();
+
+        var touchEnabled = $('#enablezoomcheckbox').is(':checked');
+        analogOptions.selection.touchEnabled = touchEnabled;
+        digitalOptions.selection.touchEnabled = touchEnabled;
+
+        // do the zooming
+        $.plot(_$analogGraph, analogdata,
+          $.extend(true, {}, analogOptions, {
+                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+                    yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+          }));
+
+
+        // don't fire event on the overview to prevent eternal loop
+        for (var idx = 0; idx < _$digitalGraph.length; idx++) {
+          $.plot(_$digitalGraph[idx], [digitaldata[idx]],
+            $.extend(true, {}, digitalOptions, {
+              yaxis: { ticks: digitalticks[idx] },
+                      xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                    }));
+        }
+
+      });
+    }
+
+    var bindDigitalZoom = function(event, ranges) {
+
+      // clamp the zooming to prevent eternal zoom
+      if (ranges.xaxis.to - ranges.xaxis.from < 0.00001) ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+      if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+
+      var touchEnabled = $('#enablezoomcheckbox').is(':checked');
+      analogOptions.selection.touchEnabled = touchEnabled;
+      digitalOptions.selection.touchEnabled = touchEnabled;
+
+      // do the zooming
+      if (analogdata.length > 0) {
+        var plot = $.plot(_$analogGraph, analogdata,
+          $.extend(true, {}, analogOptions, {
+                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+          }));
+        var yaxis = plot.getYAxes();
+        ranges.yaxis.from = yaxis[0].min;
+        ranges.yaxis.to = yaxis[0].max;
+      }
+
+      zoomlist.push(ranges);
+      $('#zoomoutbutton').enable();
+      positionZoom();
+
+      // don't fire event on the overview to prevent eternal loop
+      for (var idx = 0; idx < _$digitalGraph.length; idx++) {
+        $.plot(_$digitalGraph[idx], [digitaldata[idx]],
+          $.extend(true, {}, digitalOptions, {
+            yaxis: { ticks: digitalticks[idx] },
+                      xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+          }));
+      }
+    }
+
+    for (var idx = 0; idx < digitaldata.length; idx++) {
+      var $digitalLegend = $('<div/>').addClass('digitallegend')
+        .append($('<span/>').html('&nbsp;&nbsp;&nbsp;&nbsp;').css({backgroundColor: digitaldata[idx].color}))
+        .append($('<span/>').text(' ' + digitaldata[idx].label));
+      var $digitalGraph = $('<div/>').addClass('digitalgraph');
+
+      $graphContainer.append($digitalLegend);
+      $graphContainer.append($digitalGraph);
+          $.plot($digitalGraph, [digitaldata[idx]],
+             $.extend(true, {}, digitalOptions, {
+            yaxis: { ticks: digitalticks[idx] }
+         }));
+          $digitalGraph.bind("plotselected", bindDigitalZoom);
+
+      _$digitalGraph.push($digitalGraph);
+    }
+
+    if ((analogdata.length > 0) || (digitaldata.length > 0)) {
+
+      $("#zoomoutbutton").unbind( "click" );
+      $('#zoomoutbutton').click(function(event) {
+                              event.preventDefault();
+
+          zoomlist.pop();
+
+          var touchEnabled = $('#enablezoomcheckbox').is(':checked');
+          analogOptions.selection.touchEnabled = touchEnabled;
+          digitalOptions.selection.touchEnabled = touchEnabled;
+
+          var ranges = null;
+          var zoAnalogOptions = analogOptions;
+          var zoDigitalOptions = digitalOptions;
+
+          if (zoomlist.length > 0)
+            ranges = zoomlist[zoomlist.length - 1];
+          else
+                    $(this).disable();
+
+
+          if (ranges !== null) {
+            zoAnalogOptions = $.extend(true, {}, analogOptions, {
+                              xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+                              yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+                    })
+
+                    zoDigitalOptions = $.extend(true, {}, digitalOptions, {
+                              xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                    })
+          }
+
+
+
+          if (analogdata.length > 0)
+            $.plot(_$analogGraph, analogdata, zoAnalogOptions);
+
+          // don't fire event on the overview to prevent eternal loop
+          for (var idx = 0; idx < _$digitalGraph.length; idx++) {
+            $.plot(_$digitalGraph[idx], [digitaldata[idx]],
+              $.extend(true, {}, zoDigitalOptions, {
+                yaxis: { ticks: digitalticks[idx]}
+              }));
+          }
+
+                    });
+
+    }
+
+    resizeArticle();
+  }
+
+  var displayProgress = function($graphContainer) {
+    $graphContainer.empty();
+    $("#progressBox").show();
+    $('#buildingProgress').progressbar({
+      value: 0,
+      change: function() {
+        $('#buildingProgressLabel').html( '&nbsp;Building: ' + $('#buildingProgress').progressbar('value').toFixed(1) + '%' );
+      },
+      complete: function() {
+        $('#buildingProgressLabel').html( '&nbsp;Building: Complete.');
+      }
+    });
+    $('#transferProgress').progressbar({
+      value: 0,
+      change: function() {
+        $('#transferProgressLabel').html( '&nbsp;Transfer: ' + $('#transferProgress').progressbar('value').toFixed(1) + '%' );
+      },
+      complete: function() {
+        $('#transferProgressLabel').html( '&nbsp;Transfer: Complete.');
+      }
+    });
+  }
+
+  $('#zoomoutbutton').disable();
+
+  var $graphContainer = $('#graph-container');
+  displayProgress($graphContainer);
+
+  var request = createLogJsonRequest();
+  var date = $("#datepicker").datepicker("getDate");
+
+  var enddate = new Date(date);
+  enddate.setTime(enddate.getTime() + ((24*60*60*1000) * 4));
+  var now = new Date;
+  if (enddate > now) {
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    enddate.setTime(today.getTime() + ((24*60*60*1000) * 1));
+  }
+
+  var startdate = new Date(date);
+  startdate.setTime(enddate.getTime() - ((24*60*60*1000) * 7));
+
+
+  var id = '';
+
+  if (request.length == 0)
+    displayChart($graphContainer);
+  else {
+    if (pageXHR != null) pageXHR.abort();
+    pageXHR = postJson({"jsonrpc":"2.0", "id":"getLogStart", "method":"getLogStart",
+      "params":['json', request, startdate.toISOString(), enddate.toISOString(), {}, 'None']},
+      function(data) {
+        var result = data;
+        if (result != null) {
+          id = result.id;
+
+          // update progress
+          var updateProgress = function() {
+            pageXHR = postJson({"jsonrpc":"2.0", "id":"getLogProgress", "method":"getLogProgress", "params":[id]},
+            function(data) {
+              var result = data;
+              if (result != null) {
+                $('#buildingProgress').progressbar('value', result.progress);
+                if (result.state == 'active') {
+                  setTimeout(updateProgress, 1000);
+                } else {
+                  // Now get the log
+                  pageXHR = postJson({"jsonrpc":"2.0", "id":"getLogFinish", "method":"getLogFinish", "params":[id]},
+                  function(data) {
+                    var result = data;
+                    if (result != null) {
+                      setTimeout(function() {
+                        convertToFlotData(result);
+                        displayChart($graphContainer);
+                      }, 1);
+                    }
+                  }, jsonError,
+                  function(evt) {
+                    if (evt.lengthComputable) {
+                      var percentComplete = evt.loaded / evt.total;
+                      //Do something with upload progress
+                      $('#transferProgress').progressbar('value', (percentComplete * 100));
+                    } else {
+                      $('#transferProgressLabel').text('Unknown');
+                    }
+                  });
+
+                }
+              }
+            }, jsonError);
+          }
+          setTimeout(updateProgress, 1000);
+
+
+        } else {
+          alert('No data returned');
+        }
+
+      }, jsonError );
+  }
+  event.preventDefault();
+});
+
+
+$("#datepicker").datepicker({ showAnim: '', maxDate: new Date,
+    onSelect: function(d, i) {
+      if(d !== i.lastVal) { sessionStorage.analysis_date = d; logCache = {}; }
+    }
+  });
+
+if (!mobileBrowser)
+  $('#enablezoom').hide();
+$('#zoomoutbutton').button({icons: { primary: "icon icon-search-minus"}}).disable();
+
+$('#enablezoom').click(function(e) {
+  var $cb = $(this).first();
+  var c = ! $cb.is(':checked');
+  $cb.prop('checked', c);
+});
+
+$('#enablezoomcheckbox').change(function(e) {
+  var c = $(this).is(':checked');
+
+  if (_$analogGraph != null)
+    $.data(_$analogGraph[0], "plot").getOptions().selection.touchEnabled = c;
+
+  for (var idx = 0; idx < _$digitalGraph.length; idx++)
+    $.data(_$digitalGraph[idx][0], "plot").getOptions().selection.touchEnabled = c;
+
+}).click(function(e) { e.stopPropagation(); });
+
+
+function positionZoom() {
+  var $article = $('#article');
+  var articleoffset = $article.offset();
+  var articlebottom = articleoffset.top + $article.height() - 5;
+
+  var $zoomwrapper = $('#zoomwrapper');
+  $zoomwrapper.offset({ top: articlebottom - $zoomwrapper.height() - 5, left: articleoffset.left });
+
+}
+pageResize = function() { positionZoom(); }
+
+//////////////////////////////////
+
+
+$("#progressBox").hide();
+
+if ("analysis_logList" in sessionStorage) {
+  var logList = JSON.parse(sessionStorage.analysis_logList);
+  var $sel = $("#logList");
+  for (var row = 0; row < logList.length; row++)
+  {
+    var val = logList[row][1];
+    $sel.edittable('setCustomOptions', row, 2, loggedValues[val]);
+  }
+  $sel.edittable('loadData', logList);
+  $sel.edittable('render');
+  setTimeout(function(){ updateSelectListTouchSelect(); }, 500);
+}
+else
+  addDefaultLoggedValue();
+
+if ("analysis_date" in sessionStorage)
+  $("#datepicker").datepicker('setDate', sessionStorage.analysis_date);
+else
+  $("#datepicker").datepicker('setDate', 'today');
+
+
+checkButtons();
+
+//# sourceURL=pageAnalysis.html
+</script>

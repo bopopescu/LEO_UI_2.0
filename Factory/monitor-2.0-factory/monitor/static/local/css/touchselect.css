@@ -1,0 +1,104 @@
+.touchselect {
+  border: 1px solid #a9a9a9;
+  position: relative;
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  background-color: #ffffff;
+  vertical-align: middle;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.touchselect b {
+/*  font-size: 1.7em !important; */
+}
+
+.touchselect i.chevron {
+  display: inline;
+  position: absolute;
+  right: 1px;
+  top: 0.5em;
+}
+
+/* font-size must match "select" in mainTouch.css */
+.touchselect span {
+  display: block;
+  position: absolute;
+  left: 2px;
+  right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 1.3em !important;
+  text-overflow: ellipsis;
+  overflow: none;
+}
+
+.touchselect.disabled {
+  background-color: #ebebe4;
+}
+
+.touchselect .screendiv {
+  display: -webkit-flexbox;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  justify-content: center;
+  z-index: 25000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0 0 0 0;
+}
+
+/* font-size must match "select" in mainTouch.css */
+.touchselect .menudiv {
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
+  background: #fff;
+  border-radius: 10px 10px 10px 10px;
+  border: 3px solid #2a652a; /*#d4ccb0;*/
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-size: 1.3em !important;
+  position: relative;
+  max-height: 396px;
+  padding: 1px 1px 1px 1px;
+}
+
+.touchselect ul {
+  background: #fff;
+  border-radius: 5px;
+  color: #000000;
+  list-style: none;
+  margin: 0;
+  border: 0;
+  vertical-align: baseline;
+  white-space: nowrap;
+  overflow-x: hidden;
+  padding: 0;
+  min-width: 150px;
+}
+
+.touchselect li {
+  border-bottom: 1px solid #aaa;
+  padding: 0 15px 0 15px;
+}
+
+.touchselect .selected {
+  background: #2a652a;
+  color: #fff;
+}
+
+.touchselect li:hover { background: #eee; color: #000; }
+.touchselect li:first-child { border-radius: 5px 5px 0 0; }
+.touchselect li:last-child {
+  border: none;
+  border-radius: 0 0 5px 5px;
+}
+

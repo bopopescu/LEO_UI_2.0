@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+.user-container {
+  margin: 10px;
+}
+
+#userList td {
+ {% if ctx.localhost %}
+    padding: 6px 4px;
+    cursor: none;
+ {% else %}
+    padding: 2px 4px;
+    cursor: pointer;
+ {% endif %}
+}
+
+#editUserTable td {
+ {% if ctx.localhost %}
+    padding-top: 3px;
+    cursor: none;
+ {% else %}
+    padding-top: 8px;
+    cursor: pointer;
+ {% endif %}
+}
+
+.editUserName {}
+.editUserInfo {}
+.editUserPassword {}
+
+.userNameError { color: red; }
+.passwordError { color: red; }
+
+</style>
+
+
+<div  class="user-container">
+
+  <p><button id="userAdd" type="submit" >Add</button>&nbsp;<button id="userDelete" type="submit" >Remove</button></p>
+
+  <table id="userList" class="proptable">
+  </table>
+
+
+
+
+  <p>Click user to edit full name and roles.  Click the password column to change.</p>
+
+  <div id="editUser">
+    <table id="editUserTable">
+      <tr class="editUserName userNameError">
+        <td>&nbsp;</td>
+        <td>Invalid user name.</td>
+      </tr>
+      <tr class="editUserName" >
+        <td>User:&nbsp;</td>
+        <td><input type="text" size="20" id="userName"></td>
+      </tr>
+      <tr class="editUserInfo" >
+        <td>Full Name:&nbsp;</td>
+        <td><input type="text" size="20" id="userFullName"></td>
+      </tr>
+      <tr class="editUserInfo" >
+        <td>Roles:</td>
+        <td>
+            {% for key, value in userRoles.iteritems() %}
+              {% if value != "None" : %}
+                  <label><input type="checkbox" id={{ key }}>&nbsp; {{ value }}</label><br/>
+              {% endif %}
+            {% endfor %}
+        </td>
+      </tr>
+      <tr class="editUserPassword passwordError">
+        <td>&nbsp;</td>
+        <td>Incorrect password.</td>
+      </tr>
+      <tr class="editUserPassword" >
+        <td>Password:&nbsp;</td>
+        <td><input type="password" size="20" id="userPassword"></td>
+      </tr>
+      <tr class="editUserPassword">
+        <td>Confirm Password:&nbsp;</td>
+        <td><input type="password" size="20" id="userConfirmPassword"></td>
+      </tr>
+    <table/>
+
+  </div>
+
+
+</div>
+
+{% if ctx.osKeybd %}
+    <div id="keypadDialog">
+      <div id="keypad"></div>
+    </div>
+{% endif %}
+
+
+<script>
+
+var dictUserRoles = JSON.parse( '{{ userRoles|tojson }}' )
+var dictUserList = JSON.parse( '{{ userList|tojson }}' )
+
+  pageWaiting('done')
+
+$('#editUser').dialog({
+  modal: true,
+  autoOpen: false,
+  resizable: false,
+  draggable: false,
+  width: 'auto',
+  buttons: {
+    'Save': function() {
+      saveOperation($( this ));
+    },
+    'Cancel': function() {
+      $( this ).dialog('close');
+    }
+  },
+  close: function() {
+    window.scrollTo(0,0);
+  }
+});
+
+function postUsers(requestObject, successFunc, errorFunc) {
+  $.ajax({
+      type: "POST",
+      url: "/usrData",
+      data: JSON.stringify(requestObject),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: successFunc,
+      error: errorFunc
+  });
+}
+
+// This function simply lists out the roles separated by commas...Need to check if we really need this...
+function displayRoles(roles) {
+  var retval = [];
+
+  var spl = roles.split(',')
+  // Convert from the database role to the "readable" role
+  for (var idx = 0; idx < spl.length; idx++) {
+    // Get the role from the database
+    dbRole = spl[idx].trim();
+    for (var key in dictUserRoles) {
+      // Push the value. The checkbox is referenced by key.
+      if (key == dbRole ) {
+        retval.push(dictUserRoles[key]);
+      }
+    }
+  }
+  return retval.join(',');
+}
+
+function displayUsers(userList) {
+
+  var $tableBody = $('<tbody/>').html('<tr><th>&nbsp;</th><th>User</th><th>Full Name</th><th>Roles</th><th>Password</th></tr>');
+
+  for (var idx = 0; idx < userList.length; idx++) {
+    var userItem = userList[idx];
+    var $row = $('<tr/>').prop('id', userItem.name).click(editUserHandler);
+    $row.append($('<td/>').click(function(e) {
+          var $e = $('#delete_' + userItem.name.replace('"', '\\"'));
+          $e.prop('checked', ! $e.is(':checked'));
+          e.stopPropagation();
+        }).append($('<input/>').prop('type', 'checkbox').prop('id', 'delete_'+ userItem.name)
+          .click(function(e) { e.stopPropagation(); })));
+    $row.append($('<td/>').text(userItem.name));
+    $row.append($('<td/>').text(userItem.fullName));
+    $row.append($('<td/>').text(displayRoles(userItem.roles)));
+    $row.append($('<td/>').prop('id', 'password_'+ userItem.name).html('&#149&#149&#149&#149&#149&#149&#149&#149&#149&#149&#149&#149&#149&#149&#149'));
+    $tableBody.append($row);
+  }
+  $('#userList').empty().append($tableBody);
+}
+displayUsers(dictUserList);
+
+var _operation = null;
+var _operationUser = null;
+
+function openOperation(operation, operationUser) {
+  _operation = operation;
+  _operationUser = operationUser;
+  var title = '';
+
+  switch (_operation) {
+    case 'new':
+      $('.editUserName, .editUserInfo, .editUserPassword').show();
+      title = 'Add New User';
+      break;
+    case 'info':
+      $('.editUserInfo').show();
+      $('.editUserName, .editUserPassword').hide();
+      title = 'Edit "' + _operationUser + '" Information';
+      break;
+    case 'pw':
+      $('.editUserPassword').show();
+      $('.editUserName, .editUserInfo').hide();
+      title = 'Edit "' + _operationUser + '" Password';
+      break;
+    default:
+      return;
+  }
+  $('.userNameError, .passwordError').hide();
+  $('#editUser').dialog('option', 'title', title);
+  $('#editUser').dialog('open');
+}
+
+function clearDlgUserData() {
+  $('#userName, #userFullName, #userPassword, #userConfirmPassword').val('');
+}
+
+function saveOperation($dialog) {
+  $('.userNameError, .passwordError').hide();
+
+  switch (_operation) {
+    case 'new':
+      var name = $('#userName').val();
+      // Make sure it is properly named.
+      if (name.length == 0 || name.indexOf(' ') != -1) {
+        $('.userNameError').show();
+        return;
+      }
+
+      // Make sure name is not a duplicate
+      for (var userIdx = 0; userIdx < dictUserList.length; userIdx++) {
+        if (dictUserList[userIdx].name == name) {
+          $('.userNameError').show();
+          return;
+        }
+      }
+
+      var fullName = $('#userFullName').val();
+
+      var roles = [];
+
+      for (var key in dictUserRoles) {
+        // Push the value. The checkbox is referenced by key.
+        if ($('#'+ key).is(':checked')) roles.push(key);
+      }
+      roles = roles.join(',');
+
+      var pw = $('#userPassword').val();
+      var confirmPw = $('#userConfirmPassword').val();
+      if (pw.length == 0 || pw != confirmPw) {
+        $('.passwordError').show();
+        return;
+      }
+      pageWaiting();
+      pageXHR = postUsers({"jsonrpc":"2.0","id":"addUser","method":"addUser", "params":[name, fullName, roles, pw]},
+        function(data) {
+          dictUserList = data
+          displayUsers(data);
+          setTimeout(function() { pageWaiting('done');}, 1000);
+        }, jsonError);
+      break;
+
+    case 'info':
+
+      var fullName = $('#userFullName').val();
+
+        var roles = [];
+        for (role in dictUserRoles) { if ($('#'+ role).is(':checked')) roles.push(role); }
+        roles = roles.join(',');
+
+        pageWaiting();
+        pageXHR = postUsers({"jsonrpc":"2.0","id":"setUserInfo","method":"setUserInfo", "params":[_operationUser, fullName, roles]},
+          function(data) {
+            dictUserList = data
+            displayUsers(data);
+            setTimeout(function() { pageWaiting('done');}, 1000);
+          }, jsonError);
+        break;
+
+    case 'pw':
+      var pw = $('#userPassword').val();
+      var confirmPw = $('#userConfirmPassword').val();
+      if (pw.length == 0 || pw != confirmPw) {
+        $('.passwordError').show();
+        return;
+      }
+      pageWaiting();
+      pageXHR = postUsers({"jsonrpc":"2.0","id":"setUserPassword","method":"setUserPassword", "params":[_operationUser, pw]},
+        function(data) {
+          dictUserList = data
+          displayUsers(data);
+          setTimeout(function() { pageWaiting('done');}, 1000);
+        }, jsonError);
+      break;
+  }
+  $dialog.dialog('close');
+}
+
+function editUserHandler(e) {
+  clearDlgUserData();
+  if (e.target.id.indexOf('password_') == 0) {
+    openOperation('pw', this.id);
+  } else {
+
+    var userIdx;
+    for (userIdx = 0; userIdx < dictUserList.length; userIdx++) {
+      if (dictUserList[userIdx].name == this.id)
+        break;
+    }
+
+    $('#userFullName').val(dictUserList[userIdx].fullName);
+
+    roles = dictUserList[userIdx].roles;
+    var spl = roles.split(',')
+    for (var idx = 0; idx < spl.length; idx++)
+      $('#' + spl[idx].trim()).prop('checked', true);
+
+    openOperation('info', this.id);
+  }
+}
+
+$('#userAdd').button({icons: { primary: 'icon icon-plus'}}).click(function (event) {
+  clearDlgUserData();
+  openOperation('new', null);
+});
+
+$('#userDelete').button({icons: { primary: 'icon icon-trash'}}).click(function (event) {
+  var delUserList = [];
+
+  for (var idx = 0; idx < dictUserList.length; idx++) {
+    var userItem = dictUserList[idx];
+    var $cb = $('#delete_' + userItem.name.replace('"', '\\"'));
+    if ($cb.is(':checked')) {
+      delUserList.push(userItem.name);
+    }
+  }
+
+  pageWaiting();
+  pageXHR = postUsers({"jsonrpc":"2.0","id":"deleteUsers","method":"deleteUsers", "params":[delUserList]},
+    function(data) {
+      dictUserList = data
+      displayUsers(data);
+      setTimeout(function() { pageWaiting('done');}, 1000);
+    }, jsonError);
+  event.preventDefault();
+});
+
+
+
+
+pageClose = function() {
+{% if ctx.osKeybd %}
+  $('#keypadDialog').dialog('close');
+  $('#keypadDialog').dialog('destroy').remove();
+{% endif %}
+  $('#editUser').dialog('close');
+  $('#editUser').dialog('destroy').remove();
+}
+
+//////////////////////////////////////////////////////////
+// keyboards
+
+{% if ctx.osKeybd %}
+
+$('#userName, #userFullName, #userPassword, #userConfirmPassword')
+    .click(function() { showkeypad($(this), null) } );
+
+$('#userName').click(function() { showkeypad($(this), 'User'); } );
+$('#userFullName').click(function() { showkeypad($(this), 'Full Name'); } );
+$('#userPassword').click(function() { showkeypad($(this), 'Password'); } );
+$('#userConfirmPassword').click(function() { showkeypad($(this), 'Confirm Password'); } );
+
+
+var _keypadTarget = null;
+
+$('#keypadDialog').dialog({
+  autoOpen: false,
+  modal: true,
+  resizable: false,
+  draggable: false,
+  width: 'auto',
+  close: function() {
+    window.scrollTo(0,0);
+  }
+ });
+
+$('#keypad').keypad({ done: function (ok, value) {
+  $('#keypadDialog').dialog('close');
+          if (ok)
+    _keypadTarget.val(value);
+  $('.ui-dialog-titlebar').show();
+} });
+
+function showkeypad(target, title) {
+  _keypadTarget = target;
+  target.blur();
+  var $keypad = $('#keypad');
+  $keypad.keypad('target', _keypadTarget);
+  $keypad.keypad('title', title);
+  $keypad.keypad('show');
+
+  $('.ui-dialog-titlebar').hide();
+  $('#keypadDialog').dialog('open');
+}
+
+{% endif %}
+
+//# sourceURL=users.html
+</script>

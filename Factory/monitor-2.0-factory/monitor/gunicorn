@@ -1,0 +1,21 @@
+/opt/monitor/log/gunicorn-err.log {
+	size 1M
+	rotate 10
+        olddir /opt/monitor/log
+	notifempty
+	create 0644 root root
+	postrotate
+		[ ! -f /var/run/gunicorn.pid ] || kill -USR1 `cat /var/run/gunicorn.pid`
+        	sleep 1
+	endscript
+}
+
+/opt/monitor/log/LEOWatchdog.log
+/opt/monitor/log/startStat.log
+/opt/monitor/log/install.log {
+	size 1M
+	rotate 1
+        olddir /opt/monitor/log
+	notifempty
+	create 0644 root root
+}

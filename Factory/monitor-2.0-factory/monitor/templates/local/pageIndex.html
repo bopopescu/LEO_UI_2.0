@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ctx.siteStatus.name}}</title>
+
+  <meta name="description" content="Status of the site">
+
+{% if ctx.localhost is sameas false %}
+  {% if session.is_authenticated %}
+  <meta http-equiv="" content="" />
+{% else %}
+  <meta http-equiv="refresh" content="300" />
+{% endif %}
+{% endif %}
+{% if ctx.localhost %}
+  <link rel="stylesheet" href="static/local/css/normalizeTouch.css">
+{% else %}
+  <link rel="stylesheet" href="static/local/css/normalize.css">
+{% endif %}
+  <link rel="stylesheet" href="static/local/css/common.css">
+
+  <script src="static/local/js/vendor/modernizr-2.6.2.min.js"></script>
+
+  <script src="static/local/js/vendor/jquery-1.11.3.min.js"></script>
+
+
+{% if ctx.localhost %}
+  <meta id="touchScreenInfo" touchScreenPresent="true" />
+  <link rel="stylesheet" href="static/local/css/huntertheme/jquery-ui-1.10.4.custom.minTouch.css">
+{% else %}
+  <meta id="touchScreenInfo" touchScreenPresent="false" />
+  <link rel="stylesheet" href="static/local/css/huntertheme/jquery-ui-1.10.4.custom.min.css">
+{% endif %}
+
+  <script src="static/local/js/vendor/jquery-ui-1.10.4.custom.min.js"></script>
+
+  <link rel="stylesheet" href="static/local/css/font/style.css">
+
+{% if ctx.localhost %}
+  <link rel="stylesheet" href="static/local/css/mainTouch.css">
+{% else %}
+  <link rel="stylesheet" href="static/local/css/main.css">
+{% endif %}
+
+
+
+  <script src="static/local/js/plugins.js"></script>
+
+  <script src="static/local/js/jquery.waiting.min.js"></script>
+  <link rel="stylesheet" href="static/local/css/waiting.css">
+  <link rel="stylesheet" href="static/local/css/alarmStatus.css">
+
+  <script src="static/local/js/units.js"></script>
+  <script src="static/local/js/web.js"></script>
+  <!-- MERGED webTouch.js and web.js <script src="static/local/js/webTouch.js"></script> -->
+
+{% if ctx.localhost %}
+{% else %}
+  <link rel="shortcut icon" href="static/local/css/favicon.ico" type="image/x-icon" />
+  <script src="static/local/js/selection.js"></script>
+{% endif %}
+
+  <script src="static/local/js/edittable.js"></script>
+{% if ctx.localhost %}
+  <link rel="stylesheet" href="static/local/css/edittableTouch.css">
+{% else %}
+  <link rel="stylesheet" href="static/local/css/edittable.css">
+{% endif %}
+
+  <script src="static/local/js/proptable.js"></script>
+  <link rel="stylesheet" href="static/local/css/proptable.css">
+
+  <script src="static/local/js/evol.colorpicker.min.js"></script>
+
+{% if ctx.localhost %}
+  <link rel="stylesheet" href="static/local/css/evol.colorpickerTouch.css">
+{% else %}
+  <link rel="stylesheet" href="static/local/css/evol.colorpicker.css">
+{% endif %}
+
+  <script src="static/local/js/image-picker.min.js"></script>
+  <link rel="stylesheet" href="static/local/css/image-picker.css">
+
+{% if ctx.localhost %}
+  <script src="static/local/js/numpad.js"></script>
+  <link rel="stylesheet" href="static/local/css/numpad.css">
+
+  <script src="static/local/js/keypad.js"></script>
+  <link rel="stylesheet" href="static/local/css/keypad.css">
+
+  <script src="static/local/js/touchselect.js"></script>
+  <link rel="stylesheet" href="static/local/css/touchselect.css">
+
+  <script src="static/local/js/vendor/jquery-nice-select-1.1.0.min.js"></script>
+  <link rel="stylesheet" href="static/local/css/vendor/jquery-nice-select-1.1.0.min.css">
+
+{% endif %}
+
+  <script src="static/local/js/verifyload.js"></script>
+
+  <script src="static/local/js/vendor/flot/jquery.flot.min.js"></script>
+  <script src="static/local/js/vendor/flot/jquery.flot.time.min.js"></script>
+  <script src="static/local/js/vendor/flot/jquery.flot.selection.touch.js"></script>
+
+  <script src="static/local/js/vendor/moment.min-2.20.1.js"></script>
+  <script src="static/local/js/vendor/moment-timezone-with-data-2012-2022.min.js"></script>
+  <!-- <script src="static/local/js/vendor/moment-timezone.min-0.5.14-2017c.js"></script> -->
+
+<script>
+$(function(){
+$("#myButton").click(function( event ) {
+
+        var username = $("#loginUsername1").val(); 
+        var password = $("#loginPassword1").val(); 
+
+  if (username.length == 0 || password.length == 0) {
+    $('.loginError').show();
+    return;
+  }
+
+  pageXHR = postRemoteLogin({"jsonrpc":"2.0","id":"logincheck","method":"logincheck", "params":[{'User':username, 'Pass':password, 'Remote':true}]},
+    function(data) {
+    //  console.log( "Login Result=", data )
+      if ( data.success == true ) {
+        // Successful login
+		$('body').css('background-color', 'white');
+		  $("#identity").hide();
+		  $( "#bodyElement" ).show();
+      }
+      else {
+         var count = sessionStorage.getItem('remoteFailCount');
+         if (count < 3)
+		 {
+		  count = count+1;
+          sessionStorage.setItem('remoteFailCount', count);
+		  }
+         else
+		 {
+			open(location, '_self').close();
+			}
+			$('.loginError').show();
+      }
+    }, jsonError);
+  event.preventDefault();
+});
+
+});
+
+
+
+
+function myFunction2()
+{
+$('.loginError').hide();
+  $( "#dummy" ).hide();
+  $( "#bodyElement" ).hide();
+$("#identity").show();
+}
+
+  if (typeof verifyload === 'undefined') location.reload();
+
+{% if mobileBrowser %}
+    var mobileBrowser = true;
+{% else %}
+    var mobileBrowser = false;
+{% endif %}
+
+  $(function() {
+
+    // Initialize the moment library.
+    // get the user's timezone
+    var tz = moment.tz.guess();
+    console.info('Timezone: ' + tz);
+    // returns: Timezone: Europe/London
+
+    // set the default user timezone
+    moment.tz.setDefault(tz);
+
+    moment().tz("America/North_Dakota/Center").format();
+    moment().tz("America/Atikokan").format();
+    moment().tz("America/Regina").format();
+    moment().tz("America/Ojinaga").format();
+    moment().tz("Pacific/Kiritimati").format();
+    moment().tz("America/New_York").format();
+    moment().tz("America/Sitka").format();
+    moment().tz("America/St_Johns").format();
+    moment().tz("America/Adak").format();
+    moment().tz("America/Puerto_Rico").format();
+    moment().tz("America/Los_Angeles").format();
+    moment().tz("America/Phoenix").format();
+    moment().tz("America/Moncton").format();
+
+{% if ctx.localhost is sameas false %}
+$('body').css('background-color', '#2a652a');
+  $( "#bodyElement" ).hide();
+    $( "#identity" ).hide();
+
+
+    sessionStorage.setItem("remoteFailCount", 0);
+
+  {% endif %} 
+
+{% if 1 %}
+    $(window).resize(function(){ resizeArticle(); });
+{% endif %}
+
+  $( "#nav_button_set" ).buttonsetv();
+
+{% if ctx.localhost %}  <!-- Alarms Page -->
+  $( "#nav_pageAlarms" ).button( "option", "icons", {primary:'icon icon-bell fs2x'} )
+    .button( "option", "text", false )
+    .click(function( event ) { pageAlarms(); event.preventDefault(); });
+  $( "#nav_pageAlarms" ).off("mouseenter mouseleave");
+{% else %}
+  $( "#nav_pageAlarms" ).button( "option", "icons", {primary:'icon icon-bell'} )
+    .click(function( event ) { pageAlarms(); event.preventDefault(); });
+{% endif %}
+
+{% if ctx.localhost %}  <!-- Site Map -->
+  $( "#nav_pageSitemap" ).button( "option", "icons", {primary:'icon icon-info-circle '} )
+    .button( "option", "text", false )
+    .click(function( event ) { pageSitemap(); event.preventDefault(); });
+  $( "#nav_pageSitemap" ).off("mouseenter mouseleave");
+{% else %}
+  $( "#nav_pageSitemap" ).button( "option", "icons", {primary:'icon icon-info-circle '} )
+    .click(function( event ) { pageSitemap(); event.preventDefault(); });
+{% endif %}
+
+{% if ctx.localhost %}  <!-- Devices Page -->
+  $( "#nav_pageDevices" ).button( "option", "icons", {primary:'icon icon-sitemap fs2x'} )
+    .button( "option", "text", false )
+    .click(function( event ) { pageDevices(); event.preventDefault(); });
+  $( "#nav_pageDevices" ).off("mouseenter mouseleave");
+{% else %}
+  $( "#nav_pageDevices" ).button( "option", "icons", {primary:'icon icon-sitemap'} )
+    .click(function( event ) { pageDevices(); event.preventDefault(); });
+{% endif %}
+
+{% if ctx.localhost %}  <!-- Analysis Page -->
+  $( "#nav_pageAnalysis" ).button( "option", "icons", {primary:'icon icon-line-chart fs2x'} )
+    .button( "option", "text", false )
+{% else %}
+  $( "#nav_pageAnalysis" ).button( "option", "icons", {primary:'icon icon-line-chart'} )
+{% endif %}
+    .click(function( event ) { pageAnalysis(); event.preventDefault(); });
+
+{% if ctx.localhost %}  <!-- Export Page -->
+  {% if allowFileDownloadOnChipsee %}
+    $( "#nav_pageExport" ).button( "option", "icons", {primary:'icon icon-download fs2x'} )
+      .button( "option", "text", false )
+      .click(function( event ) { pageExport(); event.preventDefault(); });
+  {% endif %}
+{% else %}
+  $( "#nav_pageExport" ).button( "option", "icons", {primary:'icon icon-download'} )
+    .click(function( event ) { pageExport(); event.preventDefault(); });
+{% endif %}
+
+{% if ctx.localhost %}  <!-- System Config Page -->
+  $( "#nav_pageSystemConfig" ).button( "option", "icons", {primary:'icon icon-cog fs2x'} )
+    .button( "option", "text", false )
+{% else %}
+  $( "#nav_pageSystemConfig" ).button( "option", "icons", {primary:'icon icon-cog'} )
+{% endif %}
+    .click(function( event ) { pageSystemConfig(); event.preventDefault(); });
+
+{% if ctx.localhost %} <!-- Service Page -->
+    $( "#nav_pageService" ).button( "option", "icons", {primary:'icon icon-wrench fs2x'} )
+      .button( "option", "text", false )
+{% else %}
+    $( "#nav_pageService" ).button( "option", "icons", {primary:'icon icon-wrench'} )
+{% endif %}
+      .click(function( event ) { pageService(); event.preventDefault(); });
+
+{% if ctx.localhost %}  <!-- User Management Page -->
+    $( "#nav_pageUsers" ).button( "option", "icons", {primary:'icon icon-user fs2x'} )
+      .button( "option", "text", false )
+{% else %}
+    $( "#nav_pageUsers" ).button( "option", "icons", {primary:'icon icon-user'} )
+{% endif %}
+      .click(function( event ) { pageUsers(); event.preventDefault(); });
+
+// This should only be remote.
+{% if ctx.localhost %}  <!-- Firmware update page -->
+    $( "#nav_pageUpload" ).button( "option", "icons", {primary:'icon icon-folder-open fs2x'} )
+      .button( "option", "text", false )
+{% else %}
+    $( "#nav_pageUpload" ).button( "option", "icons", {primary:'icon icon-folder-open'} )
+{% endif %}
+      .click(function( event ) { pageUpload(); event.preventDefault(); });
+
+{% if ctx.localhost %}  <!-- Login/Logout Page -->
+  {% if session.is_authenticated %}
+    $( "#nav_authbutton" ).button( "option", "icons", {primary:'icon icon-unlocked fs2x'} )
+      .button( "option", "text", false )
+      .click(function( event ) { pageLogout() });
+    $( "#nav_authbutton" ).off("mouseenter mouseleave");
+  {% else %}
+    $( "#nav_authbutton" ).button( "option", "icons", {primary:'icon icon-lock fs2x'} )
+      .button( "option", "text", false )
+      .click(function( event ) { pageLogin() });
+    $( "#nav_authbutton" ).off("mouseenter mouseleave");
+  {% endif %}
+{% else %}
+  {% if session.is_authenticated %}
+    $( "#nav_authbutton" ).button( "option", "icons", {primary:'icon icon-unlocked'} )
+      .button( "option", "text", true )
+      .click(function( event ) { pageLogout() });
+  {% else %}
+    $( "#nav_authbutton" ).button( "option", "icons", {primary:'icon icon-lock'} )
+      .button( "option", "text", true )
+      .click(function( event ) { pageLogin() });
+  {% endif %}
+{% endif %}
+
+{% if 0 %}          <!-- Touch screen calibration. Not needed for Chipsee -->
+  {% if ctx.localhost %}
+    $( "#nav_screen" ).button( "option", "icons", {primary:'icon icon-desktop fs2x'} )
+      .button( "option", "text", false )
+      .click(function( event ) { pageScreen(); event.preventDefault(); });
+  {% else %}
+  {% endif %}
+{% endif %}
+
+  {% if session.is_authenticated %}
+    var page = sessionStorage.lastPage;
+    $( "#identity" ).hide();
+    $( "#dummy" ).hide();
+    $('body').css('background-color', 'white');
+    $( "#bodyElement" ).show();
+  {% endif %}
+    {% if session.can_action_command %}
+	var i=1
+    sessionStorage.setItem('actionCommand',i);
+	  {% else %}
+	  	var i=0
+    sessionStorage.setItem('actionCommand',i);
+  {% endif %}
+  
+
+  // console.log("pageIndex: page=", page )
+  if (page === undefined )
+    var page = "pageAlarms";
+
+  var navButton = page;
+  // console.log("pageIndex - pageLoad->", page )
+  // We have to map "sub-pages" back to their "nav tile" on the left hand side.
+  // pageService includes pageNetworkStatus, pageE2Alarms, pageEmailHistory, pageAuditTrail
+  if ( ( page === "pageNetworkStatus" ) || ( page === "pageE2alarms" ) || ( page === "pageEmailHistory") ||
+       ( page === "pageAuditTrail" ) )
+  {
+    navButton = "pageService";
+  }
+
+  // console.log("pageIndex: pageLoad =", page, "navButton =", navButton );
+  pageLoad(page);
+  $("#nav_" + navButton).prop('checked', true).button("refresh");
+
+  $('#headerAlarm').hide();
+  {% if ctx.localhost %}
+    updateAlarmStatus(false);
+  {% else %}
+    updateAlarmStatus();
+  {% endif %}
+
+{% if ctx.localhost %}
+      // Burn in protection
+      var showAlarmDiv = $('#alarmInfoDiv');
+      var showAlarmTimeout = null;
+      var burnInTimeout = null;
+      var logOutTimeout = null;
+      var checkAlarmStatusTimeout = null;
+      var flashTimeout = null;
+
+      // The following two items are "cumulative" - meaning, first the screen goes to the idle/partial alarm page and then to the full page and dim
+      // So, we want the full cycle to be 10 minutes - so go to partial alarm screen after 3 minutes and to full alarm screen and dim after 7 more minutes
+      var autoIdleReturnToAlarmPageMSecs = 180000;    //180000 = 180 seconds = 3 minutes (fall back to alarm page)
+      var autoDimBacklightMSecs = 420000;             //420000 = 420000 seconds = 7 minutes (backlight dim)
+      var invertedScreenToggleTimeout = 10000;        // 10000 = 10 seconds.
+      var autoLogoutTimerMSecs =  300000;             //300000  milliseconds = 480 seconds = 5 minutes (auto logout)
+
+      function screenSaverHandler() {
+        function setScreenBrightness(percent) {
+          postJson({"jsonrpc":"2.0","id":"setScreenBrightness","method":"setScreenBrightness", "params":[{'brightPct':percent}]},
+            function(data) {setTimeout(function() { pageWaiting('done');}, 1000);}, jsonError);
+        }
+        function checkAlarmStatus() {
+          if (gPageInAlarm) {
+            if (showAlarmDiv.hasClass("alarmInfoGood")) {
+              showAlarmDiv.removeClass("alarmInfoGood").addClass("alarmInfoBad");
+              showAlarmDiv.removeClass("inverted").addClass("normal");
+            }
+          } else {
+            if (showAlarmDiv.hasClass("alarmInfoBad")) {
+              showAlarmDiv.removeClass("alarmInfoBad").addClass("alarmInfoGood");
+              showAlarmDiv.removeClass("inverted").addClass("normal");
+            }
+          }
+        }
+        showAlarmDiv.removeClass("inverted").addClass("normal");
+        if (showAlarmTimeout != null)
+          clearTimeout(showAlarmTimeout);
+        if (burnInTimeout != null)
+          clearTimeout(burnInTimeout);
+        if (logOutTimeout != null)
+          clearTimeout(logOutTimeout);
+        if (checkAlarmStatusTimeout != null)
+          clearInterval(checkAlarmStatusTimeout);
+        if (flashTimeout != null)
+          clearInterval(flashTimeout);
+        showAlarmTimeout = null;
+        burnInTimeout = null;
+        logOutTimeout = null;
+        checkAlarmStatusTimeout = null;
+        flashTimeout = null;
+        if (showAlarmDiv.is(':visible')) {
+          showAlarmDiv.hide();
+          setScreenBrightness(100);
+        }
+        var article = $("article");
+        showAlarmTimeout = setTimeout(function() {
+            $('#aboutDialog').dialog('close');
+            showAlarmDiv.css( { left: article.offset().left,
+                                top: article.offset().top,
+                                width: article.width(),
+                                height: article.height()
+                              } );
+            checkAlarmStatus();
+            showAlarmDiv.show();
+            $("#nav_pageAlarms").prop('checked', true).button("refresh");
+            pageAlarms();
+            checkAlarmStatusTimeout = setInterval(function() { checkAlarmStatus(); }, 2000);
+            burnInTimeout = setTimeout(function() {
+              showAlarmDiv.css( { left: 0,
+                                    top: 0,
+                                    width: '100%',
+                                    height: '100%'
+                                  } );
+              setScreenBrightness(3);
+              flashTimeout = setInterval(function() {
+                if (showAlarmDiv.hasClass("normal"))
+                  showAlarmDiv.removeClass("normal").addClass("inverted");
+                else
+                  showAlarmDiv.removeClass("inverted").addClass("normal");
+              }, invertedScreenToggleTimeout); // x seconds alternating
+            {% if session.is_authenticated %}
+              logOutTimeout = setTimeout(function() {
+                pageLogout();
+              }, autoLogoutTimerMSecs);
+            {% endif %}
+            }, autoDimBacklightMSecs);
+          }, autoIdleReturnToAlarmPageMSecs);
+      }
+      $('body').bind('mousedown', function(e) { screenSaverHandler(); });
+      screenSaverHandler();
+{% endif %}
+
+      $("#aboutDialog").dialog({
+          autoOpen: false,
+          modal: true,
+          resizable: false,
+          draggable: false,
+          width: "auto",
+          buttons: {
+{% if ctx.dev %}
+              "Dev Login": function() { $(this).dialog( "close"); },
+{% endif %}
+              "Close": function() { $(this).dialog( "close" ); },
+{% if ctx.localhost %}
+            }
+{% else %}
+          },
+          close: function() { window.scrollTo(0,0);
+          }
+{% endif %}
+       });
+
+      $('#commError').on("mousedown", function(e) { location.reload(); });
+      $('#custLogo').on("mousedown", function(e) { location.reload(); });
+      $('#hllogo').on("mousedown", function(e) { $("#aboutDialog").dialog( "open" ); });
+//     updateUnitGlyph();
+{% if ctx.localhost %}
+      resizeArticle();
+      $(window).resize(function(){ resizeArticle(); });
+{% endif %}
+     });
+
+      function postAlmData(requestObject, successFunc, errorFunc) {
+        $.ajax({
+            type: "POST",
+            url: "/almData",
+            data: JSON.stringify(requestObject),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: successFunc,
+            error: errorFunc
+        });
+      }
+
+      function snoozeAlarmChime() {
+        pageWaiting();
+        // console.log( "snoozeAlarmChime called" )
+        postAlmData({"jsonrpc":"2.0","id":"snoozeAlarmChime","method":"snoozeAlarmChime", "params":""},
+          function(data) {
+            timeRemainingSecs = data.timeRemainingSecs;
+            // console.log( "timeRemaining", timeRemainingSecs )
+            updateSnoozeButton( 1, SNOOZE_TIMER_STARTED, timeRemainingSecs );
+            setTimeout(function() { pageWaiting('done');}, 5000);
+            }, jsonError);
+          event.preventDefault();
+      }
+
+      function postLogin(requestObject, successFunc, errorFunc) {
+        $.ajax({
+            type: "POST",
+            url: "/logincheck",
+            data: JSON.stringify(requestObject),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: successFunc,
+            error: errorFunc
+        });
+      }
+
+function postRemoteLogin(requestObject, successFunc, errorFunc) {
+  $.ajax({
+      type: "POST",
+      url: "/logincheck",
+      data: JSON.stringify(requestObject),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: successFunc,
+      error: errorFunc
+  });
+}
+
+
+
+//# sourceURL=pageIndex.html
+</script>
+
+{% if ctx.localhost %}
+
+<style>
+#alarmInfoDiv {
+  display: -webkit-flexbox;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  justify-content: center;
+  z-index: 29000;
+  position: absolute;
+  border: 0px solid black;
+  padding: 0px;
+  cursor: none;
+}
+.alarmInfoBad {
+  font-size: 18em;
+}
+.alarmInfoBad.normal {
+  color: #f0f0f0;
+  background-color: #cb0000;
+}
+.alarmInfoBad.inverted {
+  color: #cb0000;
+  background-color: #f0f0f0;
+}
+.alarmInfoBad:before {
+  font-family: 'icomoon';
+  content: "\f0f3";
+}
+.alarmInfoGood {
+  font-size: 18em;
+}
+.alarmInfoGood.normal {
+  color: #f0f0f0;
+  background-color: #3d733d;
+}
+.alarmInfoGood.inverted {
+  color: #3d733d;
+  background-color: #f0f0f0;
+}
+.alarmInfoGood:before {
+  font-family: 'icomoon';
+  content: "\f00c";
+}
+
+#identity{
+background:#2a652a;
+}
+
+
+</style>
+
+{% endif %}
+
+<style>
+ #myButton1 {
+  background-color: #2a652a;
+  border: none;
+  color: white;
+padding: 14px 40px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+ #myButton {
+  background-color: white;
+  border: none;
+  color: black;
+padding: 14px 40px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+#dummyButton{
+  background-color: white;
+  border: none;
+  color: black;
+padding: 14px 40px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+.loginerror {
+  color: #d00000;
+}
+
+.dummy{
+
+    background-color: #2a652a;
+    overflow:hidden;
+    position: relative;
+}
+
+.identity{
+
+    background-color: #2a652a;
+    overflow:hidden;
+    position: relative;
+}
+
+.loginError { color: red; }
+
+
+.conf__table1 {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 1em;  
+}
+.conf__table1 tr {
+  width: 100%;
+}
+.conf__table1 td:first-child:not(:last-child) {
+  width: 250px;
+}
+.conf__table1 td input[type='text'],
+.conf__table1 td input[type='password'] {
+  height: 2em;
+  min-width: 250px;
+  width: 50%;
+}
+
+.conf__table1 td textarea {
+  width: 100%;
+  color: white;
+}
+</style>
+</head>
+
+{% if ctx.localhost %}
+  <body ondragstart="return false;" ondrop="return false;">
+    <div id="alarmInfoDiv" class="alarmInfoGood normal"></div>
+{% else %}
+  <div id="dummy" class="dummy" >
+    <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>
+  <center><h3><p><button id="dummyButton" onclick="myFunction2()">Login</button></p> </h3> </center>
+  </div>
+  <div id="identity" class="identity">
+  <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>   <br>
+  <center>
+<span class="loginerror">&nbsp;
+
+</span><br/><br/>
+
+<table cellpadding=2px; style="padding: 3px;" class="conf__table1">
+  <tr class="loginStatus loginError">
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>Incorrect username and password combination.</td>
+
+  </tr>
+
+  <tr>
+    <td>&nbsp;</td>
+    <td style="color:white"><b>User:</b></td>
+    <td><input type="text" size="15" id="loginUsername1" name="loginUsername1" placeholder="Enter User Name"></td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td style="color:white"><b>Password:</b></td>
+    <td><input type="password" size="15" id="loginPassword1" name="loginPassword1" placeholder="Enter Password"></td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td><input type="button" id="myButton" value="Login"></td>
+  </tr>
+</table>
+</div>
+
+</center>
+    </div>
+  <div id = "bodyElement">
+  <body>
+{% endif %}
+    <div id="commError" style="display:none">Waiting For Server...</div>
+    <div id="testEmailAlarmStatus" style="display:none;font-size:x-large;background-color:yellow;z-index:99;width:100%;position:absolute;padding-bottom:20px"></div>
+
+  <!--[if lt IE 7]>
+    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif] -->
+
+{% if session.is_authenticated %}
+<nav id="nav" class="sidebar__logged-in">
+{% else %}
+<nav id="nav">
+{% endif %}
+  <div id="nav_button_set" class="sidebar__list">
+
+    {% if 0 %}
+      {% if ctx.localhost %}
+      {% else %}
+        <!-- Only show when remote -->
+        <input type="radio" name="radio" id="nav_pageSitemap"><label for="nav_pageSitemap">&nbsp;</label>
+      {% endif %}
+    {% endif %}
+
+    {% if ctx.localhost %}
+      <input type="radio" name="radio" id="nav_pageAlarms"><label for="nav_pageAlarms">&nbsp;</label>
+      <input type="radio" name="radio" id="nav_pageDevices"><label for="nav_pageDevices">&nbsp;</label>
+      <input type="radio" name="radio" id="nav_pageAnalysis"><label for="nav_pageAnalysis">&nbsp;</label>
+
+      {% if session.can_edit_system %}
+        <input type="radio" name="radio" id="nav_pageSystemConfig"><label for="nav_pageSystemConfig">&nbsp;</label>
+      {% endif %}
+
+      {% if 0 %} <!-- Removed because we don't want file access on local display -->
+        <input type="radio" name="radio" id="nav_pageUpload"><label for="nav_pageUpload">&nbsp;</label>
+      {% endif %}
+
+      {% if session.can_edit_users %}
+        <input type="radio" name="radio" id="nav_pageUsers"><label for="nav_pageUsers">&nbsp;</label>
+      {% endif %}
+
+      {% if session.can_edit_system %}
+        <input type="radio" name="radio" id="nav_pageService"><label for="nav_pageService">&nbsp;</label>
+      {% endif %}
+
+      {% if session.is_authenticated %}
+        <input type="radio" name="radio" id="nav_authbutton"><label for="nav_authbutton">&nbsp;</label>
+      {% else %}
+        <input type="radio" name="radio" id="nav_authbutton"><label for="nav_authbutton">&nbsp;</label>
+      {% endif %}
+
+    {% else %} <!-- REMOTE BROWSER -->
+
+        <input type="radio" name="radio" id="nav_pageAlarms"><label for="nav_pageAlarms">Alarms</label>
+        <input type="radio" name="radio" id="nav_pageDevices"><label for="nav_pageDevices">Devices</label>
+        <input type="radio" name="radio" id="nav_pageAnalysis"><label for="nav_pageAnalysis">Data Log</label>
+        <input type="radio" name="radio" id="nav_pageExport"><label for="nav_pageExport">Data Export</label>
+
+      {% if session.can_edit_system %}
+        <input type="radio" name="radio" id="nav_pageSystemConfig"><label for="nav_pageSystemConfig">Configuration</label>
+      {% endif %}
+
+      {% if session.can_access_files %}
+        <input type="radio" name="radio" id="nav_pageUpload"><label for="nav_pageUpload">Files</label>
+      {% endif %}
+
+      {% if session.can_edit_users %}
+        <input type="radio" name="radio" id="nav_pageUsers"><label for="nav_pageUsers">Users</label>
+      {% endif %}
+
+      {% if session.can_edit_system %}
+        <input type="radio" name="radio" id="nav_pageService"><label for="nav_pageService">Service</label>
+      {% endif %}
+
+      {% if session.is_authenticated %}
+        <input type="radio" name="radio" id="nav_authbutton"><label for="nav_authbutton">Logout</label>
+      {% else %}
+        <input type="radio" name="radio" id="nav_authbutton"><label for="nav_authbutton">Login</label>
+      {% endif %}
+    {% endif %}
+  </div>
+</nav>
+
+  <div id="aboutDialog" title="About LEO">
+    <table>
+      <tr><td>Version:</td><td>{{ctx.versionInfo.LeoVersionNumber}}</td></tr>
+      <tr><td>Date:</td><td>{{ctx.versionInfo.LeoVersionDate}}</td></tr>
+      <tr><td>Server Address:</td><td>{{ctx.IPInfo.IP_ADDR}}</td></tr>
+      <tr><td>Server NetMask:</td><td>{{ctx.IPInfo.IP_MASK}}</td></tr>
+      <tr><td>Server Gateway:</td><td>{{ctx.IPInfo.IP_GATEWAY}}</td></tr>
+      <tr><td>DNS Server:</td><td>{{ctx.IPInfo.DNS_ADDRESS}}</td></tr>
+      <tr><td>Serial Number:</td><td>{{ctx.IPInfo.HW_ADDR}}</td></tr>
+      <tr><td>Emails In Queue:</td><td>{{ctx.emailsInQueue}}</td></tr>
+
+    </table>
+    <br/>
+     <div>Copyright (c) 2016-2017 Hunter Liberty Corporation<br/>All rights reserved.  No warranty, explicit or implicit, provided.</div>
+  </div>
+
+  <section>
+    <table id="headertable" >
+      <tr>
+        <td style="width: 200px">
+          <img id="hllogo" src="static/local/img/hllogo.png" alt="">
+        </td>
+        <td>
+          <div class="sitename">{{ctx.siteStatus.name}}
+          </div>
+        </td>
+        <td>
+          <div id="timeupdate"></div>
+          <div id="sessionInfo">
+            {% if session.is_authenticated %}
+            Login: {{session.username}}
+            {% else %}
+            Login: Not Logged In
+            {% endif %}
+          </div>
+        </td>
+        <td>
+          <img id="custLogo" src="{{logoImage}}"  width="160" height="50" alt="">
+        </td>
+      </tr>
+    </table>
+    <article id="article"><div id="content"></div></article>
+  </section>
+  </div>
+</body>
+</html>

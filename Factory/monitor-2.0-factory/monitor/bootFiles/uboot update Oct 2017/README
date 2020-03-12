@@ -1,0 +1,40 @@
+## About This shell
+
+# This tool is used to update bootloader in system. need root.
+# Don't modify this script.
+# Any modify may cause the system damage or data lose.
+
+##How TO Use
+
+# use latest u-boot.bin to replace the u-boot.bin in this directory.
+# execute shell like follow
+$ sudo ./update-uboot.sh
+
+By Chipsee
+2017.10.27
+
+This folder contains an updated u-boot.bin and the .sh script to install it.
+It was provided because there was a problem with the Chipsee device not being
+able to reboot properly from a command line "reboot".
+
+The following is from email exchanges with Nicky at Chipsee (lxq@chipsee.com)
+
+Hi,
+To update the bootloader to resolv the reboot issue easily, I build a shell to execute in your now system.
+Use follow steps to do it:
+    # download the update-uboot-package.tar.gz
+    # copy the tar to your ubuntu1204, you can use ssh
+    scp update-uboot-package.tar.gz linaro@192.168.x.x:/home/linaro
+    # untar the tar package on ubuntu1204, you also can use ssh
+    ssh linaro@192.168.x.x
+    tar zxvf update-uboot-package.tar.gz
+    # update
+    cd update-uboot-package
+    sudo ./update-uboot.sh
+    # reboot to use latest uboot to boot
+
+
+As for the boot problem, the software used a pin which has been occupied by RS485 output signal.
+     So the software reboot may have problem because of RS485 output signal depend on the RS485 BUS.
+     So we suggest you update all the product software.
+

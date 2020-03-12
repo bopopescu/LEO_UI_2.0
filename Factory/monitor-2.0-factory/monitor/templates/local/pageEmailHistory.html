@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<style>
+#EmailTransHistoryAccordion {
+  margin: 10px;
+}
+
+#ETStatusDetailDlg {
+  top: 15%;
+  overflow-y: scroll;
+}
+
+</style>
+
+<div id="EmailTransHistoryAccordion" class="accordion">
+  <h3 id="EmailHistoryTitle">Email History Log</h3>
+    <div><div id="EmailTransHistoryEntries"></div></div>
+</div>
+
+<!-- Email Transaction Status Details Popup -->
+<div id="ETStatusDetailDlg" title="Status Details">
+</div>
+
+
+<script>
+
+
+var statusDetailsClick = function (id, row, col, val) {
+
+  var ETrecId = EmailTransHistoryEntries[row][6];
+  var EBrecId = EmailTransHistoryEntries[row][5];
+
+  $("#ETStatusDetailDlg").html("Loading...");
+
+  $("#ETStatusDetailDlg").dialog("open");
+  event.preventDefault();
+
+  // console.log("Requesting ET:", ETrecId, "EB:", EBrecId );
+  pageXHR = postJson({"jsonrpc":"2.0","id":"EmailTransHistoryEntries","method":"getEmailHistoryEntries","params": [ {"transType":"emailTransAndBodyRecHTML", "ETrecId":ETrecId, "EBrecId":EBrecId} ]},
+    function(data) {
+
+      var result = data;
+
+      pageWaiting('done');
+      if ( Object.keys(result).length > 0 ) {
+
+        if ( ( result['emailBody'].length === 0 ) && ( result['ETrecDict'].length === 0 ) ) {
+          // If the emailBody and ETrecDict is empty, subjectLine contains an error string to display.
+          strHtml = "<br>" + result['subjectLine'];
+        }
+        else if (result['emailBody'] !== undefined) {
+          strHtml = "<br>" + result['emailBody'];
+          var ETrec = result['ETrecDict'];
+          strHtml = strHtml + ETrec['emailstatus'];
+        }
+        else {
+          // console.log( result );
+          ETrecDict = result['ETrecDict'];
+          EBrecDict = result['EBrecDict'];
+
+          // If this is an email alarm
+          if (ETrecDict.emailtype === 1) {   // Send alarm
+            jsonEmailInfo = EBrecDict.jsonEmailInfo;
+            alarmRecs = jsonEmailInfo['alarmRecs'];
+            strHtml = "<strong>Alarm Records</strong><br><br><table>" + "<th>Date</th><th>Name</th><th>State</th><th>Alarm</th>";
+            for (recKey in alarmRecs) {
+              alarmRec = alarmRecs[recKey];
+              // We need to convert the time into localtime
+              strLocalTime = new Date(alarmRec.date + " UTC").toString().replace(/.GMT.*$/g, "");
+              strHtml = strHtml + "<tr><td>" + strLocalTime + "</td><td>" + alarmRec.name + "</td><td>" +
+                alarmRec.action + "</td><td>" + alarmRec.displayName + "</td></tr>";
+            }
+            strHtml = strHtml + "</table>";
+          }
+          else if (ETrecDict.emailtype === 2) { // Test alarm
+            strHtml = "<strong>TEST ALARM SENT</strong><br>";
+          }
+          else if (ETrecDict.emailtype === 3) {    // Send alarm report
+            // this is an email alarm REPORT
+            jsonEmailInfo = EBrecDict.jsonEmailInfo;
+            alarmReportInfo = jsonEmailInfo['alarmReportInfo'];
+            strHtml = "<strong>Alarm Report</strong><table><th></th><th></th><tr><td>Current Alarm Report Time</td><td>" + alarmReportInfo.currentReportTime + "</td></tr>";
+            strHtml = strHtml + "<tr><td>Last Alarm Report Time</td><td>" + alarmReportInfo.lastReportTime + "</td></tr>";
+
+            strHtml = strHtml + "<br><br><tr><td>Total Active Alarms: </td><td>" + alarmReportInfo.totalActiveAlarms + "</td></tr>" +
+              "<tr><td>Total Alarm Events: </td><td>" + alarmReportInfo.totalAlarmEvents + "</td></tr></table>";
+
+            alarmSummaryList = alarmReportInfo.alarmSummaryList;
+            if (alarmSummaryList.length > 0) {
+              strHtml = strHtml + "<br><br><strong>Alarm Event Details</strong><br><br>";
+              strHtml = strHtml + "<table><th>Name</th><th>Alarm</th><th>Count</th><th>Active</th>";
+              for (recKey in alarmSummaryList) {
+                alarmReportRec = alarmSummaryList[recKey];
+                strHtml = strHtml + "<tr><td>" + alarmReportRec[0] + "</td><td>" + alarmReportRec[1] + "</td><td>" +
+                  alarmReportRec[2] + "</td><td>" + (alarmReportRec[3] ? "Yes" : "..") + "</td></tr>";
+              }
+              strHtml = strHtml + "</table>";
+            }
+            else {
+              strHtml = strHtml + "<br><strong>No Alarm Events</strong><br>";
+            }
+          }
+          strHtml = strHtml + "<br><strong>Send Email Status</strong><br>" + ETrecDict.emailstatus
+        }
+      } else {
+        console.log("not found")
+        strHtml = "<br>Information Not Found";
+      }
+      $("#ETStatusDetailDlg").html( strHtml );
+    },
+    jsonError
+    );
+};
+
+
+var EmailTransHistoryEntries = []
+
+$("#EmailTransHistoryEntries").proptable({ name: 'EmailTransHistoryEntries',
+  data: EmailTransHistoryEntries,
+  columns: [{ readonly: true, header: 'Date/Time' },
+            { readonly: true, header: 'Action' },
+            { readonly: true, header: 'To' },
+            { readonly: true, header: 'Subject' },
+            { readonly: true, header: 'Status' },
+            { type:'popup', header: 'Details', click: statusDetailsClick },
+            { readonly: true, header: 'recId', hidden:true },
+            { readonly: true, header: 'Email ID'}]
+});
+
+// initialization for status details dialog
+$(function () {
+    var winW = $(window).width() - 180;
+    var winH = $(window).height() - 180;
+    // console.log( "winW=", winW, "winH=", winH )
+    $("#ETStatusDetailDlg").dialog({
+      autoOpen: false,
+      modal: true,
+      resizable: false,
+      draggable: false,
+      height: winH,
+      width: "70%",
+      buttons: {
+        "OK": function () {
+          $(this).dialog("close");
+        },
+      }
+    });
+  });
+
+
+function getEmailTransHistory() {
+  pageWaiting();
+  pageXHR = postJson({"jsonrpc":"2.0","id":"EmailTransHistoryEntries","method":"getEmailHistoryEntries","params": [ {"transType":"allEmailTrans"} ]},
+    function(data) {
+
+      var result = data;
+
+      pageWaiting('done');
+      if (result.length === 0) {
+        while(EmailTransHistoryEntries.length > 0) { EmailTransHistoryEntries.pop(); }
+      }
+      else if ((EmailTransHistoryEntries.length === 0) || (result[0].date !== EmailTransHistoryEntries[0])) {
+        var row = 0;
+        while(EmailTransHistoryEntries.length > 0) { EmailTransHistoryEntries.pop(); }
+        for (key in result) {
+          emailTransRec = result[key];
+          var strAction = "";
+          var d = utcToLocalDate(emailTransRec.date);
+          var strLocalTime = dateToString(d);
+
+          switch (emailTransRec.emailtype) {
+            case 1:
+              strAction = strAction.concat( " Alarm" );
+              break;
+            case 2:
+              strAction = strAction.concat( "Test Alarm" );
+              break;
+            case 3:
+              strAction = strAction.concat( "Alarm Report" );
+              break;
+            case 4:
+              strAction = strAction.concat( "Test Alarm Report" );
+              break;
+          }
+
+          // Numbers are from systemConstants.py
+          var statusCSS = noalarmcss;
+          switch (emailTransRec.transstatus) {
+            case 0:
+              strStatus = "Success";
+              statusCSS = goodalarmcss;
+              break;
+            case 1:
+              strStatus = "Send Fail";
+              statusCSS = alarmcss;
+              break;
+            case 2:
+              strStatus = "Send Try 1 Fail";
+              statusCSS = retrycss;
+              break;
+            case 3:
+              strStatus = "Send Try 2 Fail";
+              statusCSS = retrycss;
+              break;
+            case 4:
+              strStatus = "Send Try 3 Fail";
+              statusCSS = retrycss;
+              break;
+            case 20:
+              strStatus = "Send In Progress";
+              statusCSS = noalarmcss;
+              break;
+            case 21:
+              strStatus = "Try 2 Queued";
+              statusCSS = noalarmcss;
+              break;
+            case 22:
+              strStatus = "Try 3 Queued";
+              statusCSS = noalarmcss;
+              break;
+          }
+          $("#EmailTransHistoryEntries").proptable('setCustomCss', row, 4, statusCSS );
+          row = row + 1;
+          // If the EBrecId/Email Id is -1, don't show. Show only positive EBrecId
+          var emailId;
+          if ( emailTransRec.EBrecId >= 0 ) emailId = emailTransRec.EBrecId; else emailId = "--";
+
+          EmailTransHistoryEntries.push( [ strLocalTime, strAction, emailTransRec.toaddress, emailTransRec.subjectline,
+                                      strStatus, emailTransRec.EBrecId, emailTransRec.recId, emailId ] );
+        }
+      }
+      $("#EmailTransHistoryEntries").proptable('render');
+
+      // Refresh the page every 60 seconds
+      pageSetTimeout(function() { getEmailTransHistory(); }, 60000);
+    },
+    jsonError
+    );
+}
+
+$( "#EmailTransHistoryAccordion" ).accordion( { heightStyle: "content",
+{% if ctx.localhost %}
+  animate: false
+{% else %}
+  animate: true
+{% endif %}
+
+ } );
+
+getEmailTransHistory();
+
+//# sourceURL=pageEmailHistory.html
+</script>
+
