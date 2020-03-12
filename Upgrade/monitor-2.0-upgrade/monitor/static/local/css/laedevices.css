@@ -1,0 +1,47 @@
+   .inptbl, .otptbl, .otptbl1{
+       padding-left:5px;
+       border: 2px solid black;
+       margin:10px;
+       left:50px;
+      width:300px;
+        position: relative;
+       clear:left;
+       resize: both;
+
+        font-color:white;
+
+   }
+    #tabStatus{
+       resize: both;
+     }
+    .ctltbl
+    {
+        padding-left:5px;
+       border: 2px solid black;
+        margin:10px;
+        clear:both;
+       width:auto;
+
+    }
+    .ControllerTable
+    {
+       float:left;
+       padding: 10px;
+        resize:both;
+
+    }
+
+    .Img
+    {
+        float: left;
+       padding: 5px;
+        left:10px;
+        right:10px;
+
+   }
+
+table.inptbl, table.otptbl, table.otptbl1 , table.ControllerTable,table.ctltbl td {
+
+        background-color: white;
+    }
+

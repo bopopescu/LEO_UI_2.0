@@ -1,0 +1,67 @@
+
+.edittable input:not([type=checkbox]) {
+  padding: 2px;
+  border: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.edittable input[type=checkbox] {
+  border: none;
+  width: 40px;
+}
+
+.edittable select {
+  padding: 0px;
+  width: 100%;
+  /*border: none;*/
+  /*outline:0px;*/
+  /* can adjust tables sizes for touch with this */
+/*  
+  height:30px;
+  line-height:30px;
+*/  
+}
+
+.edittable .color {
+  min-width: 80px;
+  padding: 0 2px;
+  cursor: none;
+}
+
+.edittable .file {
+  min-width: 80px;
+  max-width: 150px;
+  padding: 0 2px;
+  cursor: none;
+}
+
+.edittable .checkbox {
+  min-width: 30px;
+}
+
+.edittable table {
+  border-collapse: collapse;  
+}
+
+.edittable td {
+  border: 1px solid #d4ccb0;
+  padding: 10px 0;
+  background-color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;  
+  overflow: hidden;
+}
+
+.edittable th {
+  background-color: #f6f3ec;
+  border: 1px solid #d4ccb0;
+  padding: 1px 7px;
+  text-align: center;
+}
+
+.edittable tr:first-child th {
+  min-width: 30px;
+}
+
+

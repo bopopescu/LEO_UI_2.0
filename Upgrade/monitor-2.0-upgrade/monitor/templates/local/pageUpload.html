@@ -1,0 +1,393 @@
+<style>
+
+.imagePickerBorder {
+  border: 2px solid #dfd9c3;
+}
+
+div.upload {
+  border: 1px solid #dfd9c3;
+  display: inline-block;
+  padding: 3px 5% 3px 3px;
+  position:relative;
+  width: auto;
+  border-radius: 10px;
+}
+
+div.upload:hover {
+  opacity:0.95;
+}
+
+div.upload input[type="file"] {
+  display: input-block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+{% if ctx.localhost %}
+  cursor: none;
+{% else %}
+  cursor:pointer;
+{% endif %}
+  position:absolute;
+  left:0;
+}
+
+.progress-box-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(192, 192, 192, 0.40);
+  position: fixed;
+  z-index: 9998;
+  display: none;
+}
+
+.progress-box {
+  position: relative;
+  width: 50%;
+  min-width: 30%;
+  margin: auto;
+  z-index: 9999;
+}
+
+</style>
+
+
+<div id="uploadAccordion">
+
+  <h3>Device Images</h3>
+    <div>
+      <div class="imagePickerBorder">
+        <select id="deviceFilePicker" class="image-picker">
+            {% for filename in imageFiles %}
+               <option data-img-src='{{imagePath}}/{{filename}}' value="{{filename}}">{{filename}}</option>
+            {% endfor %}
+        </select>
+      </div>
+      <div>
+        <form id="devicesUpload" action="" method="post" enctype="multipart/form-data">
+          <input id="removeDevice" type="button" value="Remove" />
+          &nbsp;
+          &nbsp;
+          <div class="upload">
+            <input class="browseButton" type="button" value="Browse" />
+            <input type="file" name="fileToUpload" accept="image/*" />
+            <span >Select image...</span>
+          </div>
+          <input type="text" name="location" style="display:none" value="devices" />
+          <input class="uploadButton" type="submit" value="Upload" />
+        </form>
+      </div>
+    </div>
+
+  <h3>Download Backup</h3>
+    <div>
+      <input id="backupDownload" type="button" value="Download" />
+      &nbsp;<span>&nbsp;
+      <input id="DebugLogDownloadButton" type="button" value="Debug Log Download" />
+    {% if ctx.dev %}
+      <input id="devDownloadLog" type="button" value="Dev Download" />
+    {% endif %}
+    </div>
+
+  <h3>Restore Backup</h3>
+    <div>
+      <em>After restoring databases, the system will automatically reboot.</em>
+      <br/>
+      <br/>
+      <form id="backupUpload" action="" method="post" enctype="multipart/form-data">
+        <div class="upload">
+          <input class="browseButton" type="button" value="Browse" />
+          <input type="file" name="fileToUpload" accept=".zip" />
+          <span >Select backup file...</span>
+        </div>
+        <input type="text" name="location" style="display:none" value="restore" />
+        <input class="uploadButton" type="submit" value="Restore" />
+      </form>
+    </div>
+
+  <h3>Install Firmware</h3>
+    <div>
+      <table>
+        <tr><td>Current Version&nbsp;&nbsp;&nbsp;</td><td>{{ctx.versionInfo.LeoVersionNumber}}</td></tr>
+        <tr><td>Build Date</td><td>{{ctx.versionInfo.LeoVersionDate}}</td></tr>
+      </table>
+      <br/>
+      <em>After installing firmware, you may need to refresh browser to see updates.</em>
+      <br/>
+      <br/>
+      <form id="firmwareUpload" action="" method="post" enctype="multipart/form-data">
+        <div class="upload">
+          <input class="browseButton" type="button" value="Browse" />
+          <input type="file" name="fileToUpload" accept=".pkg" />
+          <span >Select firmware package...</span>
+        </div>
+        <input type="text" name="location" style="display:none" value="firmware" />
+        <input class="uploadButton" type="submit" value="Install" />
+      </form>
+
+    </div>
+
+  <h3>Customer Custom Display Image</h3>
+    <div>
+      <div class="imagePickerBorder">
+        <select id="deviceFilePicker1" class="image-picker">
+            {% for filename in imageCustFiles %}
+			 {%if filename == "custlogo.png" %}
+               <option data-img-src='{{imageCustPath}}/{{filename}}' value="{{filename}}">{{filename}}</option>
+			{% endif %}
+            {% endfor %}
+        </select>
+      </div>
+      <div>
+        <form id="devicesUpload1" action="" method="post" enctype="multipart/form-data">
+          <input id="removeDevice1" type="button" value="Remove" />
+          &nbsp;
+          &nbsp;
+          <div class="upload">
+            <input class="browseButton" type="button" value="Browse" />
+            <input type="file" name="fileToUpload" accept="image/*" />
+            <span >Select image...</span>
+          </div>
+          <input type="text" name="location" style="display:none" value="devices1" />
+          <input class="uploadButton" type="submit" value="Upload" />
+        </form>
+      </div>
+    </div>
+</div>
+
+</div> <!-- Accordian div -->
+
+
+<!-- Backup download -->
+<form action="/fileData" method="post" name="backuppost">
+<input type="hidden" id="backuprequest" name="backuprequest" value="vBackupRequest">
+<input type="hidden" id="reqType" name="reqType" value="BackupRequest">
+</form>
+
+<!-- Debug Log download -->
+<form action="/fileData" method="post" name="debuglogpost">
+<input type="hidden" id="DebugLogDownload" name="DebugLogDownload" value="DebugReport">
+<input type="hidden" id="reqType" name="reqType" value="DebugReport">
+</form>
+
+<!-- Dev log download -->
+<form action="/fileData" method="post" name="devdownloadpost">
+<input type="hidden" id="devDownloadLog" name="devDownloadLog" value="vDevDownloadLog">
+<input type="hidden" id="reqType" name="reqType" value="DevDownloadLog">
+ <input type="hidden" id="devFilePath" name="devFilePath">
+</form>
+
+
+<div id = "progressBox" class="progress-box-overlay">
+  <div class="progress-box">
+    <div id="uploadProgress">
+      <div id="uploadProgressLabel">&nbsp;Uploading:&nbsp;Waiting...</div>
+    </div>
+  </div>
+</div>
+
+
+<div id="DownloadStandbyDlg" title="Please Standby">
+  <table style="width: 100%;text-align:center">
+    <tr><td>Preparing Download File</td></tr>
+    <br/>
+    <tr><td>Please Wait.</td></tr>
+  </table>
+</div>
+
+
+<script>
+
+//////////////////////////////////////////////////////////
+// Accordion
+
+(function() {
+
+  $('input[type=file]').change(function(e) {
+    var $in = $(this);
+    var val = $in.val();
+    if (val.length > 0)
+      $in.next().html(val.replace(/^.*\\/, ""));
+    else
+      $in.next().html('Nothing selected...');
+  });
+
+  var displayProgress = function() {
+    $("#progressBox").show();
+    $('#uploadProgress').progressbar({
+      value: 0,
+      change: function() {
+        $('#uploadProgressLabel').html( '&nbsp;Uploading: ' + $('#uploadProgress').progressbar('value').toFixed(1) + '%' );
+      },
+      complete: function() {
+        $('#uploadProgressLabel').html( '&nbsp;Uploading: Complete.');
+      }
+    });
+  }
+
+
+  var ajaxSubmit = function(data, firmware) {
+    $.ajax({
+      url: "/uploadcheck",   // Url to which the request is send
+      type: "POST",             // Type of request to be send, called as method
+      data: data,               // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+      enctype: "multipart/form-data",
+      contentType: false,       // The content type used when sending data to the server.
+      cache: false,             // To unable request pages to be cached
+      processData:false,        // To send DOMDocument or non processed data file it is set to false
+      xhr: function() {
+        var xhr = new window.XMLHttpRequest();
+        xhr.upload.addEventListener("progress", function(evt) {
+                    var percentComplete = evt.loaded / evt.total;
+                    var visible = $('#testElement').is(':visible')
+                    if ((percentComplete < 1.00) && (!visible)) {
+                      displayProgress();
+                      visible = true;
+                    }
+                    if (visible)
+                      $('#uploadProgress').progressbar('value', (percentComplete * 100));
+                }, false);
+        return xhr;
+      },
+      success: function(data)   // A function to be called if request succeeds
+      {
+        // console.log("Upload Success!!! Data=", data)
+        if (data.length > 0) {
+          // console.log("data.length is > 0")
+          if (confirm(strStatus) == true) {
+              txt = "You pressed OK!";
+          } else {
+              txt = "You pressed Cancel!";
+          }
+//          alert(data);
+          $("#progressBox").hide();
+        } else {
+          if (firmware) {
+            $('#uploadProgress').progressbar('value', 100);
+            setTimeout(function() { location.reload() }, 3000);
+          }
+          else
+            pageReload();
+        }
+      },
+      error: function(data)   // A function to be called if request fails
+      {
+        // console.log("Upload ERROR!!! Data=", data)
+        if (data.length > 0) {
+          alert(data);
+          $("#progressBox").hide();
+        }
+      }
+
+    });
+  }
+
+  $('#devicesUpload, #devicesUpload1, #backupUpload').submit(function(e) { e.preventDefault(); ajaxSubmit(new FormData(this), false); } );
+  $('#firmwareUpload').submit(function(e) { e.preventDefault(); ajaxSubmit(new FormData(this), true); } );
+
+  $('.browseButton, .uploadButton').button();
+
+  // Image box
+  var deviceImage = null;
+
+  var $deviceFilePicker = $('#deviceFilePicker');
+  $deviceFilePicker.imagepicker({ clicked: function() { deviceImage = $(this).val(); }, show_label: true });
+  deviceImage = $deviceFilePicker.val();
+  
+    var $deviceFilePicker1 = $('#deviceFilePicker1');
+  $deviceFilePicker1.imagepicker({ clicked: function() { deviceImage1 = $(this).val(); }, show_label: true });
+  deviceImage1 = $deviceFilePicker1.val();
+
+  $('#removeDevice').button().click(function(e) {
+    e.preventDefault();
+    if (deviceImage != null) {
+      var formData = new FormData();
+      formData.append('action', 'delete');
+      formData.append('location', 'devices');
+      formData.append('fileToDelete', deviceImage);
+      ajaxSubmit(formData);
+    }
+  });
+
+  $('#removeDevice1').button().click(function(e) {
+    e.preventDefault();
+    if (deviceImage != null) {
+      var formData = new FormData();
+      formData.append('action', 'delete');
+      formData.append('location', 'devices1');
+      formData.append('fileToDelete', deviceImage1);
+      ajaxSubmit(formData);
+    }
+  });
+
+  $('#backupDownload').button().click(function() {
+    // console.log( "version", "{{ctx.versionInfo.LeoVersionNumber}}" )
+    $("#DownloadStandbyDlg").dialog( "open" );
+    var d = new Date();
+//    var fn = 'LeoBkup_' + document.title + '_' + d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+'_'+d.getHours()+'-'+d.getMinutes()+'-'+d.getSeconds();
+    var fn = 'LeoBkup_' + document.title + '_' + 'v{{ctx.versionInfo.LeoVersionNumber}}' + '_' + d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+'_'+d.getHours()+'-'+d.getMinutes()+'-'+d.getSeconds();
+    // console.log( "Filename", fn )
+    $('#backuprequest').val( fn );
+    document.backuppost.submit();
+    setTimeout(function() { $("#DownloadStandbyDlg").dialog( "close" ) }, 6000);
+
+  });
+
+  $('#DebugLogDownloadButton').button().click(function() {
+
+    $("#DownloadStandbyDlg").dialog( "open" );
+    var d = new Date();
+    var fn = 'DebugReport_'+ document.title + '_' + d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+'_'+d.getHours()+'-'+d.getMinutes()+'-'+d.getSeconds();
+    $('#DebugLogDownload').val( fn );
+    document.debuglogpost.submit();
+    setTimeout(function() { $("#DownloadStandbyDlg").dialog( "close" ) }, 6000);
+
+  });
+
+
+  $("#DownloadStandbyDlg").dialog({
+      autoOpen: false,
+      modal: true,
+      resizable: false,
+      draggable: false,
+      width: "auto"
+  });
+
+
+
+
+
+  $('#devDownloadLog').button().click(function() {
+    $('#devFilePath').val( 'leonardo.log' );
+    document.devdownloadpost.submit();
+  });
+
+
+  var accordion_active = false;
+  if ('upload_accordion' in sessionStorage)
+    accordion_active = parseInt(sessionStorage.upload_accordion);
+
+  $('#uploadAccordion').accordion( { heightStyle: "content", collapsible: true, active: accordion_active,
+      {% if ctx.localhost %}
+        animate: true,
+      {% else %}
+        animate: true,
+      {% endif %}
+      activate: function(event, ui) {
+        sessionStorage.upload_accordion = $(this).accordion('option', 'active');
+      },
+    } );
+
+
+  pageClose = function() {
+    //alert('closing page')
+  }
+
+}());
+
+pageWaiting('done')
+//# sourceURL=pageUpload.html
+
+</script>

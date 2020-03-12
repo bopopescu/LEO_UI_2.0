@@ -1,0 +1,143 @@
+
+<style>
+.loginerror {
+  color: #d00000;
+}
+
+.loginError { color: red; }
+
+</style>
+
+<div class="logincontent">
+<span class="loginerror">&nbsp;
+
+</span><br/><br/>
+
+<table cellpadding=2px; style="padding: 3px;" class="conf__table">
+  <tr class="loginStatus loginError">
+    <td>&nbsp;</td>
+    <td>Incorrect username and password combination.</td>
+  </tr>
+
+  <tr>
+    <td>User:</td>
+    <td><input type="text" size="15" id="loginUsername" name="loginUsername"></td>
+  </tr>
+  <tr>
+    <td>Password:</td>
+    <td><input type="password" size="15" id="loginPassword" name="loginPassword"></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td><input type="button" id="loginBtn" value="Login"></td>
+  </tr>
+</table>
+</div>
+
+  {% if ctx.osKeybd %}
+    <div id="keypadDialog">
+      <div id="keypad"></div>
+    </div>
+  {% endif %}
+
+<script>
+
+pageWaiting('done');
+$('.loginError').hide();
+
+function postLogin(requestObject, successFunc, errorFunc) {
+  $.ajax({
+      type: "POST",
+      url: "/logincheck",
+      data: JSON.stringify(requestObject),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: successFunc,
+      error: errorFunc
+  });
+}
+
+
+$("#loginBtn").button().click(function( event ) {
+  var username = $('#loginUsername').val();
+  var password = $('#loginPassword').val();
+	
+	var i = 1;
+	sessionStorage.setItem("username",username )
+	sessionStorage.setItem("loginCounter", i)
+	
+  if (username.length == 0 || password.length == 0) {
+    $('.loginError').show();
+    return;
+  }
+
+  pageXHR = postLogin({"jsonrpc":"2.0","id":"logincheck","method":"logincheck", "params":[{'User':username, 'Pass':password}]},
+    function(data) {
+//      console.log( "Login Result=", data )
+      if ( data.success == true ) {
+        // Successful login
+        location.reload() // Refresh header
+      }
+      else {
+        $('.loginError').show();
+      }
+    }, jsonError);
+  event.preventDefault();
+
+});
+
+{% if ctx.osKeybd %}
+  pageClose = function() {
+    $('#keypadDialog').dialog('close');
+    $('#keypadDialog').dialog('destroy').remove();
+  }
+
+  $('#loginUsername').focus(function() { showkeypad($(this), 'User'); });
+  $('#loginPassword').focus(function() { showkeypad($(this), 'Password'); });
+
+  //////////////////////////////////////////////////////////
+  // keyboards
+
+  var _keypadTarget = null;
+
+  $('#keypadDialog').dialog({
+    autoOpen: false,
+    modal: true,
+    resizable: true,
+    draggable: false,
+    width: 'auto',
+    close: function() {
+      window.scrollTo(0,0);
+    }
+   });
+
+  $('#keypad').keypad({ done: function (ok, value) {
+    $('#keypadDialog').dialog('close');
+            if (ok)
+      _keypadTarget.val(value);
+  } });
+
+  $('.ui-dialog-titlebar').hide();
+
+
+  function showkeypad(target, title) {
+    _keypadTarget = target;
+    target.blur();
+    var $keypad = $('#keypad');
+    $keypad.keypad('target', _keypadTarget);
+    $keypad.keypad('title', title);
+    $keypad.keypad('show');
+
+    $('#keypadDialog').dialog('open');
+  }
+
+{% else %}
+    $('#loginUsername').focus();
+{% endif %}
+
+//# sourceURL=login.html
+</script>

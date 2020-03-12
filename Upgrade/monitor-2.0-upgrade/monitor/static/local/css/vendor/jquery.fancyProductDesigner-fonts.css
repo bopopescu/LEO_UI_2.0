@@ -1,0 +1,18 @@
+/*
+ * Put here your custom fonts, you only need to include woff files. Copy the @font-face code and replace THE_FONT_NAME and FONT_FILE.
+ *
+ * @font-face {
+ *		font-family: 'THE_FONT_NAME';
+ *		src: local('☺'), url('../fonts/FONT_FILE.woff') format('woff');
+ *		font-weight: normal;
+ *		font-style: normal;
+ *	}
+ *
+ */
+
+@font-face {
+	font-family: 'Fearless';
+	src: local('☺'), url('../fonts/fearless.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}

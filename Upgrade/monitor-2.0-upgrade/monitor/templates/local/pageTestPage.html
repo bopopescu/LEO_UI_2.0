@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<style>
+/*
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+*/
+
+/*
+body {
+  margin: 40px;
+  font-family: 'Open Sans', 'sans-serif';
+  background-color: #fff;
+  color: #444;
+}
+*/
+
+h1,
+p {
+  margin: 0 0 1em 0;
+}
+
+.wrapper {
+  max-width: 940px;
+  margin: 0 20px;
+  /* margin: 0 auto; */
+  display: grid;
+  grid-gap: 10px;
+  padding-top: 10px;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  grid-auto-rows: repeat(4, minmax(80px, auto));
+}
+
+
+.panel1x1 {
+  /* needed for the flex layout*/
+  margin-left: 5px;
+  margin-right: 5px;
+  flex: 1 1 200px;   /* flex-grow:1, flex-shrink:1, flex-basis:200px (width) */
+
+  background-color: #444;
+  color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+  margin-bottom: 10px;
+}
+
+.panel2x1 {
+  grid-row-end: span 2;
+}
+
+.panel3x1 {
+  grid-row-end: span 3;
+}
+
+.panel3x2 {
+  grid-row-end: span 3;
+  grid-column-end: span 2;
+}
+
+.panel4x1 {
+  grid-row-end: span 4;
+}
+
+.panel4x2 {
+  grid-row-end: span 4;
+  grid-column-end: span 2;
+}
+
+.panel4x3 {
+  grid-row-end: span 4;
+  grid-column-end: span 3;
+}
+
+.panel4x4 {
+  grid-row-end: span 4;
+  grid-column-end: span 4;
+}
+
+
+
+.header,
+.footer {
+  margin-left: 5px;
+  margin-right: 5px;
+  flex: 0 1 100%;
+  grid-column: 1 / -1;
+}
+
+/*
+.wrapper > * {
+  background-color: #444;
+  color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+  margin-bottom: 10px;
+  padding-top: 10px;
+}*/
+
+</style>
+
+
+<!-- Dev Version links to full versions (non-minified) of javascript and css files -->
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Page</title>
+
+<div id="grid_json" style="margin:auto;"></div>
+
+<div class="wrapper">
+<!--  <header class="header">My header</header> -->
+
+  <div class="panel1x1">Panel A</div>
+  <div class="panel1x1">Panel B</div>
+  <div class="panel1x1 panel3x2">Panel C</div>
+  <div class="panel1x1">Panel D</div>
+  <div class="panel1x1">Panel E</div>
+  <div class="panel1x1">Panel F</div>
+  <div class="panel1x1">Panel G</div>
+  <div class="panel1x1">Panel H</div>
+  <div class="panel1x1">Panel I</div>
+  <div class="panel1x1">Panel J</div>
+  <div class="panel1x1">Panel K</div>
+  <div class="panel1x1">Panel L</div>
+  <div class="panel1x1">Panel M</div>
+  <div class="panel1x1">Panel N</div>
+  <div class="panel1x1">Panel O</div>
+  <div class="panel1x1">Panel P</div>
+  <div class="panel1x1">Panel Q</div>
+  <div class="panel1x1">Panel R</div>
+  <div class="panel1x1">Panel S</div>
+
+<!--    <footer class="footer">My footer</footer> -->
+</div>
+
+<script>
+
+pageWaiting('done');
+//# sourceURL=pageTestPage.html
+</script>

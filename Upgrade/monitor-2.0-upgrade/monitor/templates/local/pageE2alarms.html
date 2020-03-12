@@ -1,0 +1,273 @@
+
+<style>
+#E2alarmAccordion {
+  margin: 10px;
+}
+
+</style>
+
+<!-- device dropdown list -->
+<div id='E2deviceSelect'>
+  <br>
+  Select Device:&nbsp;
+  <select id="E2deviceList" style="width:400px;" tabindex="18">
+    {% for E2device in E2deviceNameList %}
+      <option>{{E2device}}</option>
+    {% endfor %}
+  </select>
+</div>
+
+
+<div id="E2alarmAccordion" class="accordion">
+  <h3 id="E2AllAlarmsTitle">E2 Alarms</h3>
+    <div class="E2OnlineStatus E2OfflineError">
+        <h2><p id="E2OfflineErrorMsg" style="color:red;text-align: center;"></p></h2>
+    </div>
+    <div>
+      <div><div id="E2AlarmCounts"></div></div>
+      <br>
+      <div><div id="E2AllAlarms"></div></div>
+    </div>
+</div>
+
+<script>
+"use strict";
+
+var E2deviceNameList = {{ E2deviceNameList|tojson|safe  }}
+var E2AlarmCounts = []
+var alarmPageTimeout = 0;
+var E2AlarmDeviceName = ""
+
+$("#E2AlarmCounts").proptable({ name: 'E2AlarmCounts',
+  data: E2AlarmCounts,
+  columns: [{ readonly: true, header: 'Last Update'},
+            { readonly: true, header: 'Total Alarms'},
+            { readonly: true, header: 'Active Fail'},
+            { readonly: true, header: 'Active Alarm'},
+            { readonly: true, header: 'Active Notice'},
+            { readonly: true, header: 'Fail'},
+            { readonly: true, header: 'Alarm'},
+            { readonly: true, header: 'Notice' },
+            { readonly: true, header: 'RTN' }]
+});
+
+var E2AllAlarms = []
+
+$("#E2AllAlarms").proptable({ name: 'E2AllAlarms',
+  data: E2AllAlarms,
+  columns: [{ readonly: true, header: 'Date/Time'},
+            { readonly: true, header: 'State'},
+            { readonly: true, header: 'Source'},
+            { readonly: true, header: 'Alarm'},
+            { readonly: true, header: 'Alarm Value / Limit' },
+            { readonly: true, header: 'Priority'}]
+});
+
+$("#E2deviceList").change(function() {
+  if (pageXHR != null)
+    pageXHR.abort();
+
+  clearTimeout(alarmPageTimeout); // Stop the alarm update timer
+
+  E2AlarmDeviceName = $(this).val();
+  sessionStorage.devices_E2AlarmDeviceName = E2AlarmDeviceName;
+  pageWaiting();
+  getE2AllAlarms(E2AlarmDeviceName);
+});
+
+
+function getE2AllAlarms( E2AlarmDeviceNameIn ) {
+  var numTotalAlms=0
+  var E2OK = 0
+  var numActiveFails=0, numActiveAlms=0, numActiveNotices=0
+  var numAlarmAlms=0, numFailAlms=0, numNoticeAlms=0, numRTNAlms=0
+
+  if ( E2AlarmDeviceNameIn.length > 0 )
+  {
+    // Get alarms (and E2 online status)
+    pageXHR = postJson({"jsonrpc":"2.0","id":"E2AllAlarmsMe","method":"getE2AllAlarms","LeoE2Name": E2AlarmDeviceNameIn },
+      function(data) {
+
+        var result = data;
+
+        pageWaiting('done');
+
+        if ( result.online ) {
+          $("#E2OfflineErrorMsg").html( "" )
+          $(".E2OfflineError").hide();
+          $(".E2AlarmCounts").show();
+          $(".E2AllAlarms").show();
+          E2OK = 1
+        }
+        else {
+          $(".E2OfflineError").show();
+          $(".E2AlarmCounts").hide();
+          $(".E2AllAlarms").hide();
+          E2OK = 0
+        }
+
+        if ( E2OK > 0 )
+        {
+          if (result.alarms.length == 0) {
+            while(E2AllAlarms.length > 0) { E2AllAlarms.pop(); }
+          }
+          else if ((E2AllAlarms.length == 0) || (result.alarms[0].date != E2AllAlarms[0])) {
+
+            while(E2AllAlarms.length > 0) { E2AllAlarms.pop(); }
+
+            E2AlarmCounts.pop()
+
+            // result.lastAlarmUpdateTime is "2017-09-18 19:16:36" (NO TIMEZONE OR ANYTHING)
+            // We will turn into ISO8601 format by adding "Z" to the end of the time.
+            // Need to simplify to: "2017-09-18 19:16:36" because Edge and Firefox error on longer format.
+            var lastAlarmUpdateTime = result.lastAlarmUpdateTime + "Z";
+            var d = utcToLocalDate(lastAlarmUpdateTime);
+            var strLastE2AlarmUpdate = dateToString(d);
+
+            var alarmResults = result.alarms;
+
+            for (var iRow = 0; iRow < alarmResults.length; iRow++) {
+              var alarm = alarmResults[iRow];
+
+              // E2 Alarms are stored in local time in database (e.g. NOT UTC)
+              var d = utcToLocalDate(alarm.dbTimestamp);
+
+              // debugger;
+              var s = MYdateToString(d);
+              // css attributes will not color a column if there is a a null string in the column. So we check and fill.
+              if ( alarm.reportvalue.length === 0 ) alarm.reportvalue = '<br>';
+              E2AllAlarms.push([s, alarm.dbState, alarm.source, alarm.text, alarm.reportvalue, alarm.priority]);
+
+              var activeAlmState = 0;
+              /* Keep alarm Counts */
+              numTotalAlms = numTotalAlms + 1;
+              switch( alarm.dbState ) {
+                case "N-ALM*" :
+                  numAlarmAlms = numAlarmAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "N-NTC*" :
+                  numNoticeAlms = numNoticeAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "N-FL*" :
+                  numFailAlms = numFailAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "ALARM*" :
+                  numAlarmAlms = numAlarmAlms + 1;
+                  numActiveAlms = numActiveAlms + 1;
+                  activeAlmState = 2;
+                  break;
+                case "NOTCE*" :
+                  numNoticeAlms = numNoticeAlms + 1;
+                  numActiveNotices = numActiveNotices + 1;
+                  break;
+                case "FAIL*" :
+                  numFailAlms = numFailAlms + 1;
+                  numActiveFails = numActiveFails + 1;
+                  activeAlmState = 1;
+                  break;
+                case "N-ALM-" :
+                  numAlarmAlms = numAlarmAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "N-NTC-" :
+                  numNoticeAlms = numNoticeAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "N-FL-" :
+                 numFailAlms = numFailAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "R-FL-" :
+                  numFailAlms = numFailAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "R-ALM-" :
+                  numAlarmAlms = numAlarmAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "R-NTC-" :
+                  numNoticeAlms = numNoticeAlms + 1;
+                  numRTNAlms = numRTNAlms + 1;
+                  break;
+                case "ALARM-" :
+                  numAlarmAlms = numAlarmAlms + 1;
+                  break;
+                case "NOTCE-" :
+                  numNoticeAlms = numNoticeAlms + 1;
+                  break;
+                case "FAIL-" :
+                  numFailAlms = numFailAlms + 1;
+                  break;
+
+                default: console.log( "Unknown dbState = ", alarm.dbState )
+              }
+
+              var newcss;
+              if ( activeAlmState > 0 ) {
+                // Active FAIL or ALARM
+                newcss = alarmcss;
+              }
+              else {
+                // No Active Alarm or fail. Set white.
+                newcss = noalarmcss;
+              }
+              // Set color for the alarm state appropriately.
+              $("#E2AllAlarms").proptable('setRowCustomCss', iRow, newcss );
+            }
+            E2AlarmCounts.push([strLastE2AlarmUpdate, numTotalAlms, numActiveFails, numActiveAlms, numActiveNotices, numFailAlms, numAlarmAlms, numNoticeAlms, numRTNAlms]);
+          }
+          $("#E2AllAlarms").proptable('render');
+          $("#E2AlarmCounts").proptable('render');
+        }
+        else {
+          pageWaiting('done')
+          $("#E2OfflineErrorMsg").html( "E2 OFFLINE OR NOT SETUP" );
+        }
+        alarmPageTimeout = setTimeout( function() { getE2AllAlarms( E2AlarmDeviceNameIn ) }, 20000);
+      },
+      jsonError
+    );
+  }
+  else {
+    $("#E2OfflineErrorMsg").html( "E2 OFFLINE OR NOT SETUP" );
+  }
+}
+
+// If there are devices, look at sessionStorage or just pick the first from the list
+// If there are NO devices, default the deviceName to "", clear the session and hide the controller status div.
+if ( (E2deviceNameList !== null ) && ( E2deviceNameList.length > 0 ) ) {
+  if ("devices_E2AlarmDevName" in sessionStorage) {
+    if ( sessionStorage.devices_E2AlarmDeviceName.length > 0 ) {
+      E2AlarmDeviceName = sessionStorage.devices_E2AlarmDeviceName;
+    }
+    else {
+      E2AlarmDeviceName = E2deviceNameList[0]
+      sessionStorage.devices_E2AlarmDeviceName = E2AlarmDeviceName
+    }
+  }
+  else {
+    E2AlarmDeviceName = E2deviceNameList[0]
+    sessionStorage.devices_E2AlarmDeviceName = E2AlarmDeviceName
+  }
+}
+else {
+  E2AlarmDeviceName = ""
+  sessionStorage.devices_E2AlarmDeviceName = ""
+}
+
+
+pageWaiting();
+getE2AllAlarms( E2AlarmDeviceName )
+
+//# sourceURL=pageE2alarms.html
+</script>
+
+
+
+
+
+
+

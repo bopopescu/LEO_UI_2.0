@@ -1,0 +1,1869 @@
+
+<!-- Core Device Values Status Styles -->
+<style>
+#deviceValueTable {
+  width: 100%;
+}
+
+/*.tempclass{  */
+/* background-color: firebrick; */
+/* border-radius: 12px; */
+/* } */
+
+html {
+  scroll-behavior: smooth;
+}
+
+#deviceValueTable td {
+  vertical-align: top;
+}
+
+/* resize images */
+#deviceImage img {
+  width: auto;
+  height: auto;
+  max-width: 50%;
+  display: block;
+  cursor: pointer;
+  padding-left:50px; <!-- Give pad between table and image-->
+  float:left;
+}
+
+@keyframes flash {
+    0%   {background-color:red;}
+    50%  {background-color:darkred; }
+    100% {background-color:red;}
+}
+
+.deviceIconsTable
+{
+text-decoration: underline;
+}
+#configureLoggingTable td {
+  height: 40px;
+}
+
+#deviceStatusTableDiv {
+  float: left;
+}
+
+#NormalDeviceStatusDiv {
+  float: left;
+}
+
+.newDiv{
+float: left;
+
+border: 8px solid grey;
+border-radius: 12px;
+margin-top:5px;
+margin-bottom:5px;
+margin-right:5px;
+margin-left:5px;
+color: grey;
+
+}
+
+.E2Device
+{
+    float:left;
+    border-radius: 12px;
+    background-image: url('static/uimg/devices/E2.png');
+    display: inline-block;
+    background-size: 150px 180px;
+    height: 160px;
+    width: 180px;
+    background-repeat: no-repeat;
+    background-position: center center;
+  /* -webkit-transition-duration: 0.4s;  Safari */
+  /*  transition-duration: 0.4s; */
+    padding: 20px;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 white, 0 -1px white;
+	text-decoration: underline;
+	background-color: grey;
+	color: black;
+	border:1px solid grey;
+	margin-top:10px;
+	margin-right:10px;
+	margin-left:10px;
+	text-align:top;
+}
+
+.AKSC255
+{
+    float:left;
+    border-radius: 12px;
+    background-image: url('static/uimg/devices/AKSC255.png');
+    display: inline-block;
+    background-size: 150px 180px;
+    height: 160px;
+    width: 180px;
+    background-repeat: no-repeat;
+    background-position: center center;
+  /* -webkit-transition-duration: 0.4s;  Safari */
+  /*  transition-duration: 0.4s; */
+    padding: 20px;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 white, 0 -1px white;
+	text-decoration: underline;
+	background-color: grey;
+	color: black;
+	border:1px solid grey;
+	margin-top:10px;
+	margin-right:10px;
+	margin-left:10px;
+	text-align:top;
+}
+
+.SiteSupervisor
+{
+    float:left;
+    border-radius: 12px;
+    background-image: url('static/uimg/devices/SiteSupervisor.png');
+    display: inline-block;
+    background-size: 150px 180px;
+    height: 160px;
+    width: 180px;
+    background-repeat: no-repeat;
+    background-position: center center;
+  /* -webkit-transition-duration: 0.4s;  Safari */
+  /*  transition-duration: 0.4s; */
+    padding: 20px;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 white, 0 -1px white;
+	text-decoration: underline;
+	background-color: grey;
+	color: black;
+	border:1px solid grey;
+	margin-top:10px;
+	margin-right:10px;
+	margin-left:10px;
+	text-align:top;
+}
+
+.LAEDevice:hover {background-color: #bae8ab;}
+
+.E2Device:hover {background-color:#bae8ab;}
+.AKSC255:hover {background-color:#bae8ab;}
+.SiteSupervisor:hover {background-color:#bae8ab;}
+
+.LAEDevice
+{ 
+    float:left;
+    border-radius: 12px;
+    background-image: url('static/uimg/devices/at1-5.png');
+    display: inline-block;
+    background-size: 150px 180px;
+    height: 160px;
+    width: 180px;
+    background-repeat: no-repeat;
+    background-position: center center;
+  /* -webkit-transition-duration: 0.4s;  Safari */
+  /*  transition-duration: 0.4s; */
+    padding: 20px;
+	font-size:14px;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+	text-decoration: underline;
+	background-color: grey;
+	border:1px solid grey;
+	margin-top:10px;
+	margin-right:10px;
+	margin-left:10px;
+	text-align:top;
+
+
+}
+#imagePicture {
+  padding-top: 7%;
+  padding-left: 2%;
+}
+
+#info {
+  text-align:center;
+}
+
+#techInfo {
+  width: auto;
+  text-align:center;
+}
+<!-- Alarm Table CSS -->
+
+</style>
+
+<html>
+  <title>Devices</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link href="/static/local/css/statusLayout.css" rel="stylesheet" />
+  <script src="/static/local/js/statusLayout.js"></script>
+
+<div id="deviceIcons"></div>
+<!-- device dropdown list -->
+<div id='pageDeviceHeader' style="margin: 10px">
+  <table style="width:85%">
+<tr></tr>
+
+
+  <tr>
+      <td>
+        <select id="pageDeviceList" tabindex="18">
+          {% for device in deviceNameList %}
+            <option>{{device}}</option>
+          {% endfor %}
+        </select>
+      </td>
+      <td>&nbsp;</td> <!--- I know this is a hack. I just need some space between the select and information -->
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div id="selectDev"><button id="selectDiv"> Click To Select Device </button> </div></td>
+      <td><div id="info"></div></td>
+    </tr>
+  </table>
+</div>
+
+
+
+<div id='deviceMain'>
+<!--  <h2 id="deviceName"></h2> -->
+
+  <!-- CSS and DIV FOR TABS -->
+  <ul id="DevStatusTabs" style="padding-left:0px" >
+      <li><a href="#" name="tabStatus">Status</a></li>
+      <li><a href="#" name="tabAlarms">Alarms</a></li>
+    {% if 0 %}
+      <li><a href="#" name="tabGraphs">Graph</a></li>
+    {% endif %}
+    {% if session.can_edit_device %}
+      <li><a href="#" name="tabConfigure">Configure</a></li>
+      <li><a href="#" name="tabTechStatus">Tech Status</a></li>
+        <li><a href="#" name="tabSyncStatus">Sync Configs</a></li>
+    {% endif %}
+  </ul>
+
+  <div id="tabContent" style="margin:0px;clear:both">
+    <div id="tabStatus">
+      <div id="sitemap" class="device-unit">
+      </div>
+      <!-- Hidden for most devices; shown for exception devices  - e.g. E2 -->
+      <div id="deviceTabStatusDiv" style="float:left">
+        <table id="deviceStatusTable" style="float:left">
+          <tbody>
+            <tr><td>&nbsp;</td></tr>
+            <tr></tr>
+          </tbody>
+        </table>
+        <br style="clear:both"/>
+        <div id="devicePluginPagetabStatus"></div>
+        <div id="statutTabCustomDeviceStatusDiv"></div>
+
+      </div> <!-- deviceTabStatusDiv -->
+    </div>
+
+    <div id="tabAlarms">
+      <div class="deviceAlarm deviceAlarmHide" style="float:left">
+        <br>
+        <h2>Device Active Alarms</h2>
+        <div>
+            <div id="deviceActiveAlarms"></div>
+            <div id="NoActiveAlarmsFound" style="font-size: 24px; text-align: center; color: green; display: none;display:none">No Active Alarms</div>
+        </div>
+        <div id="CustomDeviceAlarmsDiv" style="clear:both"> <!-- div for placing custom information in configure tab in pageDevices - to the right of configure settings -->
+        </div>
+        <h2>Device Alarm History</h2>
+        <div>
+            <div id="deviceAlarmHistory"></div>
+            <div id="NoHistoryAlarmsFound" style="font-size: 24px; text-align: center; color: green; display: none;display:none">No Historical Alarms</div>
+        </div>
+      </div>
+    </div> <!-- tabAlarms -->
+
+    {% if 0 %} <!-- Future -->
+      <div id="tabGraph">
+        <button id="graph">Graph</button>&nbsp;
+        <div id="graph"><div id="graphTable"></div></div>
+      </div>
+    {% endif %}
+
+    <div id="tabConfigure">
+      <div id="configureDeviceDiv">
+        <div id="configureDeviceSection"  style="float:left;margin-top:20px;margin-bottom:10px">
+          <h2><strong>Configure Device Settings</strong></h2>
+          <div id="configureNotSupported" style="float:left;margin-top:20px;margin-bottom:10px">
+            <p style="color:royalblue;text-align: center;"> <strong>Configure Device Not Supported For This Device.</strong>
+          </div> <!-- configureNotSupported -->
+          <div id="configureDevice">
+            <div id="configureDeviceTable">
+            </div>
+            <div id="configureDeviceSaveDiv" style="margin-top:10px">
+              <button id="configureDeviceSave">Save Configuration</button>
+            </div>
+          </div> <!-- configureDevice -->
+        </div>
+        <div id="CustomDeviceConfigureDiv" style="float:left;margin-top:20px;margin-bottom:10px"> <!-- div for placing custom information in configure tab in pageDevices - to the right of configure settings -->
+        </div>
+      </div> <!-- configureDeviceDiv -->
+      <br style="clear:both"/>
+
+    {% if session.can_edit_logging %}
+      <div id="LoggingHeader"  style="margin-top:20px;margin-bottom:10px">
+        <h2><strong>Configure Device Logging</strong></h2>
+      </div>
+      <div id="configureLogging" style="width:70%">
+        <div id="configureLoggingTable">
+        </div>
+      </div>
+      <div id="configureLoggingSaveDiv" style="margin-top:10px">
+        <button id="configureLoggingSave">Save Log Configuration</button>
+      </div> <!-- LoggingHeader -->
+    {% endif %}
+    </div> <!-- tabConfigure -->
+
+    <div id="tabTechStatus">
+      <div id="deviceStatusTableDiv">
+        <div id="techInfo"></div>
+
+        <div id="NormalDeviceStatusDiv">
+          <h3>Controller Status</h3>
+          <div id="outputStatus">
+            <div id="outputStatusDeviceTable"></div>
+          </div>
+        </div>
+        <div id="deviceImage"></div>  <!-- showing picture uploaded by customer. -->
+      </div>  <!-- deviceStatusTableDiv -->
+      <br style="clear:both"/>
+      <div id="tabTechStatusDevicePluginPage"></div>
+      <div id="CustomDeviceStatusDiv"></div> <!-- div for placing custom information in configure tab in pageDevices - to the right of configure settings -->
+    </div> <!-- tabTechStatus -->
+
+    <div id="tabSyncStatus">
+
+        <div id="NormalDeviceStatusDiv">
+        <div id="syncNotSupported" style="float:left;margin-top:20px;margin-bottom:10px">
+            <p style="color:royalblue;text-align: center;"> <strong>Sync Configuration Is Not Supported For This Device.</strong>
+          </div> <!-- configureNotSupported -->
+            <div id="syncStatus">
+	<h3>Configuration Status Analysis </h3>&ensp; &ensp;<input id="syncDaily" type="checkbox">&nbsp; <b>Enable Daily Sync from BackUp
+		  </b>
+<!-- 		  <input id="number" id="syncHour" placeholder="Value from 00 to 24" type="number" value="22">&nbsp;
+			<input id="number" id="syncMin" placeholder="Value from 0 to 59" type="number" value="00"> -->
+<br>
+<br>
+
+
+            <div id="syncStatusDeviceTable"></div>
+			<br>
+              <tr><td><button id="configureSyncDeviceSave">Write From BackUp Configuration</button></td></tr><br>
+			  <tr></tr><br>
+			  <tr><td><button id="configureBackSyncDeviceSave">Save To Backup Configuration</button></tr>
+          </div>
+        </div>
+      </div>  <!-- deviceStatusTableDiv -->
+      <br style="clear:both"/>
+      <div id="tabTechStatusDevicePluginPage"></div>
+      <div id="CustomDeviceStatusDiv"></div> <!-- div for placing custom information in configure tab in pageDevices - to the right of configure settings -->
+    </div> <!-- tabTechStatus -->
+
+  </div> <!-- tabContent -->
+
+  <div id="imageDialog" title=""></div>
+
+</div> <!-- deviceMain -->
+
+
+{% if ctx.localhost %}
+<div id="numpadDialog">
+  <div id="numpad"></div>
+</div>
+<div id="keypadDialog">
+  <div id="keypad"></div>
+</div>
+{% endif %}
+
+</html>
+
+<script>
+
+{% if ctx.osKeybd %}
+  $('select').niceSelect();
+{% endif %}
+
+////////////////////////////////////////////
+// Device Selection dropdown
+////////////////////////////////////////////
+$("#pageDeviceList").change(function() {
+  if (pageXHR != null)
+    pageXHR.abort();
+  pageClearTimeout();
+
+  deviceName = $(this).val();
+  // console.log("PAGEDEVICES - CHANGE - deviceName:", deviceName)
+  sessionStorage.devices_deviceName = deviceName;
+  // If NewDeviceName handler is set, call the function
+  if (_funcNewDeviceName) {
+    _funcNewDeviceName(deviceName);
+  }
+  pageWaiting();
+  updateInformation(deviceName);
+});
+
+function buttonClick(deviceNameVar)
+
+{
+
+{% if ctx.osKeybd %}
+    $("#pageDeviceList").val(deviceNameVar).niceSelect('update');
+{% else %}
+   $('#pageDeviceList').val(deviceNameVar);
+{% endif %}
+//console.log(deviceNameVar);
+$("#pageDeviceList").val(deviceNameVar).change();
+$("#deviceMain").show();
+$("#pageDeviceHeader").show();
+$("#pageDeviceList").hide();
+$("#deviceIcons").hide()
+
+    var elmnt = document.getElementById("pageDeviceHeader");
+    elmnt.scrollIntoView(true);
+  //updateInformation(deviceName);
+  
+  //$("#divContent").load(location.href + " #divContent");
+}
+$("#imageDialog").dialog({
+    autoOpen: false,
+    modal: true,
+    resizable: false,
+    draggable: false,
+    width: "auto",
+    buttons: {
+      "Close": function() { $(this).dialog( "close" ); },
+    },
+    close: function() {
+      window.scrollTo(0,0);
+    }
+});
+
+////////////////////////////////////////////
+// Device Details Table (Shown at top of screen)
+////////////////////////////////////////////
+var infoData = [];
+$("#info").proptable({ name: 'info',
+  data: infoData,
+  columns: [{ readonly: true, header: 'Alarm'},
+            { readonly: true, header: 'Comm Status'},
+            { readonly: true, header: 'Description' }]
+});
+
+
+////////////////////////////////////////////
+// Tech Status Device Information Table
+////////////////////////////////////////////
+var techInfoData = [];
+$("#techInfo").proptable({ name: 'techInfo',
+  data: techInfoData,
+  columns: [{ readonly: true, header: 'Device Type'},
+            { readonly: true, header: 'Network'},
+            { readonly: true, header: 'Address' }]
+});
+
+
+
+////////////////////////////////////////////
+// Device Status Table
+////////////////////////////////////////////
+var _outputStatusDeviceTable = [];
+
+$("#outputStatusDeviceTable").proptable({ name: 'outputStatusDeviceTable',
+  data: _outputStatusDeviceTable,
+  columns: [{ hidden: true},
+            { readonly: true, header: 'Name'},
+            { readonly: true, type: 'text', header: 'Value'},
+            { readonly: true, header: 'Unit'},
+            { readonly: true, header: 'Description'}
+            ],
+    customOptions: [],
+    customTypes: [],
+    customCss: [],
+    showHeading: true
+});
+
+var _syncStatusDeviceTable = [];
+
+$("#syncStatusDeviceTable").proptable({ name: 'syncStatusDeviceTable',
+  data: _syncStatusDeviceTable,
+  columns: [{ hidden: true},
+            { readonly: true, header: 'Name'},
+            { readonly: true, type: 'text', header: 'Current Value'},
+            { readonly: true, type: 'text', header: 'Backup Value'},
+            { readonly: true, header: 'Unit'},
+            { readonly: true, header: 'Description'}
+            ],
+    customOptions: [],
+    customTypes: [],
+    customCss: [],
+    showHeading: true
+});
+
+////////////////////////////////////////////
+// Device Alarm Tables
+////////////////////////////////////////////
+
+var _deviceActiveAlarms = [];
+var _deviceAlarmHistory = [];
+
+$("#deviceActiveAlarms").proptable({ name: 'deviceActiveAlarms',
+  data: _deviceActiveAlarms,
+  columns: [{ readonly: true, header: 'Date/Time'},
+            { readonly: true, header: 'Action'},
+            { readonly: true, header: 'Device'},
+            { readonly: true, header: 'Alarm'},
+            { readonly: true, header: 'Description' }]
+});
+
+$("#deviceAlarmHistory").proptable({ name: 'deviceAlarmHistory',
+  data: _deviceAlarmHistory,
+  columns: [{ readonly: true, header: 'Date/Time'},
+            { readonly: true, header: 'Action'},
+            { readonly: true, header: 'Device'},
+            { readonly: true, header: 'Alarm'},
+            { readonly: true, header: 'Description' }]
+});
+
+////////////////////////////////////////////
+// Configure Device Table
+////////////////////////////////////////////
+var _configDataEdited = [];
+var i = 0;
+
+$("#configureDeviceTable").proptable({ name: 'configureDeviceTable',
+  data: _configDataEdited,
+  columns: [{ hidden: true},
+            { readonly: true, header: 'Name'},
+            { type: 'text', header: 'Value'},
+            { readonly: true, header: 'Unit'},
+            { readonly: true, header: 'Description'}
+            ],
+    customOptions: [],
+    customTypes: [],
+    customCss: [],
+    showHeading: true,
+  change: function (row, col, c) {
+    var key = _configDataEdited[row][0];
+    var valueDesc = _valueDescriptions[key];
+    var value = convertStringToValueByType(valueDesc, _configDataEdited[row][col]) || 0;
+    _configDataEdited[row][col] = getDisplayValueByType(valueDesc, value);
+    $("#configureDeviceTable").proptable('update', row, col);
+  },
+
+  {% if ctx.localhost %}
+    textFocus: function ($el, row, col) {
+      var key = _configDataEdited[row][0];
+      var valueDesc = _valueDescriptions[key];
+      if (valueDesc.dataType == 'string')
+        showKeyPad($el, _configDataEdited[row][1])
+      else
+        showNumPad($el, _configDataEdited[row][1], _configDataEdited[row][3])
+    }
+  {% endif %}
+});
+
+////////////////////////////////////////////
+// Configure Loogging Table
+////////////////////////////////////////////
+var _loggingList = [];
+
+$("#configureLoggingTable").proptable({ name: 'configureLoggingTable',
+  data: _loggingList,
+  columns: [{ hidden: true},
+            { readonly: true, header: 'Value'},
+            { type: 'checkbox', header: 'Logged'}]
+});
+
+
+$(document).ready(function() {
+
+    $("#tabContent").find("[id^='tab']").hide(); // Hide all content
+    $("#DevStatusTabs li:first").attr("id","current"); // Activate the first tab
+    $("#tabContent #tabStatus").fadeIn(); // Show first tab's content
+
+    $('#DevStatusTabs a').click(function(e) {
+        e.preventDefault();
+        if ($(this).closest("li").attr("id") == "current"){ //detection for current tab
+         return;
+        }
+        else{
+          $("#tabContent").find("[id^='tab']").hide(); // Hide all content
+          $("#DevStatusTabs li").attr("id",""); //Reset id's
+          $(this).parent().attr("id","current"); // Activate this
+          // console.log("TabName:", $(this).attr('name') );
+          $('#' + $(this).attr('name')).fadeIn(); // Show content for the current tab
+        }
+    });
+
+});
+
+// END SCRIPT FOR TABS
+
+
+var _firstRender = true;
+
+var _inputData = [];
+var _outputData = [];
+var _configData = [];
+var _idealConfigData = [];
+var constantConfig=[];
+var _valueDescriptions = null;
+
+var _funcStatusPage = null;
+var _funcNewConfigValueData = null;
+var _funcNewValueData = null;
+var _funcNewDeviceName = null;
+var _funcRefreshValues = null;
+var _deviceOnline = null;
+var configBit = 0;
+var configBitVals = {};
+
+var dummy = 0;
+
+//////////////////////////////////
+// CONFIGURE DEVICE Function
+//////////////////////////////////
+
+$("#selectDiv").button({icons: { primary: "icon icon-check"}}).click(function( event ) {
+
+$("#deviceMain").hide();
+$("#pageDeviceHeader").hide();
+$("#deviceIcons").show();
+$("#pageDeviceList").hide();
+
+});
+
+{% if session.can_edit_device %}
+
+function updateConfigureDevice() {
+
+//  console.log( "updateConfgiureDevice, _valueD:", _valueDescriptions )
+
+  // must deep copy
+  while(_configDataEdited.length > 0) { _configDataEdited.pop(); }
+
+  // show or hide configure device based upon whether E2 or not.
+  // console.log( "updateConfigureDevice->", deviceType )
+  if ( deviceType != "E2 Device" ) {
+
+    for (var key in _configData) {
+      var valueDesc = _valueDescriptions[key];
+      _configDataEdited.push([key, valueDesc.displayName, _configData[key], getValueUnitByType(valueDesc), valueDesc.description]);
+    }
+
+    var row = 0;
+    for (var key in _configData) {
+      var valueDesc = _valueDescriptions[key];
+      var datatype = valueDesc.dataType;
+
+      if (datatype == "bool" ) {
+        if (valueDesc.dataList == null) {
+            $("#configureDeviceTable").proptable('setCustomType', row, 2, 'checkbox');
+        } else {
+          datatype = "list";
+        }
+      }
+
+      if (datatype == "list") {
+        $("#configureDeviceTable").proptable('setCustomType', row, 2, 'select');
+
+        var customOptions = [];
+        for (key in valueDesc.dataList)
+          customOptions.push(valueDesc.dataList[key])
+
+        $("#configureDeviceTable").proptable('setCustomOptions', row, 2, customOptions);
+      }
+      else if ( datatype != "bool" ) {
+        // Need to make sure the row is reset properly - in case the row was previously a select or checkbox.
+        $("#configureDeviceTable").proptable('setCustomType', row, 2, 'text');
+        $("#configureDeviceTable").proptable('setCustomOptions', row, 2, []);
+      }
+      row++;
+    }
+
+    $("#configureDeviceTable").proptable('render');
+  }
+}
+
+
+
+// Save configure device settings
+$("#configureDeviceSave").button({icons: { primary: "icon icon-save"}}).click(function( event ) {
+  var configValues = {};
+
+  var values = $("#configureDeviceTable").proptable('getData');
+
+  var row = 0;
+  for (var key in _configData) {
+    var valueDesc = _valueDescriptions[key];
+    configValues[key] = convertStringToValueByType(valueDesc, values[row++][2]);
+	//console.log(key, configValues[key], typeof configValues[key]);
+  }
+	delete  configValues["MDEF"];
+	//console.log(configValues);
+    pageWaiting();
+    pageXHR = postJson({"jsonrpc":"2.0","id":"setDeviceConfigValues","method":"setDeviceConfigValues",
+      "params":[deviceName, configValues]},
+      function(data) {setTimeout(function() { pageWaiting("done");}, 1000);}, jsonError);
+    event.preventDefault();
+});
+
+// Sync configure device settings
+$("#configureSyncDeviceSave").button({icons: { primary: "icon icon-chevron-right"}}).click(function( event ) {
+  location.reload();
+  var configValues = {};
+
+  var values = $("#syncStatusDeviceTable").proptable('getData');
+	//console.log(values)
+  var row = 0;
+  for (var key in _idealConfigData) {
+    var valueDesc = _valueDescriptions[key];
+    configValues[key] = convertStringToValueByType(valueDesc, values[row++][3]);
+	//console.log(key, configValues[key], typeof configValues[key]);
+  }
+	delete  configValues["MDEF"];
+	//console.log(configValues);
+    pageWaiting();
+    pageXHR = postJson({"jsonrpc":"2.0","id":"setDeviceConfigValues","method":"setDeviceConfigValues",
+      "params":[deviceName, configValues]},
+      function(data) {setTimeout(function() { pageWaiting("done");}, 1000);}, jsonError);
+    event.preventDefault();
+  //  location.reload();
+});
+
+// Sync configure device settings
+$("#configureBackSyncDeviceSave").button({icons: { primary: "icon icon-chevron-left"}}).click(function( event ) {
+
+  var configValues = {};
+
+  var values = $("#syncStatusDeviceTable").proptable('getData');
+
+  var row = 0;
+  for (var key in _idealConfigData) {
+    var valueDesc = _valueDescriptions[key];
+    configValues[key] = convertStringToValueByType(valueDesc, values[row++][2]);
+	//console.log(key, configValues[key], typeof configValues[key]);
+  }
+	delete  configValues["MDEF"];
+	//console.log(configValues);
+    pageWaiting();
+    pageXHR = postJson({"jsonrpc":"2.0","id":"setDeviceConstantConfigValues","method":"setDeviceConstantConfigValues",
+      "params":[deviceName, configValues]},
+      function(data) {setTimeout(function() { pageWaiting("done");}, 1000);}, jsonError);
+    event.preventDefault();
+   //  location.reload();
+});
+
+{% endif %}
+
+
+///////////////////////////////////////////////////////////////
+/// CONFIGURE LOGGING functions
+///////////////////////////////////////////////////////////////
+
+{% if session.can_edit_logging %}
+
+var loggedValues = [];
+
+function updateConfigureLogging() {
+
+  // console.log("Hit refreshConfigureLogging. valueDescr:", _valueDescriptions, "_outputData:", _outputData )
+  while(_loggingList.length > 0) { _loggingList.pop(); }
+
+  for (var key in _outputData) {
+    var valueDesc = _valueDescriptions[key];
+    if (valueDesc.unitType != 'string') {
+      var state = (loggedValues.indexOf(key) !== -1);
+      _loggingList.push([key, valueDesc.displayName, state]);
+    }
+  }
+  $("#configureLoggingTable").proptable('render');
+}
+  //  console.log(_loggingList);
+
+// Save configure logging settings
+$("#configureLoggingSave").button({icons: { primary: "icon icon-save"}}).click(function( event ) {
+  pageWaiting();
+  var saveLoggingList = $("#configureLoggingTable").proptable('getData');
+  var saveLoggedValues = [];
+
+  for (var row = 0; row < _loggingList.length; row++) {
+    if (saveLoggingList[row][2]) {
+      saveLoggedValues.push(saveLoggingList[row][0]);
+    }
+  }
+
+   var setValue = 1;
+  pageXHR = postJson({"jsonrpc":"2.0","id":"saveLoggedValues","method":"setLoggedValuesForDevice",
+    "params":[deviceName, saveLoggedValues,setValue]},
+    function(data) { pageWaiting("done"); },
+    jsonError
+    );
+  event.preventDefault();
+});
+
+{% endif %}
+
+
+
+///////////////////////////////////////////////////////////////
+/// OutputStatus functions
+///////////////////////////////////////////////////////////////
+
+var _emptyValue = '--';
+k=0;
+
+
+function setDataValue(valueKey, value) {
+
+  if (valueKey in _configData) {
+    _configData[valueKey] = value;
+	//console.log("conFigData Value", _configData[valueKey]);
+    return;
+  }
+
+  if (value === null) value = _emptyValue;
+  if (valueKey in _inputData)
+    _inputData[valueKey] = value;
+  else if (valueKey in _outputData)
+    _outputData[valueKey] = value;
+}
+
+function setDataValue1(valueKey, value) {
+
+  if (valueKey in _configData) {
+
+    _idealConfigData[valueKey] = value;
+	//console.log("_idealConfigData",_idealConfigData[valueKey]);
+    return;
+  }
+  if (value === null) value = _emptyValue;
+}
+
+function getDataValue(valueKey) {
+  if (valueKey in _configData)
+    return _configData[valueKey];
+  else if (valueKey in _inputData)
+    return _inputData[valueKey];
+  else if (valueKey in _outputData)
+    return _outputData[valueKey];
+}
+
+function updateInformation(deviceNameIn) {
+  // console.log( "HIT updateInformation - _firstRender:", _firstRender, "DeviceNameIn:", deviceNameIn )
+  if (deviceNameIn.length <= 0)
+    return;
+
+  pageClearTimeout()
+
+  _firstRender = true;
+
+  _inputData = [];
+  _outputData = [];
+  _configData = [];
+  _valueDescriptions = null;
+  {% if session.can_edit_logging %}
+  loggedValues = [];
+  {% endif %}
+  _funcStatusPage = null;
+  _funcNewConfigValueData = null;
+  _funcNewValueData = null;
+  _funcRefreshValues = null;
+  $('#devicePluginPage').empty();
+  $('#CustomDeviceStatusDiv').html('');
+  $('#CustomDeviceAlarmsDiv').html('');
+  $('#CustomDeviceConfigureDiv').html('');
+
+
+  // Empty the current configuration display table
+  while(_configDataEdited.length > 0) { _configDataEdited.pop(); }
+
+  // Find the device in the deviceDictList so we can set the device type for the device name
+  for (var idx in deviceDictList){
+    deviceRec = deviceDictList[idx];
+    if ( deviceRec.devName == deviceNameIn ) {
+      deviceType = deviceRec.devType;
+    }
+  }
+
+  refreshValueDescriptions(deviceNameIn);
+
+  // We will create a dynamic display in __E2__.HTML
+  // console.log("updateInformation - deviceName->", deviceNameIn, "deviceType->", deviceType );
+
+  if (deviceType == "E2 Device" || deviceType == "AKSC255" || deviceType == "SiteSupervisor" ) {
+    // We need to hide configuration information if an E2 device type
+    // since currently we do not support configuring of E2 settings.
+    // console.log( "showNotSupported" )
+    $("#configureNotSupported").show();
+    $("#configureDevice").hide();
+    $("#CustomDeviceConfigureDiv").hide();
+    $("#syncNotSupported").show();
+    // E2 page is built elsewhere...in __E2 Device__.html file
+    $("#deviceTabStatusDiv").show();
+    $("#sitemap").hide();
+	$("#NormalDeviceStatusDiv").hide()
+	$("#syncStatus").hide();
+  }
+  else {
+    // console.log( "showConfigureTable" )
+    $("#configureNotSupported").hide();
+    $("#syncNotSupported").show();
+    $("#configureDevice").show();
+    $("#CustomDeviceConfigureDiv").show();
+		$("#syncStatus").show();
+	    $("#syncNotSupported").hide();
+    $("#deviceTabStatusDiv").hide();
+	$("#NormalDeviceStatusDiv").show()
+    $("#sitemap").show();
+	//$("#tabSyncStatus").show();
+  }
+//  console.log( "DevList:", deviceDictList, "DevType:", deviceType )
+}
+
+function updateOutputStatusTable() {
+  // console.log( "HIT updateOutputStatusTable", deviceName, "OutputData:", _outputData )
+
+  // We will create a dynamic display in __E2__.HTML
+  if (deviceType != "E2 Device") {
+    // by default, do not show any alarm status bits. The specific device html page can set this to true to show alarm bits (see code below).
+    if ( pageDevicesShowAlarmBitStatus === undefined ) pageDevicesShowAlarmBitStatus = false;
+
+    // clear out table in prep for  update.
+    while(_outputStatusDeviceTable.length > 0) { _outputStatusDeviceTable.pop(); }
+
+    var row = 0;
+    for (var key in _outputData) {
+      var valueDesc = _valueDescriptions[key];
+
+      // If the key name contains alarm, we will assume it is an alarm field and color Yes/No and True/False to highlight alarm state.
+      if ( key.indexOf("ALARM") >= 0 ) {
+        if ( pageDevicesShowAlarmBitStatus ) {
+          // Set background color for YES and NO status values
+          if ( (_outputData[key] == "Yes") || (_outputData[key] == "On") ) {
+            $("#outputStatusDeviceTable").proptable('setCustomCss', row, 2, alarmcss );
+          }
+          else if ((_outputData[key] == "No") || (_outputData[key] == "Off")) {
+            $("#outputStatusDeviceTable").proptable('setCustomCss', row, 2, goodalarmcss );
+          }
+          _outputStatusDeviceTable.push([key, valueDesc.displayName, _outputData[key], getValueUnitByType(valueDesc), valueDesc.description]);
+          row = row + 1;
+        }
+      }
+      else {
+        _outputStatusDeviceTable.push([key, valueDesc.displayName, _outputData[key], getValueUnitByType(valueDesc), valueDesc.description]);
+        row = row + 1;
+      }
+    }
+    $("#outputStatusDeviceTable").proptable('render');
+  }
+}
+
+
+
+function updateSyncStatusTable() {
+  // console.log( "HIT updateOutputStatusTable", deviceName, "OutputData:", _outputData )
+  // We will create a dynamic display in __E2__.HTML
+  if (deviceType != "E2 Device" || deviceType != "AKSC255" || deviceType != "SiteSupervisor") {
+    // by default, do not show any alarm status bits. The specific device html page can set this to true to show alarm bits (see code below).
+    if ( pageDevicesShowAlarmBitStatus === undefined ) pageDevicesShowAlarmBitStatus = false;
+
+    // clear out table in prep for  update.
+    while(_syncStatusDeviceTable.length > 0) { _syncStatusDeviceTable.pop(); }
+
+    var row = 0;
+
+    for (var key in _configData) {
+
+      var valueDesc = _valueDescriptions[key];
+	  var configval = _configData[key]
+	  var idealConfigVal = _idealConfigData[key]
+
+      // If the key name contains alarm, we will assume it is an alarm field and color Yes/No and True/False to highlight alarm state.
+      if ( key.indexOf("ALARM") >= 0 ) {
+        if ( pageDevicesShowAlarmBitStatus ) {
+          // Set background color for YES and NO status values
+          if ( (_configData[key] == "Yes") || (_configData == "On") ) {
+            $("#syncStatusDeviceTable").proptable('setCustomCss', row, 2, alarmcss );
+          }
+          else if ((_configData == "No") || (_configData == "Off")) {
+            $("#syncStatusDeviceTable").proptable('setCustomCss', row, 2, goodalarmcss );
+          }
+
+		  else if ((configval == idealConfigVal))
+		  {
+            $("#syncStatusDeviceTable").proptable('setCustomCss', row, 2, alarmcss );
+            $("#syncStatusDeviceTable").proptable('setCustomCss', row, 3, alarmcss );
+		  }
+          _syncStatusDeviceTable.push([key, valueDesc.displayName, _configData[key],_idealConfigData[key],getValueUnitByType(valueDesc), valueDesc.description]);
+          row = row + 1;
+        }
+      }
+      else
+	  {
+
+		if ((configval == idealConfigVal))
+	  {
+		$("#syncStatusDeviceTable").proptable('setCustomCss', row, 2, goodalarmcss );
+		$("#syncStatusDeviceTable").proptable('setCustomCss', row, 3, goodalarmcss );
+	  }
+	  else
+		{
+		$("#syncStatusDeviceTable").proptable('setCustomCss', row, 2, alarmcss );
+		$("#syncStatusDeviceTable").proptable('setCustomCss', row, 3, alarmcss );
+		}
+       _syncStatusDeviceTable.push([key, valueDesc.displayName, _configData[key],_idealConfigData[key],getValueUnitByType(valueDesc), valueDesc.description]);
+        row = row + 1;
+      }
+    }
+    $("#syncStatusDeviceTable").proptable('render');
+  }
+}
+
+function performUserCommand(commandData, returnFunc) {
+//  console.log( "HIT performUserCommand" )
+
+  if (pageXHR != null)
+    pageXHR.abort();
+
+  pageXHR = postJson({"jsonrpc":"2.0","id":"DoIt","method":"performDeviceUserAction",
+    "params":[deviceName, commandData]},
+    function(data) {
+      if ($.isFunction(returnFunc))
+        returnFunc(data);
+      refreshValueDescriptions(deviceName);
+    },
+    jsonError
+  );
+}
+
+
+function refreshValueDescriptions(deviceNameIn) {
+
+  // console.log( "HIT pageDevices refreshValueDescriptions:", deviceNameIn, deviceName )
+
+  pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameIn + "0","method":"getDeviceValueDescriptions","params":deviceNameIn},
+    function(data) {
+
+      _inputData = [];
+      _outputData = [];
+      _configData = [];
+      _valueDescriptions = data;
+
+//      console.log( "ValueDescr", _valueDescriptions)
+
+      for (key in _valueDescriptions) {
+        var value = _valueDescriptions[key];
+//        console.log( "valueType", value.valueType )
+        switch(value.valueType) {
+                  case "input":
+            _inputData[key] = ".";
+                    break;
+                  case "output":
+            _outputData[key] = ".";
+                    break;
+                  case "config":
+				if (key == "MDEF")
+				  {
+					 break;
+				  }
+            _configData[key] = ".";
+                    break;
+        }
+
+      }
+      if (_inputData.length == 0) {
+        $("#inputheader").hide();
+        $("#inputcontainer").hide();
+      } else {
+        $("#inputheader").show();
+        $("#inputcontainer").show();
+      }
+
+      {% if session.can_edit_logging %}
+      pageSetTimeout(function() { refreshLoggedValues(deviceNameIn); }, 100);
+      {% else %}
+      pageSetTimeout(function() { refreshDeviceInformation(deviceNameIn); }, 100);
+      {% endif %}
+
+    },
+    jsonError
+    );
+}
+
+{% if session.can_edit_logging %}
+
+function refreshLoggedValues(deviceNameIn) {
+  // console.log( "HIT refreshLoggedValues", deviceNameIn, "Len:", loggedValues.length )
+
+  if (loggedValues.length == 0 ) {
+    blUpdateConfigureLoggingTable = true
+  }
+  else {
+    blUpdateConfigureLoggingTable = false
+  }
+
+  pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameIn + "1","method":"getLoggedValuesForDevice","params":deviceNameIn},
+    function(data) {
+      loggedValues= [];
+      if (data != null)
+        loggedValues = data;
+  // console.log(loggedValues);
+   
+      if ( blUpdateConfigureLoggingTable ) // If we got data because the loggedValues array was empty, refresh the configure logging table - because we just changed devices.
+        updateConfigureLogging();
+      pageSetTimeout(function() { refreshDeviceInformation(deviceNameIn); }, 100);
+    },
+    jsonError
+    );
+}
+{% endif %}
+
+
+function refreshDeviceInformation(deviceNameIn) {
+
+  // console.log( "HIT refreshDeviceInformation", deviceNameIn )
+
+  pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameIn + "2","method":"getDeviceInformation","params":deviceNameIn},
+    function(data) {
+      var result = data;
+
+      // console.log( "RefreshDeviceInformation - executionType", result.executionType );
+
+      // Clear out before pushing new values.
+      while ( infoData.length > 0 ) { infoData.pop(); }
+      while ( techInfoData.length > 0 ) { techInfoData.pop(); }
+
+      // First, Refresh the information in the #info table.
+      if (result.executionType == "networkDevice" || result.executionType == "e2Device" || result.executionType == "AKSC255" || result.executionType == "SiteSupervisor") {
+        infoData.push([result.alarm ? "Alarm" : "No Alarm", result.online ? "Online" : "Offline", result.description]);
+
+        $("#info").proptable('setCustomCss', 0, 0, result.alarm ? alarmcss : goodalarmcss );
+        $("#info").proptable('setCustomCss', 0, 1, result.online ? goodalarmcss : alarmcss );
+        _deviceOnline = result.online
+
+        if (result.deviceTypeName == "E2 Device" || result.deviceTypeName == "AKSC255" || result.deviceTypeName == "SiteSupervisor") {
+          // If an E2 device, we need to remove the :<port number> from the device address. This is written automatically.
+          var colonLoc = result.networkAddress.lastIndexOf(":");
+          if ( colonLoc >= 0 ) {
+            result.networkAddress = result.networkAddress.substring(0,colonLoc);
+          }
+        }
+
+        techInfoData.push([result.deviceTypeName, result.network, result.networkAddress]);
+      }
+      else {
+        infoData.push([result.alarm ? "Alarm" : "No Alarm", "N/A", result.description]);
+        $("#info").proptable('setCustomCss', 0, 0, result.alarm ? alarmcss : goodalarmcss );
+        $("#info").proptable('setCustomCss', 0, 1, noalarmcss );
+
+        techInfoData.push([result.deviceTypeName, "N/A", "N/A"]);
+      }
+
+
+      if (_firstRender) {
+        $("#info").proptable('render');
+        $("#techInfo").proptable('render');
+      }
+      else {
+        $("#info").proptable('updateAll');
+        $("#techInfo").proptable('updateAll');
+      }
+
+
+      if (_firstRender) {     // This is the user supplied image.
+        $("#deviceImage").html('');
+        if (result.image.length > 0) {
+          var imageTest = document.createElement('img');
+          // console.log( "Image Name=", result.image )
+          imageTest.onload = function() {
+           // $("#deviceImage").html('<img id="imagePicture" src="static/uimg/devices/' + result.image + '" alt=""/>');
+			$("#deviceImage").html('<img left="40px" src="static/uimg/devices/' + result.image + '" alt="" height="250" width="230" position="relative"/>');
+            $('#imagePicture').on("mousedown", function(e) { $( "#imageDialog" ).dialog( "open" ); e.stopPropagation(); });
+
+            //$("#imageDialog").html('<img style="margin: 0 auto" src="static/uimg/devices/' + result.image + '" alt=""/>');
+			$("#imageDialog").html('<img left="40px" src="static/uimg/devices/' + result.image + '" alt="" height="250" width="230" position="relative"/>');
+            //$('#imageDialog').dialog("option", "title", deviceNameIn);
+          }
+          imageTest.src = 'static/uimg/sitemap/' + result.image;
+        }
+      }
+
+      if (_firstRender) {
+
+        if ( result.deviceType == "E2" || result.deviceType == "AKSC255" || result.deviceType == "SiteSupervisor" ) {
+          // console.log("Call clearStatusLayout");
+          statusLayout.clearStatusLayout();
+        }
+        else {
+          // load/start the specific DEVICE TYPE loading for the status screen.
+          statusLayout.initStatusLayout( result.deviceType, deviceNameIn );
+        }
+
+        // load the specific DEVICE TYPE page.
+        uriSpaceDeviceType = encodeURIComponent(result.deviceType)
+        console.log(uriSpaceDeviceType)
+        if ( uriSpaceDeviceType == "E2" || uriSpaceDeviceType == "AKSC255" || uriSpaceDeviceType == "SiteSupervisor" ) {
+          pluginPageSelector = "#devicePluginPagetabStatus";
+        }
+        else {
+          pluginPageSelector = "#tabTechStatusDevicePluginPage";
+        }
+
+        var loc = '/static/devPluginUI/' + uriSpaceDeviceType + '/__' + uriSpaceDeviceType  + '__.html'
+		console.log(loc);
+        $( pluginPageSelector ).load(loc, function(response, status, xhr) {
+          // error handling
+          if(status == "error") {
+            $( pluginPageSelector ).html("<p style='padding: 2px'>Could not load page.</p><p style='padding: 2px'>Verify the controller is still powered on and check network connections.");
+            jsonError();
+          } else {
+            pageSetTimeout(function() { refreshConfigValues(deviceNameIn); }, 1000);
+          }
+          resizeArticle();
+        })
+      }
+      else {
+        // We do not want to constantly refresh values if the user is not on the status or techStatus page.
+        if ( ( $("#tabStatus").is(":visible") ) || $("#tabTechStatus").is(":visible") || ( $("#tabAlarms").is(":visible") || $("#tabSyncStatus").is(":visible") )) {
+          pageSetTimeout(function() { refreshConfigValues(deviceNameIn); }, 1000);
+        }
+        else {
+          pageSetTimeout(function() { refreshDeviceInformation(deviceNameIn); }, 5000);
+        }
+      }
+    },
+    jsonError
+  );
+}
+
+
+function refreshConfigValues(deviceNameIn) {
+  // console.log( "HIT refreshConfigValues", deviceNameIn, "Len:", _configDataEdited.length )
+
+  if (_configDataEdited.length == 0 )
+    blUpdateConfigureDeviceTable = true;
+  else
+    blUpdateConfigureDeviceTable = false;
+
+  pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameIn + "3","method":"getDeviceConfigValues","params":deviceNameIn},
+    function(data) {
+      var result = data;
+//      console.log( "refreshConfigValues", data )
+      for (valueKey in result) {
+        setDataValue(valueKey, getDisplayValueByType(_valueDescriptions[valueKey], result[valueKey]));
+      }
+
+      // Refresh config values in the sub
+      if (_funcNewConfigValueData)
+        _funcNewConfigValueData();
+
+      {% if session.can_edit_device %}
+      if ( blUpdateConfigureDeviceTable )
+	  {
+
+
+		updateSyncStatusTable();
+		updateConfigureDevice();
+		setReccuringSync();
+}
+
+	  else {
+
+          setReccuringSync();
+          updateSyncStatusTable();
+      }
+
+      {% endif %}
+
+      $('#configure').enable();
+
+
+      pageSetTimeout(function() { refreshValues(deviceNameIn); }, 500);
+    },
+    jsonError
+    );
+
+	    pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameIn + "3","method":"getDeviceConstantConfigValues","params":deviceNameIn},
+    function(data) {
+      var result = data;
+	//console.log( "getDeviceConstantConfigValues", data )
+      for (valueKey in result) {
+        setDataValue1(valueKey, getDisplayValueByType(_valueDescriptions[valueKey], result[valueKey]));
+      }
+	  		updateSyncStatusTable();
+      $('#configure').enable();
+
+      //pageSetTimeout(function() { refreshValues(deviceNameIn); }, 100);
+    },
+    jsonError
+    );
+
+}
+var k =0;
+function refreshValues(deviceNameIn) {
+  if ( deviceNameIn == deviceName ) {
+    // console.log( "HIT refreshValues", deviceNameIn, deviceName )
+
+    // Allows an alternative screen to refresh values
+    if (_funcRefreshValues) {
+      refreshRate = _funcRefreshValues( deviceNameIn )
+      _firstRender = false;
+      pageSetTimeout(function() { getDeviceActiveAlarms(deviceNameIn); }, 100 );
+
+    }
+    else
+    {
+      // console.log( "getDeviceDataValues->", deviceNameIn )
+      pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameIn + "4","method":"getDeviceDataValues","params":deviceNameIn},
+        function(data) {
+
+          var result = data;
+          for (valueKey in result) {
+            // console.log( "refreshValues - valueKey:", valueKey, "result:", result[valueKey] )
+            setDataValue(valueKey, getDisplayValueByType(_valueDescriptions[valueKey], result[valueKey]));
+          }
+
+          // Refresh values in inputs and outputs to the sub page
+          if (_funcStatusPage) {
+            _funcStatusPage();
+          }
+          else if (_funcNewValueData) {
+            // Override call to updateOutputStatusTable
+            _funcNewValueData();
+          }
+          else {
+            // Update default output status table
+            updateOutputStatusTable()
+          }
+
+          _firstRender = false;
+          if (_firstRender)
+            resizeArticle();
+          pageSetTimeout(function() { getDeviceActiveAlarms(deviceNameIn); }, 100 );
+          pageWaiting("done");
+
+      },
+      jsonError
+      );
+    }
+  }
+//  else {
+//    console.log( "***** refreshValues mismatch", deviceNameIn, deviceName )
+//  }
+k++;
+}
+
+function getDeviceActiveAlarms(deviceNameIn) {
+  // console.log( "HIT getDeviceActiveAlarms", deviceNameIn, deviceName )
+  if ( deviceNameIn == deviceName ) {
+
+    pageXHR = postJson({"jsonrpc":"2.0","id":"PageDeviceAlarm","method":"getDeviceAlarms", "params":[{"deviceName":deviceNameIn,"AlarmType":"Active"}] },
+
+    function(data) {
+
+      var result = data;
+
+      if (result.length == 0) {
+        while(_deviceActiveAlarms.length > 0) { _deviceActiveAlarms.pop(); }
+        $('#_deviceActiveAlarms').hide();
+        $('#NoActiveAlarmsFound').show();
+      }
+      else if ((_deviceActiveAlarms.length == 0) || (result[0].date != _deviceActiveAlarms[0])) {
+        while(_deviceActiveAlarms.length > 0) { _deviceActiveAlarms.pop(); }
+        $('#_deviceActiveAlarms').show();
+        $('#NoActiveAlarmsFound').hide();
+        var iRow = 0
+        for (key in result) {
+          alarmRec = result[key];
+          var d = utcToLocalDate(alarmRec.date)
+          var s = dateToString(d);
+          _deviceActiveAlarms.push([s, getAction(alarmRec.action), alarmRec.name, alarmRec.alarm, alarmRec.description]);
+          // Highlight the action column red if alarm is new.
+          if ( alarmRec.action == "NEW" ) {
+            var newcss = alarmcss;
+          }
+          else if ( alarmRec.action == "ACK" ) {
+            var newcss = ackcss;
+          }
+          else {
+            var newcss = noalarmcss;
+          }
+          $("#deviceActiveAlarms").proptable('setRowCustomCss', iRow, newcss );
+          iRow = iRow + 1;
+        }
+      }
+      $("#deviceActiveAlarms").proptable('render');
+
+      if ( deviceNameIn == deviceName ) {
+        pageSetTimeout(function() { getDeviceAlarmHistory(deviceNameIn); }, 100 );
+      }
+    },
+    jsonError
+    );
+  }
+}
+
+function getDeviceAlarmHistory(deviceNameIn) {
+//  console.log( "HIT getDeviceAlarmHistory" )
+  pageXHR = postJson({"jsonrpc":"2.0","id":"PageDeviceAlarm","method":"getDeviceAlarms", "params":[{"deviceName":deviceNameIn,"AlarmType":"History"}] },
+
+    function(data) {
+
+      var result = data;
+
+      if (result.length == 0) {
+        while(_deviceAlarmHistory.length > 0) { _deviceAlarmHistory.pop(); }
+        $('#_deviceHistoryAlarms').hide();
+        $('#NoHistoryAlarmsFound').show();
+      }
+      else {
+        if ((_deviceAlarmHistory.length == 0) || (result[0].date != _deviceAlarmHistory[0])) {
+          while(_deviceAlarmHistory.length > 0) { _deviceAlarmHistory.pop(); }
+          $('#_deviceHistoryAlarms').show();
+          $('#NoHistoryAlarmsFound').hide();
+
+          for (key in result) {
+            alarmRec = result[key];
+            var d = utcToLocalDate(alarmRec.date)
+            var s = dateToString(d);
+            _deviceAlarmHistory.push([s, getAction(alarmRec.action), alarmRec.name, alarmRec.alarm, alarmRec.description]);
+          }
+        }
+      }
+      $("#deviceAlarmHistory").proptable('render');
+      if ( deviceNameIn == deviceName ) {
+        pageSetTimeout(function() { refreshDeviceInformation(deviceNameIn); }, 5000);
+      }
+    },
+    jsonError
+    );
+    pageWaiting("done");
+}
+
+pageClose = function() {
+  {% if ctx.localhost %}
+    $('#numpadDialog').dialog('close');
+    $('#numpadDialog').dialog('destroy').remove();
+    $('#keypadDialog').dialog('close');
+    $('#keypadDialog').dialog('destroy').remove();
+  {% endif %}
+
+  $('#imageDialog').dialog('close');
+  $('#imageDialog').dialog('destroy').remove();
+}
+
+
+//
+// Initial Page start
+//
+var deviceName = {{deviceName|tojson}}
+// $("#caseName").html(deviceName);
+console.log(deviceName);
+var deviceDictList = {{deviceDictList|tojson}}
+console.log(deviceDictList);
+var deviceNameList = {{deviceNameList|tojson}}
+console.log(deviceNameList);
+var pageDevicesShowAlarmBitStatus = false
+
+var deviceType = ''
+$("#deviceMain").hide();
+$("#pageDeviceHeader").hide();
+
+// console.log( "start pageDevices???" )
+
+// If there are devices, look at sessionStorage or just pick the first.
+// If there are NO devices, default the deviceName to "", clear the session and hide the controller status div.
+if ( deviceNameList.length > 0 ) {
+ for (i=0;i<deviceNameList.length;i++)
+ { var deviceTypeVar = deviceDictList[i]['devType'];
+   var deviceNameVar = deviceNameList[i];
+         addInputTo($("#deviceIcons"), i, deviceTypeVar,deviceNameVar );
+ }
+  if ("devices_deviceName" in sessionStorage) {
+    $('#sitemap').show();
+    // console.log("sessionStorage: ", sessionStorage)
+
+    if (sessionStorage.devices_deviceName.length > 0 ) {
+      deviceName = sessionStorage.devices_deviceName;
+    }
+    else {
+      deviceName = deviceNameList[0]
+    }
+    // console.log("Updated deviceName: ", deviceName)
+  }
+}
+else {
+  deviceName = ""
+  sessionStorage.devices_deviceName = ""
+  $('#sitemap').hide();
+}
+
+function deviceIconAlarms( deviceTypeVar, deviceNameVar, i )
+{
+
+// for (i=0;i<deviceNameList.length;i++)
+//{
+
+	//console.log(deviceNameVar);
+var deviceTypeVar =   deviceTypeVar;     //														deviceDictList[i]['devType'];
+var deviceNameVar = deviceNameVar;
+var i = i;
+  pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameVar + "2","method":"getDeviceInformation","params":deviceNameVar},
+    function(data) {
+      var result = data;
+	  //console.log(deviceNameVar);
+	  //console.log(result['alarm']);
+	  //console.log(typeof(result));
+
+    if (result['deviceTypeName'] == 'E2 Device'){
+  
+  if(result['alarm'] == true)
+	{
+	$('div #newDiv'+i).css({ 'background-color': 'red', 'border': '8px solid red'});   //, 'animation-name':'flash', 'animation-duration': '1s', 'animation-timing-function': 'linear', 'animation-iteration-count': 'infinite'
+				$('.E2Device-'+i).css({ 'background-color': 'red'});
+	$('.newDiv').css({'color':'white'});
+	$('.E2Device').css({'background-color':'white'});
+	
+	//console.log(result.alarm);
+	}
+	else{
+	$('div #newDiv'+i).css({ 'background-color': 'green', 'border': '8px solid green'});
+				$('.E2Device-'+i).css({ 'background-color': 'green'});
+	$('.newDiv').css({'color':'white'});
+	$('.E2Device').css({'background-color':'white'});
+	}
+  }
+  else if (result['deviceTypeName'] == 'AKSC255'){
+
+  if(result['alarm'] == true)
+	{
+	$('div #newDiv'+i).css({ 'background-color': 'red', 'border': '8px solid red'});   //, 'animation-name':'flash', 'animation-duration': '1s', 'animation-timing-function': 'linear', 'animation-iteration-count': 'infinite'
+				$('.AKSC255-'+i).css({ 'background-color': 'red'});
+	$('.newDiv').css({'color':'white'});
+	$('.AKSC255').css({'background-color':'white'});
+	
+	//console.log(result.alarm);
+	}
+	else{
+	$('div #newDiv'+i).css({ 'background-color': 'green', 'border': '8px solid green'});
+				$('.AKSC255-'+i).css({ 'background-color': 'green'});
+	$('.newDiv').css({'color':'white'});
+	$('.AKSC255').css({'background-color':'white'});
+	}
+  }
+
+    else if (result['deviceTypeName'] == 'SiteSupervisor'){
+
+  if(result['alarm'] == true)
+	{
+	$('div #newDiv'+i).css({ 'background-color': 'red', 'border': '8px solid red'});   //, 'animation-name':'flash', 'animation-duration': '1s', 'animation-timing-function': 'linear', 'animation-iteration-count': 'infinite'
+				$('.SiteSupervisor-'+i).css({ 'background-color': 'red'});
+	$('.newDiv').css({'color':'white'});
+	$('.SiteSupervisor').css({'background-color':'white'});
+	
+	//console.log(result.alarm);
+	}
+	else{
+	$('div #newDiv'+i).css({ 'background-color': 'green', 'border': '8px solid green'});
+				$('.SiteSupervisor-'+i).css({ 'background-color': 'green'});
+	$('.newDiv').css({'color':'white'});
+	$('.SiteSupervisor').css({'background-color':'white'});
+	}
+  }
+  
+    else //if (result['deviceTypeName'] != 'E2 Device' || result['deviceTypeName'] != 'AKSC255' )
+  {
+	if(result['alarm'] == true)
+	{
+	$('div #newDiv'+i).css({ 'background-color': 'red', 'border': '8px solid red'}); //, 'animation-name':'flash', 'animation-duration': '1s', 'animation-timing-function': 'linear', 'animation-iteration-count': 'infinite'
+			$('.LaeDevice-'+i).css({ 'background-color': 'red'});
+	//console.log(result.alarm);
+	$('.newDiv').css({'color':'white'});
+	$('.LAEDevice').css({'background-color':'white'});
+	}
+	else{
+	$('div #newDiv'+i).css({ 'background-color': 'green', 'border': '8px solid green'});
+				$('.LaeDevice-'+i).css({ 'background-color': 'green'});
+	$('.newDiv').css({'color':'white'});
+		$('.LAEDevice').css({'background-color':'white'});
+	}
+  }
+  
+
+
+    },
+    jsonError
+  );
+
+//}
+}
+
+//setInterval(deviceIconAlarms, 30000);
+
+setInterval(function(){ 
+
+if (deviceNameList.length !=0)
+{
+for (i=0;i<deviceNameList.length;i++)
+{
+
+var deviceTypeVar = deviceDictList[i]['devType'];
+var deviceNameVar = deviceNameList[i];
+
+deviceIconAlarms(deviceTypeVar, deviceNameVar, i);
+deviceIconsTempVal(deviceTypeVar, deviceNameVar, i);
+
+}
+}
+
+}, 30000);
+
+function deviceIconsTempVal(deviceTypeVar,deviceNameVar, i)
+
+{
+
+var deviceTypeVar= deviceTypeVar;
+var deviceNameVar = deviceNameVar;
+var i = i;
+//console.log(deviceNameVar);
+if(deviceTypeVar !='E2 Device')
+{
+
+pageXHR = postJson({"jsonrpc":"2.0","id":deviceNameVar + "4","method":"getDeviceDataValues","params":deviceNameVar},
+        function(data) {
+
+          var result = data;
+          for (valueKey in result) {
+            // console.log( "refreshValues - valueKey:", valueKey, "result:", result[valueKey] )
+			if(valueKey == 'T1 TEMP' || valueKey == 'T1')
+			{
+			//console.log(result[valueKey]);
+			var abc = result[valueKey];
+			var text = "Case Temp : ";
+			var val = text.bold()+ abc + " °C";
+			//console.log(val);
+			$("#temp"+i).html(val);
+			}
+            //setDataValue(valueKey, getDisplayValueByType(_valueDescriptions[valueKey], result[valueKey]));
+          }
+
+},
+    jsonError
+  );
+  
+}
+}
+
+function addInputTo(container,i, deviceTypeVar, device)
+{
+
+var deviceName = device;
+
+//if (i == 0)
+	//	container.append("<br><br>");
+	container.append("<div class= 'newDiv' id='newDiv"+i+"'> <table id='deviceIconTable1' class='deviceIconsTable'>");
+	 var abc = $("#newDiv"+i)
+	 if (deviceTypeVar == 'E2 Device' )
+	 {
+		 var button1 = "<tr><td id='E2Device-"+i+"'><button class ='E2Device' id='E2Device"+i+"'>&nbsp;</button></td></tr><tr>&nbsp</tr><tr><td align='center'><b>"+deviceName+"</b></td></tr><tr><b><td id='temp"+i+"' align='left'>&nbsp</td></b></tr></table></div>"; //<tr><td align='center'><b>Case Temp</b></td><td align='center' id='temp"+i+"'>&nbsp</td></tr>
+		 abc.append(button1);
+		 	//container.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+//    $("#E2Device"+i)
+//        .text("")
+//        .button();
+$("#E2Device"+i).on('click',function(){ buttonClick(deviceName); });
+}
+
+	 else if (deviceTypeVar == 'AKSC255')
+	 {
+		 var button1 = "<tr><td id='AKSC255-"+i+"'><button class ='AKSC255' id='AKSC255"+i+"'>&nbsp;</button></td></tr><tr>&nbsp</tr><tr><td align='center'><b>"+deviceName+"</b></td></tr><tr><b><td id='temp"+i+"' align='left'>&nbsp</td></b></tr></table></div>"; //<tr><td align='center'><b>Case Temp</b></td><td align='center' id='temp"+i+"'>&nbsp</td></tr>
+		 abc.append(button1);
+		 	//container.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+//    $("#AKSC255"+i)
+//        .text("")
+//        .button();
+$("#AKSC255"+i).on('click',function(){ buttonClick(deviceName); });
+}
+
+	 else if (deviceTypeVar == 'SiteSupervisor')
+	 {
+		 var button1 = "<tr><td id='SiteSupervisor-"+i+"'><button class ='SiteSupervisor' id='SiteSupervisor"+i+"'>&nbsp;</button></td></tr><tr>&nbsp</tr><tr><td align='center'><b>"+deviceName+"</b></td></tr><tr><b><td id='temp"+i+"' align='left'>&nbsp</td></b></tr></table></div>"; //<tr><td align='center'><b>Case Temp</b></td><td align='center' id='temp"+i+"'>&nbsp</td></tr>
+		 abc.append(button1);
+		 	//container.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+//    $("#AKSC255"+i)
+//        .text("")
+//        .button();
+$("#SiteSupervisor"+i).on('click',function(){ buttonClick(deviceName); });
+}
+
+  else //if (deviceTypeVar !== 'E2 Device' || deviceTypeVar !== 'AKSC255' )
+	 {
+		console.log(deviceTypeVar);
+		 var button1 = "<tr><td id='LaeDevice-"+i+"'><button class ='LAEDevice' id='LaeDevice"+i+"'>&nbsp;</button></td></tr><tr>&nbsp</tr><tr><td align='center'><b>"+deviceName+"</b></td></tr><tr><b><td class='tempclass'  id='temp"+i+"' align='center'>&nbsp</td></b></tr></table></div>";  //<td ><b>Case Temp :</b></td>
+		 abc.append(button1);
+	 	//container.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+//        .text(""+ deviceName +"")
+//    $("#LaeDevice"+i)
+//        .text("")
+//        .button();
+$("#LaeDevice"+i).click(function(){ buttonClick(deviceName); });
+//console.log(deviceName);
+
+     }
+
+}
+{% if ctx.osKeybd %}
+    $("#pageDeviceList").val(deviceName).niceSelect('update');
+{% else %}
+    $('#pageDeviceList').val(deviceName);
+{% endif %}
+
+if ( deviceName.length > 0 ) {
+  updateInformation(deviceName);
+}
+pageWaiting("done");
+
+
+//////////////////////////////////////////////////////////
+// on screen touch keypad
+
+{% if ctx.localhost %}
+
+  var _numpadTarget = null;
+
+  $('#numpad').numpad();
+
+  $("#numpadDialog").dialog({
+      autoOpen: false,
+      modal: true,
+      resizable: false,
+      draggable: false,
+      width: "auto",
+      buttons: {
+          "OK": function() {
+            $("#numpadDialog").dialog( "close" );
+            var value = $('#numpad').numpad('getValue');
+            if (value.length > 0) {
+              _numpadTarget.val(value);
+              _numpadTarget.trigger('change');
+            }
+          },
+          "Cancel": function() {
+            $("#numpadDialog").dialog( "close" );
+          }
+      },
+      close: function() {
+        window.scrollTo(0,0);
+      }
+  });
+
+
+  function showNumPad(target, prop, unit) {
+    _numpadTarget = target;
+    target.blur();
+    $('#numpad').numpad('target', _numpadTarget);
+    $('#numpad').numpad('title', prop);
+    $('#numpad').numpad('unit', unit);
+    $('#numpad').numpad('show');
+
+    $('#numpadDialog').dialog('option', 'title', deviceName + ' - ' + prop);
+    $("#numpadDialog").dialog('open');
+  }
+
+  var _keypadTarget = null;
+
+  $('#keypadDialog').dialog({
+    autoOpen: false,
+    modal: true,
+    resizable: false,
+    draggable: false,
+    width: 'auto',
+    close: function() {
+      window.scrollTo(0,0);
+    }
+  });
+
+  $('#keypad').keypad({ done: function (ok, value) {
+    $('#keypadDialog').dialog('close');
+            if (ok) {
+      _keypadTarget.val(value);
+      _keypadTarget.trigger('change');
+    }
+    $('.ui-dialog-titlebar').show();
+  } });
+
+
+
+  function showKeyPad(target, title) {
+    _keypadTarget = target;
+    target.blur();
+    var $keypad = $('#keypad');
+    $keypad.keypad('target', _keypadTarget);
+    $keypad.keypad('title', title);
+    $keypad.keypad('show');
+
+    $('.ui-dialog-titlebar').hide();
+    $('#keypadDialog').dialog('open');
+  }
+
+{% endif %}
+
+$('#syncDaily').bind('change', function () {
+
+   if ($(this).is(':checked'))
+   {
+       var configBit = 1;
+	   pageXHR = postJson({"jsonrpc":"2.0","id":"setConfigSyncDaily","method":"setConfigSyncDaily",
+      "params":[deviceName, configBit]},
+      function(data) {setTimeout(function() { pageWaiting("done");}, 1000);}, jsonError);
+	 setReccuringSync();
+
+   }
+   else
+     //alert("Unchecked");
+        configBit = 0;
+	   pageXHR = postJson({"jsonrpc":"2.0","id":"setConfigSyncDaily","method":"setConfigSyncDaily",
+      "params":[deviceName, configBit]},
+      function(data) {setTimeout(function() { pageWaiting("done");}, 1000);}, jsonError);
+	 setReccuringSync();
+});
+
+function setReccuringSync()
+{
+	    pageXHR = postJson({"jsonrpc":"2.0","id":"getConfigSyncDaily","method":"getConfigSyncDaily","params":deviceName},
+    function(data) {
+      var result = data;
+	  //console.log(result)
+if (result != null)
+{ var k =0;
+		for (var row in result)
+		{
+
+		//console.log("entered into result for loop");
+		configBitVals[k] = {"deviceName":result[row]["deviceName"],"enableBit":result[row]["enableBit"]};
+		k++;
+}
+}
+
+for (var row in configBitVals)
+		{
+        if ((configBitVals[row]["deviceName"] == deviceName))
+        {
+		if (configBitVals[row]["enableBit"] == 1)
+				$('#syncDaily').prop('checked', true);
+		else
+			$('#syncDaily').prop('checked', false);
+       }
+}
+    },
+    jsonError
+    );
+}
+
+//# sourceURL=pageDevices.html
+</script>

@@ -1,0 +1,33 @@
+# Comment -  Column Headers,,,,,,,
+# Group Type - (e.g. E2, LAE, etc) - Single or Grouping of device Types. * if not sure.,,,,,
+# Alarm Type - High Level Grouping of alarms (e.g. High Temperature, High Suction, Network, Door Alarm, etc.),,,
+#              A high level groupoing/abstraction of alarms,,,,,,,
+# Alarm Text - The alarm string as written by the device to the alarm log,,,,,,,
+# Description - Description column of alarm log,,,,,,,
+# Device Type - E2, BR1-28, AT1-5, etc - for specific device alarms or * for all in the group type,,,,
+# Device Name - Name of one specific device in Leo - communicating device name or E2 controller name,,,,,,,
+# App Name - For E2 only, the application Name as it appears in the E2.,,,,,,
+# App Property - For E2 only, the property name as it it appears in the E2.,,,,,,
+#,,,,,,,
+Group Type, Alarm Type, Alarm Text, Description, Device Type, Device Name, App Name, App Property
+E2,High Temperature,Case Temp Hi Limit Exceeded,*,E2,*,*,*
+E2,High Suction Pressure,High Suction Limit Exceeded,*,E2,*,*,*
+E2,Network,Device absent from network,*,E2,*,16AI_*,*
+E2,Network,Device absent from network,*,E2,*,8RO_*,*
+E2,Network,Device absent from network,*,E2,*,4AO_*,*
+E2,Low Liquid,Low Liquid Level,*,E2,*,*,*
+E2,Fail Rack Phase Loss,Rack Fail Phase Fail,*,E2,*,*,*
+E2,Fail Rack Discharge Trip,Rack Fail Discharge Trip,*,E2,*,*,*
+E2,Global Data REFR Phase,REFR Phase Loss,*,E2,*,*,*
+E2,Trip Discharge Pressure,Discharge Trip,*,E2,*,*,*
+E2,High Discharge Pressure,High Discharge Limit Exceeded,*,E2,*,*,*
+E2,Network,Device absent from network,*,E2,*,8DO_*,*
+E2,Analog Sensor Control,Alarm Limit Exceeded,*,E2,*,*,*
+E2,Digital Sensor Control,Digital Sensor Alarm,*,E2,*,*,*
+# Automatically built into software now (1.00B12) - E2,Network,Network Failure,*,E2,*,*,*
+# E2,Miscellaneous,Beta time period expired,*,E2,*,*,*
+# E2,Network,Device absent from network,*,E2,*,*,*
+LAE,High Temperature,HIGHTEMPALARM,*,LAE,*,*,*
+LAE,Low Temperature,LOWTEMPALARM,*,LAE,*,*,*
+LAE,Door Alarm,DOOROPENALARM,*,LAE,*,*,*
+SiteSupervisor,Critical Category,(Critical),*,SiteSupervisor,*,*,*

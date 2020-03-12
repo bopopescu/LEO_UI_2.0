@@ -1,0 +1,321 @@
+CellType Table,,,,,,,,,
+131,Standard Circuit,,,,,,,,
+399,XM Circuit,,,,,,,,
+162,Enhanced Suction,,,,,,,,
+128,Suction Control,,,,,,,,
+129,Condenser,,,,,,,,
+85,Heat Cool,,,,,,,,
+134,AHU,,,,,,,,
+135,HVAC Zone,,,,,,,,
+142,RTU/ARTC,,,,,,,,
+98,Lighting,,,,,,,,
+80,Time Schedule,,,,,,,,
+64,Rack SIM,,,,,,,,
+94,Analog Sensor Control,,,,,,,,
+96,Digital Sensor Control,,,,,,,,
+342,RLDS,,,,,,,,
+
+CellType,Prop Base Name,data Type, In/Out/Cfg,Display Name,Unit Type,Precision,Default,Description,Default Logging
+Standard Circuit,Name,string,output,Name,string,,,,
+Standard Circuit,CIRCUIT STATE,string,output,CIRCUIT STATE,string,,,,
+Standard Circuit,CASE TEMP 1,float,output,CASE TEMP 1,temperature,1,,,Y
+Standard Circuit,CASE TEMP 2,float,output,CASE TEMP 2,temperature,1,,,Y
+Standard Circuit,CASE TEMP 3,float,output,CASE TEMP 3,temperature,1,,,Y
+Standard Circuit,CASE TEMP 4,float,output,CASE TEMP 4,temperature,1,,,Y
+Standard Circuit,CASE TEMP 5,float,output,CASE TEMP 5,temperature,1,,,Y
+Standard Circuit,CASE TEMP 6,float,output,CASE TEMP 6,temperature,1,,,Y
+Standard Circuit,REFRIG SOLENOID,bool,output,REFRIG SOLENOID,OnOff,,,,Y
+Standard Circuit,DEFROST,bool,output,DEFROST,OnOff,,,,Y
+Standard Circuit,FAN,bool,output,FAN,OnOff,,,,Y
+Standard Circuit,CONTROL TEMP,float,output,CONTROL TEMP,temperature,1,,,Y
+Standard Circuit,ACTIVE SETPT,float,output,ACTIVE SETPT,temperature,1,,,Y
+Standard Circuit,CASE TEMP SETPT,float,output,CASE TEMP SETPT,temperature,1,,,Y
+Standard Circuit,DUAL TEMP STPT,float,output,DUAL TEMP STPT,temperature,1,,,Y
+Standard Circuit,DUAL TEMP SWITCH,bool,output,DUAL TEMP SWITCH,OnOff,,,,Y
+Standard Circuit,Dual Temp Enab,boot,output,Dual Temp Enab,OnOff,,,,Y
+Standard Circuit,Num Case Sensrs,int,output,Number of Case Sensors,int,,,,Y
+XM Circuit,Name,string,output,Name,string,,,,
+XM Circuit,CIRCUIT STATE,string,output,CIRCUIT STATE,string,,,,
+XM Circuit,CONTROL TEMP,float,output,CONTROL TEMP,temperature,1,,,Y
+XM Circuit,ACTIVE SETPT,float,output,ACTIVE SETPT,temperature,1,,,Y
+XM Circuit,REFRIG ACT,bool,output,REFRIG SOLENOID,OnOff,,,,Y
+XM Circuit,DEFROST ACT,bool,output,DEFROST ACT,OnOff,,,,Y
+Enhanced Suction,Name,string,output,Name,string,,,,
+Enhanced Suction,Number - Stages,int,output,Num Compressors,int,,,,N
+Enhanced Suction,FILTERED PRES,float,output,Suction Pressure,pressure,1,,,Y
+Enhanced Suction,CUR PRES SETPT,float,output,Suction Set Point,pressure,1,,,Y
+Enhanced Suction,PHASE LOSS,bool,output,Phase Loss,LossOk,,,,Y
+Enhanced Suction,PERCENT USED,float,output,Capacity,,2,,,Y
+Enhanced Suction,STAGE OUT1,bool,output,Compressor 01,OnOff,,,,Y
+Enhanced Suction,STAGE OUT2,bool,output,Compressor 02,OnOff,,,,Y
+Enhanced Suction,STAGE OUT3,bool,output,Compressor 03,OnOff,,,,Y
+Enhanced Suction,STAGE OUT4,bool,output,Compressor 04,OnOff,,,,Y
+Enhanced Suction,STAGE OUT5,bool,output,Compressor 05,OnOff,,,,Y
+Enhanced Suction,STAGE OUT6,bool,output,Compressor 06,OnOff,,,,Y
+Enhanced Suction,STAGE OUT7,bool,output,Compressor 07,OnOff,,,,Y
+Enhanced Suction,STAGE OUT8,bool,output,Compressor 08,OnOff,,,,Y
+Enhanced Suction,STAGE OUT9,bool,output,Compressor 09,OnOff,,,,Y
+Enhanced Suction,STAGE OUT10,bool,output,Compressor 10,OnOff,,,,Y
+Enhanced Suction,STAGE OUT11,bool,output,Compressor 11,OnOff,,,,Y
+Enhanced Suction,STAGE OUT12,bool,output,Compressor 12,OnOff,,,,Y
+Enhanced Suction,STAGE OUT13,bool,output,Compressor 13,OnOff,,,,Y
+Enhanced Suction,STAGE OUT14,bool,output,Compressor 14,OnOff,,,,Y
+Enhanced Suction,STAGE OUT15,bool,output,Compressor 15,OnOff,,,,Y
+Enhanced Suction,STAGE OUT16,bool,output,Compressor 16,OnOff,,,,Y
+Suction Control,Name,string,output,Name,string,,,,
+Suction Control,Num of Stages,int,output,Num Compressors,int,,,,N
+Suction Control,SUCT PRES OUT,float,output,Suction Pressure,pressure,1,,,Y
+Suction Control,CUR PRESS SETPT,float,output,Suction Set Point,pressure,1,,,Y
+Suction Control,PHASE LOSS,bool,output,Phase Loss,LossOk,,,,Y
+Suction Control,PERCENT USED,float,output,Capacity,,2,,,Y
+Suction Control,COMP1,bool,output,Compressor 01,OnOff,,,,Y
+Suction Control,COMP2,bool,output,Compressor 02,OnOff,,,,Y
+Suction Control,COMP3,bool,output,Compressor 03,OnOff,,,,Y
+Suction Control,COMP4,bool,output,Compressor 04,OnOff,,,,Y
+Suction Control,COMP5,bool,output,Compressor 05,OnOff,,,,Y
+Suction Control,COMP6,bool,output,Compressor 06,OnOff,,,,Y
+Suction Control,COMP7,bool,output,Compressor 07,OnOff,,,,Y
+Suction Control,COMP8,bool,output,Compressor 08,OnOff,,,,Y
+Suction Control,COMP9,bool,output,Compressor 09,OnOff,,,,Y
+Suction Control,COMP10,bool,output,Compressor 10,OnOff,,,,Y
+Suction Control,COMP11,bool,output,Compressor 11,OnOff,,,,Y
+Suction Control,COMP12,bool,output,Compressor 12,OnOff,,,,Y
+Suction Control,COMP13,bool,output,Compressor 13,OnOff,,,,Y
+Suction Control,COMP14,bool,output,Compressor 14,OnOff,,,,Y
+Suction Control,COMP15,bool,output,Compressor 15,OnOff,,,,Y
+Suction Control,COMP16,bool,output,Compressor 16,OnOff,,,,Y
+Condenser,Name,string,output,Name,string,,,,
+Condenser,Number of Fans,int,output,Number of Fans,int,,,,N
+Condenser,Condenser Type,string,output,Cond Type,string,,,,N
+Condenser,Control Type,string,output,Cntrl Type,string,,,,N
+Condenser,Fan Type,string,output,Fan Type,string,,,,N
+Condenser,AMB TEMP IN,float,output,Ambient,temperature,1,,,Y
+Condenser,LIQUID LEVEL,float,output,Liquid,,2,,,Y
+Condenser,CTRL VAL OUT,float,output,Control Pressure,pressure,1,,,Y
+Condenser,CTRL VAL STPT,float,output,Pressure SetPoint,pressure,1,,,Y
+Condenser,T CTRL VAL OUT,float,output,Control Temp,temperature,1,,,Y
+Condenser,T CTRL VAL STPT,float,output,Temp SetPoint,temperature,1,,,Y
+Condenser,DISCHARGE OUT,float,output,Discharge Pressure,pressure,1,,,Y
+Condenser,CONTROL PID,float,output,Capacity,,2,,,Y
+Condenser,SPLIT VALVE,bool,output,Split Valve,ActiveInactive,,,,Y
+Condenser,EVAP PUMP1,bool,output,EVAP pump1,OnOff,,,,Y
+Condenser,EVAP PUMP2,bool,output,EVAP pump2,OnOff,,,,Y
+Condenser,VS FAN OUT,float,output,VS Fan,,2,,,Y
+Condenser,FAN OUT1,bool,output,Fan 01,OnOff,,,,Y
+Condenser,FAN OUT2,bool,output,Fan 02,OnOff,,,,Y
+Condenser,FAN OUT3,bool,output,Fan 03,OnOff,,,,Y
+Condenser,FAN OUT4,bool,output,Fan 04,OnOff,,,,Y
+Condenser,FAN OUT5,bool,output,Fan 05,OnOff,,,,Y
+Condenser,FAN OUT6,bool,output,Fan 06,OnOff,,,,Y
+Condenser,FAN OUT7,bool,output,Fan 07,OnOff,,,,Y
+Condenser,FAN OUT8,bool,output,Fan 08,OnOff,,,,Y
+Condenser,FAN OUT9,bool,output,Fan 09,OnOff,,,,Y
+Condenser,FAN OUT10,bool,output,Fan 10,OnOff,,,,Y
+Condenser,FAN OUT11,bool,output,Fan 11,OnOff,,,,Y
+Condenser,FAN OUT12,bool,output,Fan 12,OnOff,,,,Y
+Condenser,FAN CONTACTOR,bool,output,Fan Contact,OnOff,,,,Y
+Condenser,FAN RELAY1,bool,output,Fan Relay1,OnOff,,,,Y
+Condenser,FAN RELAY2,bool,output,Fan Relay2,OnOff,,,,Y
+AHU,Name,string,output,Name,string,,,,
+AHU,SPACE TEMP OUT,float,output,Space Temp Out,temperature,1,,,Y
+AHU,OCC STATE,string,output,Occupancy,string,,,,Y
+AHU,ACTIVE SETPT,float,output,Setpoint,temperature,1,,,Y
+AHU,SPACE HUMID,float,output,Space Humid,temperature,1,,,Y
+AHU,ACT DEHUM SETPT,float,output,Dehum Setpoint,temperature,1,,,Y
+AHU,ACT CTRL TEMP,float,output,Actual Control Temp,temperature,1,,,Y
+AHU,FAN STATUS,bool,output,Fan,OnOff,,,,Y
+AHU,HEAT STAGE1,bool,output,Heat On,OnOff,,,,Y
+AHU,COOL STAGE1,bool,output,Cool On,OnOff,,,,Y
+RTU/ARTC,Name,string,output,Name,string,,,,
+RTU/ARTC,CONTROL TEMP,float,output,Control Temp,temperature,1,,,Y
+RTU/ARTC,SEASON,string,output,Season,string,,,,N
+RTU/ARTC,OCCUPANCY,string,output,Occupancy,string,,,,Y
+RTU/ARTC,GEN STATUS,string,output,Online Status,string,,,,N
+RTU/ARTC,SUPPLY TEMP,float,output,Control Temp,temperature,1,,,Y
+RTU/ARTC,RETURN TEMP,float,output,Control Temp,temperature,1,,,Y
+RTU/ARTC,FAN,bool,output,Fan,OnOff,,,,Y
+RTU/ARTC,HEAT1,bool,output,Ht 1,OnOff,,,,Y
+RTU/ARTC,HEAT2,bool,output,Ht 2,OnOff,,,,Y
+RTU/ARTC,COOL1,bool,output,Cl 1,OnOff,,,,Y
+RTU/ARTC,COOL2,bool,output,Cl 2,OnOff,,,,Y
+RTU/ARTC,Num Heat Stages,int,output,Number of Heat Stages,int,,,,Y
+RTU/ARTC,Num Cool Stages,int,output,Number of Cool Stages,int,,,,Y
+HVAC Zone,Name,string,output,Name,string,,,,
+HVAC Zone,ZONE TEMP OUT,float,output,Zone Temperature,temperature,1,,,Y
+HVAC Zone,ZONE HUM OUT,float,output,Zone Humidity,int,1,,,Y
+HVAC Zone,OCC STATE,string,output,Occupancy,string,,,,Y
+HVAC Zone,ACTIVE CL STPT,float,output,Cool Set Point,temperature,1,,,Y
+HVAC Zone,ACTIVE HT STPT,float,output,Heat Set Point,temperature,1,,,Y
+Lighting,Name,string,output,Name,string,,,,
+Lighting,LIGHTS OUTPUT,bool,output,Light Status,OnOff,,,,Y
+Lighting,ACTIVE SCHED,bool,output,Schedule Status,OnOff,,,,Y
+Time Schedule,Name,string,output,Name,string,,,,
+Time Schedule,OUTPUT,bool,output,Output,OnOff,,,,Y
+Time Schedule,SCHED OUTPUT,bool,output,Sched Output,OnOff,,,,Y
+Time Schedule,BYPASS STATE,bool,output,Bypass State,OnOff,,,,Y
+Analog Sensor Control,Name,string,output,Name,string,,,,
+Analog Sensor Control,CONTROL VALUE,string,output,Control Value,,,,,Y
+Analog Sensor Control,COMMAND OUT,bool,output,Command Out,OnOff,,,,Y
+Digital Sensor Control,Name,string,output,Name,string,,,,
+Digital Sensor Control,CONTROL VALUE,bool,output,Control Value,OnOff,,,,Y
+Digital Sensor Control,COMMAND OUT,bool,output,Command Out,OnOff,,,,Y
+RLDS,Device Name,string,output,Device Name,,,,
+RLDS,ALARM,string,output,Alarm,,,,,Y
+RLDS,COMM STATUS,string,output,Alarm,,,,,
+RLDS,Mode,string,output,Mode,,,,,Y
+RLDS,State,string,output,State,,,,,
+RLDS,7024,int,output,Number of Zones,,,,,Y
+RLDS,CONCENTRATION1,float,output,Zone #1,ppm,2,,,Y
+RLDS,CONCENTRATION2,float,output,Zone #2,ppm,2,,,Y
+RLDS,CONCENTRATION3,float,output,Zone #3,ppm,2,,,Y
+RLDS,CONCENTRATION4,float,output,Zone #4,ppm,2,,,Y
+RLDS,CONCENTRATION5,float,output,Zone #5,ppm,2,,,Y
+RLDS,CONCENTRATION6,float,output,Zone #6,ppm,2,,,Y
+RLDS,CONCENTRATION7,float,output,Zone #7,ppm,2,,,Y
+RLDS,CONCENTRATION8,float,output,Zone #8,ppm,2,,,Y
+RLDS,CONCENTRATION9,float,output,Zone #9,ppm,2,,,Y
+RLDS,CONCENTRATION10,float,output,Zone #10,ppm,2,,,Y
+RLDS,CONCENTRATION11,float,output,Zone #11,ppm,2,,,Y
+RLDS,CONCENTRATION12,float,output,Zone #12,ppm,2,,,Y
+RLDS,CONCENTRATION13,float,output,Zone #13,ppm,2,,,Y
+RLDS,CONCENTRATION14,float,output,Zone #14,ppm,2,,,Y
+RLDS,CONCENTRATION15,float,output,Zone #15,ppm,2,,,Y
+RLDS,CONCENTRATION16,float,output,Zone #16,ppm,2,,,Y
+RLDS,7050,string,output,Zone #1 Name,,,,,N
+RLDS,7053,string,output,Zone #2 Name,,,,,N
+RLDS,7056,string,output,Zone #3 Name,,,,,N
+RLDS,7059,string,output,Zone #4 Name,,,,,N
+RLDS,7062,string,output,Zone #5 Name,,,,,N
+RLDS,7065,string,output,Zone #6 Name,,,,,N
+RLDS,7068,string,output,Zone #7 Name,,,,,N
+RLDS,7071,string,output,Zone #8 Name,,,,,N
+RLDS,7074,string,output,Zone #9 Name,,,,,N
+RLDS,7077,string,output,Zone #10 Name,,,,,N
+RLDS,7080,string,output,Zone #10 Name,,,,,N
+RLDS,7083,string,output,Zone #11 Name,,,,,N
+RLDS,7086,string,output,Zone #12 Name,,,,,N
+RLDS,7089,string,output,Zone #13 Name,,,,,N
+RLDS,7092,string,output,Zone #14 Name,,,,,N
+RLDS,7095,string,output,Zone #15 Name,,,,,N
+RLDS,7098,string,output,Zone #16 Name,,,,,N
+Heat Cool,Name,string,output,Name,string,,,,
+Heat Cool,AC PHASE LOSS,string,output,AC Phase Loss,string,,,,Y
+Heat Cool,SPACE TEMP,float,output,Space Temp,temperature,1,,,Y
+Heat Cool,2059,float,output,Active Setpoint,temperature,1,,,Y
+Heat Cool,HEAT/COOL Mode,,output,Heat Cool Mode,,,,,Y
+Heat Cool,OCC STATE,string,output,Occupancy State,string,,,,Y
+Heat Cool,FAN OUT,bool,output,Fan Out,OnOff,,,,Y
+Heat Cool,Stages of Heat,int,output,Stages of Heat,int,,,,Y
+Heat Cool,Stages of Cool,int,output,Stages of Cool,int,,,,Y
+Heat Cool,HEAT STAGE1,bool,output,Heat Stage1,OnOff,,,,Y
+Heat Cool,HEAT STAGE2,bool,output,Heat Stage2,OnOff,,,,Y
+Heat Cool,HEAT STAGE3,bool,output,Heat Stage3,OnOff,,,,Y
+Heat Cool,HEAT STAGE4,bool,output,Heat Stage4,OnOff,,,,Y
+Heat Cool,HEAT STAGE5,bool,output,Heat Stage5,OnOff,,,,Y
+Heat Cool,HEAT STAGE6,bool,output,Heat Stage6,OnOff,,,,Y
+Heat Cool,HEAT STAGE7,bool,output,Heat Stage7,OnOff,,,,Y
+Heat Cool,HEAT STAGE8,bool,output,Heat Stage8,OnOff,,,,Y
+Heat Cool,COOL STAGE1,bool,output,Cool Stage1,OnOff,,,,Y
+Heat Cool,COOL STAGE2,bool,output,Cool Stage2,OnOff,,,,Y
+Heat Cool,COOL STAGE3,bool,output,Cool Stage3,OnOff,,,,Y
+Heat Cool,COOL STAGE4,bool,output,Cool Stage4,OnOff,,,,Y
+Heat Cool,COOL STAGE5,bool,output,Cool Stage5,OnOff,,,,Y
+Heat Cool,COOL STAGE6,bool,output,Cool Stage6,OnOff,,,,Y
+Heat Cool,COOL STAGE7,bool,output,Cool Stage7,OnOff,,,,Y
+Heat Cool,COOL STAGE8,bool,output,Cool Stage8,OnOff,,,,Y
+
+E2 Status Screen Data,,,,,,,,,
+AppHeader,Circuit Control,,,,,
+AppType,StandardCircuit,131,,,,
+MultiTitle,Circuit Name,State,Temp,SetPt,REF,DEF
+MultiValue,Name,CIRCUIT STATE,CONTROL TEMP,ACTIVE SETPT,REFRIG SOLENOID,DEFROST
+AppHeader,XM Circuit Control,,,,,
+AppType,XM Circuit,399,,,,
+MultiTitle,Circuit Name,State,Temp,SetPt,REF,DEF
+MultiValue,Name,CIRCUIT STATE,CONTROL TEMP,ACTIVE SETPT,REFRIG ACT,DEFROST ACT
+AppHeader,Enhanced Suction,,,,,,,,
+AppType,Enhanced Suction,162,,,,,,,
+SglStatus,App Name,Name,,,,,,,
+SglStatus,Suction Pressure =,FILTERED PRES,,,,,,,
+SglStatus,Suction Set Point =,CUR PRES SETPT,,,,
+DblStatus,Phase Loss =,PHASE LOSS,Capacity =,PERCENT USED,,
+SectHeader,Compressor Stages,,,,,
+StagesStatus,16,Number - Stages,STAGE OUT*,,,
+AppHeader,Suction Control,,,,,,,,
+AppType,Suction Control,128,,,,,,,
+SglStatus,App Name,Name,,,,,,,
+SglStatus,Suction Pressure =,SUCT PRES OUT,,,,,,,
+SglStatus,Suction Set Point =,CUR PRESS SETPT,,,,
+DblStatus,Phase Loss =,PHASE LOSS,Capacity =,PERCENT USED,,
+SectHeader,Compressor Stages,,,,,
+StagesStatus,16,Num of Stages,COMP*,,,
+AppHeader,Condenser Control,,,,,
+AppType,Condenser,129,,,,
+SglStatus,App Name,Name,,,,
+SglStatus,Cond Type,Condenser Type,,,,
+SglStatus,Cntrl Type,Control Type,,,,
+SglStatus,Fan Type,Fan Type,,,,
+SglStatus,Ambient,AMB TEMP IN,,,,
+SectHeader,Condenser Values,,,,,
+SglStatus,Liquid,LIQUID LEVEL,,,,
+SglStatus,Control Pressure,CTRL VAL OUT,,,,
+SglStatus,Pressure SetPoint,CTRL VAL STPT,,,,
+SglStatus,Control Temp,T CTRL VAL OUT,,,,
+SglStatus,Temp SetPoint,T CTRL VAL STPT,,,,
+SglStatus,Discharge Pressure,DISCHARGE OUT,,,,
+SectHeader,Condenser Outs,,,,,
+SglStatus,Capacity,CONTROL PID,,,,
+SglStatus,Split Valve,SPLIT VALVE,,,,
+SglStatus,EVAP pump1,EVAP PUMP1,,,,
+SglStatus,EVAP pump2,EVAP PUMP2,,,,
+SglStatus,VS Fan,VS FAN OUT,,,,
+SectHeader,Condenser Fans,,,,,
+StagesStatus,12,Number of Fans,FAN OUT*,,,
+AppHeader,Heat/Cool Control ,,,,,
+AppType,Heat Cool,85,,,,
+SglStatus,App Name,Name,,,,
+SglStatus,AC Phase Loss=,AC PHASE LOSS,,,,
+SglStatus,Space Temp=,SPACE TEMP,,,,
+SglStatus,Active Setpoint=,2059,,,,
+SglStatus,Heat Cool Mode=,HEAT/COOL Mode,,,,
+SglStatus,Occupancy State=,OCC STATE,,,,
+SglStatus,Fan Out=,FAN OUT,,,,
+SectHeader,Heat Stages,,,,,
+StagesStatus,8,Stages of Heat,HEAT STAGE*,,,
+SectHeader,Cool Stages,,,,,
+StagesStatus,8,Stages of Cool,COOL STAGE*,,,
+AppHeader,AHU,,,,,,,,
+AppType,AHU,134,,,,,,,
+MultiTitle,Name,Space Temp,Occupancy,Fan,Setpoint,Heat On,Cool On,Space Humid,Dehum Setpoint,Actual Control Temp,,
+MultiValue,Name,SPACE TEMP OUT,OCC STATE,ACTIVE SETPT,FAN STATUS,HEAT STAGE1,COOL STAGE1,SPACE HUMID,ACT DEHUM SETPT,ACT CTRL TEMP,,
+AppHeader,RTU/ARTC,,,,,,,,
+AppType,RTU/ARTC,142,,,,,,,
+MultiTitle,Name,Control Temp,Occupancy,Fan,Heat1,Heat2,Cool1,Cool2,Online Status
+MultiValue,Name,CONTROL TEMP,OCCUPANCY,FAN,HEAT1,HEAT2,COOL1,COOL2,GEN STATUS
+AppHeader,Zones,,,,,,,,
+AppType,AHU Zone,135,,,,,,,
+MultiTitle,Name,Zone Temp,Zone Humidity,Occupancy,Cool Set Point,Heat Set Point,,
+MultiValue,Name,ZONE TEMP OUT,ZONE HUM OUT,OCC STATE,ACTIVE CL STPT,ACTIVE HT STPT,,
+AppHeader,Lighting,,,,,,,,
+AppType,Lighting,98,,,,,,,
+MultiTitle,Name,Light State,Schedule State,,,,,,
+MultiValue,Name,LIGHTS OUTPUT,ACTIVE SCHED,,,,,,
+AppHeader,Time Schedule,,,,,,,,
+AppType,Time Schedule,80,,,,,,,
+MultiTitle,Name,Output,Schedule State,Bypass State,,,,,
+MultiValue,Name,OUTPUT,SCHED OUTPUT,BYPASS STATE,,,,,
+AppHeader,Analog Sensor Control,,
+AppType,Analog Sensor Control,94,
+MultiTitle,Name,Control Value,Command Out
+MultiValue,Name,CONTROL VALUE,COMMAND OUT
+AppHeader,Digital Sensor Control,,
+AppType,Digital Sensor Control,96,
+MultiTitle,Name,Control Value,Command Out
+MultiValue,Name,CONTROL VALUE,COMMAND OUT
+AppHeader,RLDS (Lead Detection),,,,,,,,
+AppType,RLDS,342,
+MultiTitle,Alarm,Onlne Status,Mode,State,Num Zones
+MultiValue,ALARM,COMM STATUS,Mode,State,7024
+MultiTitle,Zone Name,PPM
+MultiValueStar,16,7024,CONCENTRATION*
+MultiValue,7050,7053,7056,7059,7062,7065,7068,7071

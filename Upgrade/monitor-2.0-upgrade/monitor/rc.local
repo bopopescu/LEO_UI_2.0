@@ -1,0 +1,40 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# START LEO Specific startup.
+# VERSION: 1.00
+
+date >> /opt/monitor/log/startStat.log
+
+# First check to see if there is an installion update.
+# Start LEO Install Check
+echo Start install >> /opt/monitor/log/startStat.log
+cd /opt/monitor/system
+date >> /opt/monitor/log/startStat.log
+/usr/bin/python install.py >> /opt/monitor/log/startStat.log 2>&1
+
+# Start LEO Core
+echo Start LEO >> /opt/monitor/log/startStat.log
+cd /opt/monitor
+/usr/local/bin/gunicorn --pid /var/run/gunicorn.pid --bind unix:/tmp/nginx.sock leo_ui:app --capture-output --error-logfile /opt/monitor/log/gunicorn-err.log & >> /opt/monitor/log/startStat.log 2>&1
+echo Done LEO Core Start >> /opt/monitor/log/startStat.log
+
+# Start LEO Process Watchdog
+echo Start LEO Proc Wdog >> /opt/monitor/log/startStat.log
+cd /opt/monitor
+/usr/bin/python leoProcWdog.py & >> /opt/monitor/log/startStat.log 2>&1
+echo Done LEO Proc Wdog >> /opt/monitor/log/startStat.log
+
+# END LEO Specific startup.
+
+# The following is the default for this script.
+echo 1 1 > /proc/sys/vm/lowmem_reserve_ratio
+exit 0

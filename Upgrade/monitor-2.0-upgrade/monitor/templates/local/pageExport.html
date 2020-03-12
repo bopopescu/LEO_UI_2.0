@@ -1,0 +1,392 @@
+
+<style>
+
+/*! This is the common css for the pageAnalysis and pageExport pages */
+<link rel="stylesheet" href="static/local/css/leoLog.css">
+
+</style>
+
+<div class="logsection">
+  <table class="logsectiontable">
+    <tr>
+      <th style="border-bottom: 1px solid #dfd9c3;">Values</th>
+      <th>&nbsp;</th>
+      <th style="border-bottom: 1px solid #dfd9c3;">Time Period</th>
+    </tr>
+    <tr>
+      <td>
+        <div id="logListButtons">
+<!-- Remove EXPORT ALL button until we determine how to do this without causing the system to crash
+          <table>
+            <td><input id="exportAllValues" type="checkbox">&nbsp;Export All Values</td>
+          </table>
+-->
+          <table>
+            <td><button id="add" class="samesizebutton" >Add</button></td>
+            <td><button id="delete" class="samesizebutton" >Remove</button></td>
+            <td><button id="clear" class="samesizebutton" >Remove All</button></td>
+          </table>
+        </div>
+      </td>
+      <td>&nbsp;</td>
+      <td>
+        <div id="dateUpdateButton" style="vertical-align:top">
+          <table>
+            <td>From:&nbsp;<input id="startdatepicker" style="width:6em"></td>
+            <td>&nbsp;To:&nbsp;<input id="enddatepicker" style="width:6em"></td>
+            <td><button id="download" class="samesizeweekbutton" style="height:3em;width:9em;">Download</button></td>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div id="logList" class="loglist"></div>
+</div>
+
+<div id="progressBox" class="progress-box">
+  <br/>
+  <button id="cancel" class="samesizebutton" style="margin-bottom:20px">Cancel</button>
+  <div id="buildingProgress"><div id="buildingProgressLabel"&nbsp;Building CSV:&nbsp;Waiting...</div></div>
+</div>
+
+
+<form action="/fileData" method="post" name="csvpost">
+<input type="hidden" id="csvrequest" name="csvrequest" value="">
+<input type="hidden" id="reqType" name="reqType" value="CSVPost">
+</form>
+
+<br/>&nbsp;
+
+<script>
+/////////////////////////////// Handle the list
+var loggedDevices = []
+var loggedValues = []
+
+var deviceName = "{{deviceName}}"
+var allLoggedValues = {{allLoggedValues|tojson}}
+
+  pageWaiting('done')
+
+  for (var deviceName in allLoggedValues){
+      loggedDevices.push( deviceName )
+      loggedValues[deviceName] = [];
+
+      for (var val in allLoggedValues[deviceName]) {
+          var key = allLoggedValues[deviceName][val].key
+          var value = allLoggedValues[deviceName][val].displayName
+          var loggedParameterKV = {}
+          loggedParameterKV[key] = value
+          loggedValues[deviceName].push( loggedParameterKV )
+      }
+  }
+
+function logCacheKey(deviceName, valueName) { return deviceName + '_' + valueName; }
+
+var logList = [];
+var id = '';
+
+$("#logList").edittable({ name: 'loglist',
+  data: logList,
+  columns: [{ type: 'checkbox', header: ''},
+            { type: 'select', options: loggedDevices, header: 'Device'},
+            { type: 'select', options: loggedValues[loggedDevices[0]], header: 'Value'}],
+  change: function(row, col, val) {
+    if (col == 1) {
+      col++;
+      logList[row][col] = Object.keys(loggedValues[val][0])[0];
+      var $sel = $("#logList");
+      $sel.edittable('setCustomOptions', row, col, loggedValues[val]);
+      $sel.edittable('render');
+      sessionStorage.export_loglist = JSON.stringify(logList);;
+    }
+    sessionStorage.export_loglist = JSON.stringify(logList);
+  }
+})
+
+function checkButtons() {
+  if (id === '') {
+    if (logList.length > 0)
+      $('#download').enable();
+    else
+          $('#download').disable();
+    $('#cancel').disable();
+  } else {
+    $('#cancel').enable();
+    $('#download').disable();
+  }
+
+
+  if ($("#exportAllValues").is(':checked')) {
+    $("#add,#clear,#delete,#logList").disable();
+    $('#logList').edittable('disabled', true);
+  } else {
+    $("#add,#logList").enable();
+    if (logList.length > 0) {
+      $("#clear,#delete").enable();
+    } else {
+      $("#clear,#delete").disable();
+    }
+    $('#logList').edittable('disabled', false);
+  }
+
+
+}
+
+$("#clear").button({icons: { primary: "icon icon-trash"}}).click(function(event) {
+    while(logList.length > 0) { logList.pop(); }
+    $("#logList").edittable('render');
+    sessionStorage.export_loglist = JSON.stringify(logList);
+    resizeArticle();
+    checkButtons();
+  });
+
+
+function addDefaultLoggedValue() {
+  var doThis = 1
+  if (loggedDevices.length > 0) {
+    if ( doThis > 0 ) {
+      var key = loggedDevices[0];
+      var optionNum = 0;
+
+      var logListLength = logList.length;
+      if (logListLength > 0) {
+        var previousLogListItem = logList[logListLength - 1];
+        key = previousLogListItem[1];
+        var lastOption = previousLogListItem[2];
+        var list = loggedValues[key];
+        for (var idx = 0; idx < list.length; idx++) {
+          if (Object.keys(list[idx])[0] == lastOption) {
+            optionNum = idx + 1;
+            break;
+          }
+        }
+
+        if (optionNum >= loggedValues[key].length)
+          optionNum = loggedValues[key].length - 1;
+      }
+
+      var option = Object.keys(loggedValues[key][optionNum])[0];
+      logList.push([false, key, option]);
+      $("#logList").edittable('render');
+      sessionStorage.export_loglist = JSON.stringify(logList);;
+      resizeArticle();
+  }
+  else {
+      var key = loggedDevices[0];
+      var firstOption = Object.keys(loggedValues[key][0])[0];
+
+      logList.push([false, key, firstOption]);
+      $("#logList").edittable('render');
+      sessionStorage.export_loglist = JSON.stringify(logList);;
+      resizeArticle();
+    }
+  }
+  checkButtons();
+}
+
+$("#add").button({icons: { primary: "icon icon-plus"}}).click(function(event) {
+    if (loggedDevices.length == 0) {
+      alert("No values are logged.");
+    } else {
+      addDefaultLoggedValue();
+    }
+    checkButtons();
+  });
+
+$("#delete").button({icons: { primary: "icon icon-trash"}}).click(function(event) {
+    var idx = 0;
+    while (idx < logList.length) {
+      if (logList[idx][0]) logList.splice(idx, 1); else idx++;
+    }
+    $("#logList").edittable('render');
+    sessionStorage.export_loglist = JSON.stringify(logList);
+    resizeArticle();
+    checkButtons();
+  });
+
+
+var displayProgress = function() {
+  checkButtons();
+  $("#progressBox").show();
+  $('#buildingProgress').progressbar({
+    value: 0,
+    change: function() {
+      $('#buildingProgressLabel').html( '&nbsp;Building CSV: ' + $('#buildingProgress').progressbar('value').toFixed(1) + '%' );
+    },
+    complete: function() {
+      $('#buildingProgressLabel').html( '&nbsp;Building CSV: Complete.');
+    }
+  });
+}
+
+var clearProgress = function() {
+  setTimeout(function() { $('#progressBox').fadeOut(); }, 1000);
+  id = '';
+  checkButtons();
+}
+
+$("#cancel").button({icons: { primary: "icon icon-close"}}).click(function(event) {
+    if (pageXHR != null) pageXHR.abort();
+    pageXHR = postJson({"jsonrpc":"2.0", "id":"getLogCancel", "method":"getLogCancel", "params":[id]});
+    clearProgress();
+  });
+
+$("#download").button({icons: { primary: "icon icon-download"}}).click(function( event ) {
+
+  var createLogJsonRequestFromList = function() {
+    var request = [];
+    var uniqueKeys = [];
+
+    for (var idx = 0; idx < logList.length; idx++) {
+      var deviceName = logList[idx][1];
+      var valueName = logList[idx][2];
+      var key = logCacheKey(deviceName, valueName);
+
+      if (uniqueKeys.indexOf(key) !== -1)
+        continue;
+      uniqueKeys.push(key);
+
+
+      request.push( { 'deviceName': deviceName, 'valueName': valueName } );
+    }
+    return request;
+  }
+
+  var getNameForValue = function(deviceName, valueName) {
+    list = loggedValues[deviceName];
+    for (var idx = 0; idx < list.length; idx++) {
+      if (valueName in list[idx])
+        return deviceName + '-' + list[idx][valueName];
+    }
+  }
+
+  var createLogJsonRequestAllValues = function() {
+    var request = [];
+
+    for (deviceName in loggedValues) {
+      list = loggedValues[deviceName];
+      for (var idx = 0; idx < list.length; idx++) {
+        for (valueName in list[idx])
+          request.push( { 'deviceName': deviceName, 'valueName': valueName } );
+      }
+    }
+    return request;
+  }
+
+  var request;
+  if ($("#exportAllValues").is(':checked')) {
+    request = createLogJsonRequestAllValues();
+  } else {
+    request = createLogJsonRequestFromList();
+  }
+  var startdate = $("#startdatepicker").datepicker("getDate");
+  var enddate = $("#enddatepicker").datepicker("getDate");
+  enddate.setTime(enddate.getTime() + (24*60*60*1000));
+
+  id = '';
+
+
+  if (pageXHR != null) pageXHR.abort();
+  // console.log( "Display units", displayUnitSetting )
+  pageXHR = postJson({"jsonrpc":"2.0", "id":"getLogStart", "method":"getLogStart",
+    "params":['csv', request, startdate.toISOString(), enddate.toISOString(), displayUnitSetting, '%Y-%m-%d %H:%M:%S' ]},
+    function(data) {
+      var result = data;
+      if (result != null) {
+        id = result.id;
+
+        displayProgress();
+
+
+        // update progress
+        var updateProgress = function() {
+          pageXHR = postJson({"jsonrpc":"2.0", "id":"getLogProgress", "method":"getLogProgress", "params":[id]},
+          function(data) {
+            var result = data;
+            if (result != null) {
+              $('#buildingProgress').progressbar('value', result.progress);
+              if (result.state == 'active') {
+                setTimeout(updateProgress, 500);
+              } else {
+                var d = new Date();
+                var fn = 'datalog_' + d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+'_'+d.getHours()+'-'+d.getMinutes()+'-'+d.getSeconds();
+                $('#csvrequest').val(JSON.stringify({ file: fn, id: id }));
+                document.csvpost.submit();
+                clearProgress();
+
+              }
+            }
+          }, jsonError);
+        }
+        setTimeout(updateProgress, 500);
+
+
+      } else {
+        alert('No data returned.')
+      }
+
+    }, jsonError );
+
+  event.preventDefault();
+});
+
+
+$("#startdatepicker").datepicker({ showAnim: '', maxDate: new Date,
+    onSelect: function(d, i) {
+      if(d !== i.lastVal) { sessionStorage.export_startdate = d; }
+    }
+  });
+
+$("#enddatepicker").datepicker({ showAnim: '', maxDate: new Date,
+    onSelect: function(d, i) {
+      if(d !== i.lastVal) { sessionStorage.export_enddate = d; }
+    }
+  });
+
+
+$("#exportAllValues").click(function() {
+  checkButtons();
+  sessionStorage.export_allvalues = $("#exportAllValues").is(':checked');
+})
+
+//////////////////////////////////
+
+
+$("#progressBox").hide();
+
+var $exportAllValues = $('#exportAllValues')
+if ("export_allvalues" in sessionStorage) {
+  $exportAllValues.prop("checked", (sessionStorage.export_allvalues === "true"));
+} else {
+  $exportAllValues.prop("checked", false);
+}
+
+if ("export_loglist" in sessionStorage) {
+  logList = JSON.parse(sessionStorage.export_loglist);
+  var $logList = $('#logList')
+  $logList.edittable('loadData', logList);
+  $logList.edittable('render');
+}
+else
+  addDefaultLoggedValue();
+
+
+if ("export_enddate" in sessionStorage)
+  $("#enddatepicker").datepicker('setDate', sessionStorage.export_enddate);
+else
+  $("#enddatepicker").datepicker('setDate', 'today');
+
+if ("export_startdate" in sessionStorage)
+  $("#startdatepicker").datepicker('setDate', sessionStorage.export_startdate);
+else {
+  var date = $("#enddatepicker").datepicker("getDate");
+  var startdate = new Date(date);
+  startdate.setTime(startdate.getTime() - ((24*60*60*1000) * 7));
+  $("#startdatepicker").datepicker('setDate', startdate);
+}
+
+checkButtons();
+
+//# sourceURL=pageExport.html
+</script>
+

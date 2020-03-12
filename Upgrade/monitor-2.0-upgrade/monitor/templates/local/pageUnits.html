@@ -1,0 +1,64 @@
+
+<style>
+.unit-container {
+  margin: 10px;
+}
+</style>
+
+<div class="unit-container">
+  <div id="units"></div>
+  <br/>
+  <button id="unitupdate">Update</button>
+</div>
+
+
+<script>
+
+  var unitData = []
+
+  pageWaiting('done')
+  for (idx in displayUnitSetting) {
+    switch(idx) {
+      case "temperature":
+        unitData.push(["Temperatures", displayUnitSetting[idx]]);
+        break;
+      case "deltatemperature":    // delta temps will be set to temps
+        break;
+      case "pressure":
+        unitData.push(["Pressures", displayUnitSetting[idx]]);
+        break;
+    }
+  }
+
+
+$("#units").proptable({ name: 'units',
+  data: unitData,
+  columns: [{ readonly: true, header: 'Unit'},
+            { type: 'select', options: [], header: 'Selection' }]
+});
+
+$("#units").proptable('setCustomOptions', 0, 1, displayUnitTypes.temperature);
+$("#units").proptable('setCustomOptions', 1, 1, displayUnitTypes.pressure);
+$("#units").proptable('render');
+{% if ctx.osKeybd %}
+  $('table select').niceSelect();
+{% endif %}
+
+$("#unitupdate").button({ icons: { primary: "icon icon-save" } })
+      .click(function( event ) {
+
+        displayUnitSetting["temperature"] = unitData[0][1];
+        displayUnitSetting["pressure"] = unitData[1][1];
+
+        displayUnitMatchDeltaToTemperature();
+
+        displayUnitStoreSettings();
+
+        updateUnitGlyph();
+
+        event.preventDefault();
+      });
+
+//# sourceURL=pageUnits.html
+</script>
+

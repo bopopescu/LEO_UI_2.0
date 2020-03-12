@@ -1,0 +1,92 @@
+
+<style>
+#NetworkStatusAccordion {
+  margin: 10px;
+}
+
+</style>
+
+<div id="NetworkStatusAccordion" class="accordion">
+  <h3 id="NetworkStatusTitle">LEO Network Device Status</h3>
+    <div><div id="NetworkStatusEntries"></div></div>
+</div>
+
+<script>
+
+var NetworkStatusEntries = []
+
+$("#NetworkStatusEntries").proptable({ name: 'NetworkStatusEntries',
+  data: NetworkStatusEntries,
+  columns: [{ readonly: true, header: 'Device Name', size: 40},
+            { readonly: true, header: 'Net Status' },
+            { readonly: true, header: 'Alarms' },
+            { readonly: true, header: 'Device Type' },
+            { readonly: true, header: 'Network' },
+            { readonly: true, header: 'Network Address' } ],
+    customOptions: [],
+    customTypes: [],
+    customCss: [],
+    showHeading: true
+});
+
+function getNetworkStatus() {
+  pageWaiting('done')
+  pageXHR = postJson({"jsonrpc":"2.0","id":"getDeviceStatus","method":"getDeviceStatus"},
+    function(data) {
+      var row = 0;
+      var result = data;
+
+      // Refresh screen every 30 seconds.
+      pageSetTimeout( function() { getNetworkStatus( ) }, 30000);
+
+      if (result.length === 0) {
+        while(NetworkStatusEntries.length > 0) { NetworkStatusEntries.pop(); }
+      }
+      else {
+        while(NetworkStatusEntries.length > 0) { NetworkStatusEntries.pop(); }
+        for ( var key in result) {
+          var deviceStatusRec = result[key];
+          devName = key;
+          if ( deviceStatusRec.online === false ) {
+            $("#NetworkStatusEntries").proptable('setCustomCss', row, 1, alarmcss );
+            devNetStatus = "Offline";
+          }
+          else {
+            $("#NetworkStatusEntries").proptable('setCustomCss', row, 1, goodalarmcss );
+            devNetStatus = "Online";
+          }
+          if ( deviceStatusRec.alarm === false ) {
+            $("#NetworkStatusEntries").proptable('setCustomCss', row, 2, goodalarmcss );
+            devAlarms = "No Alarm";
+          }
+          else {
+            $("#NetworkStatusEntries").proptable('setCustomCss', row, 2, alarmcss );
+            devAlarms = "Alarms";
+          }
+
+          var devTypeName = deviceStatusRec.deviceTypeName;
+          var devNetwork = deviceStatusRec.network;
+          var devAddress = deviceStatusRec.networkAddress;
+          if ( devTypeName === "E2 Device" ) {
+            var colonLoc = devAddress.lastIndexOf(":");
+            if ( colonLoc >= 0 ) {
+              devAddress = devAddress.substring(0,colonLoc);
+            }
+          }
+          NetworkStatusEntries.push([ devName, devNetStatus, devAlarms, devTypeName, devNetwork, devAddress ]);
+          row = row + 1;
+        }
+      }
+      $("#NetworkStatusEntries").proptable('render');
+    },
+    jsonError
+    );
+}
+
+$( "#NetworkStatusAccordion" ).accordion( { heightStyle: "content", animate: true  } );
+
+getNetworkStatus();
+
+//# sourceURL=pageNetworkStatus.html
+</script>
+

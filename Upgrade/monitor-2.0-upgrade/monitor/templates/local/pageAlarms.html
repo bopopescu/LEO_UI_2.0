@@ -1,0 +1,230 @@
+<script type="text/javascript">
+
+// Status Tab management
+$(document).ready(function() {
+    $("#tabContent").find("[id^='tab']").hide(); // Hide all content
+    $("#DevStatusTabs li:first").attr("id","current"); // Activate the first tab
+    $("#tabContent #tab1").fadeIn(); // Show first tab's content
+    $(".deviceAlarmHide").hide() // Hide by alarms by default
+    $('#DevStatusTabs a').click(function(e) {
+        e.preventDefault();
+        if ($(this).closest("li").attr("id") == "current"){ //detection for current tab
+         return;
+        }
+        else{
+          $("#tabContent").find("[id^='tab']").hide(); // Hide all content
+          $("#DevStatusTabs li").attr("id",""); //Reset id's
+          $(this).parent().attr("id","current"); // Activate this
+          $('#' + $(this).attr('name')).fadeIn(); // Show content for the current tab
+        }
+    });
+});
+// END SCRIPT FOR TABS
+
+  $('.snoozeInfoBtn').on("mousedown", function(e) {
+      snoozeAlarmChime()
+   });
+</script>
+
+<div id="alarmMain">
+  <ul id="DevStatusTabs" style="padding-left:0px" >
+      <li><a href="#" name="tab1" >Annunciated Active Alarms</a></li>
+      <li><a href="#" name="tab2" >Filtered Active Alarms</a></li>
+      <li><a href="#" name="tab3" >Alarm History</a></li>
+  </ul>
+    <div id="tabContent" style="margin:0px;clear:both">
+        <div id="tab1">
+            <div>
+                <div id="enunciatedAlarms"></div>
+                <div id="NoAlarmsEnu" style="font-size: 48px; text-align: center; color: green; display: none;display:none">No Alarms</div>
+            </div>
+            <div id="snoozeInfoDiv">
+              <div id="snoozeCountDownDiv"></div>
+              <div id="snoozeInfoBtnDiv"><button class="snoozeInfoBtn ui-button ui-widget ui-state-default ui-corner-all">Snooze Alarm Bell</button></div>
+            </div>
+        </div>
+        <div id="tab2">
+            <div>
+                <div id="activeAlarms""></div>
+                <div id="NoAlarmsAct" style="font-size: 48px; text-align: center; color: green; display: none;display:none">No Alarms</div>
+            </div>
+        </div>
+        <div id="tab3">
+            <div>
+                <div id="alarmHistory"></div>
+                <div id="NoAlarmsHis" style="font-size: 48px; text-align: center; color: green; display: none;display:none">No Alarms</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+var enunciatedAlarms = []
+var activeAlarms = []
+var alarmHistory = []
+
+pageWaiting('done')
+
+$("#enunciatedAlarms").proptable({ name: 'enunciatedAlarms',
+  data: enunciatedAlarms,
+  columns: [{ readonly: true, header: 'Date/Time'},
+            { readonly: true, header: 'Device'},
+            { readonly: true, header: 'Alarm'},
+            { readonly: true, header: 'Description' }]
+});
+
+$("#activeAlarms").proptable({ name: 'activeAlarms',
+  data: activeAlarms,
+  columns: [{ readonly: true, header: 'Date/Time'},
+            { readonly: true, header: 'Device'},
+            { readonly: true, header: 'Alarm'},
+            { readonly: true, header: 'Description' }]
+});
+
+$("#alarmHistory").proptable({ name: 'alarmHistory',
+  data: alarmHistory,
+  columns: [{ readonly: true, header: 'Date/Time'},
+            { readonly: true, header: 'Action'},
+            { readonly: true, header: 'Device'},
+            { readonly: true, header: 'Alarm'},
+            { readonly: true, header: 'Description' }]
+});
+
+function getActiveAlarms( blClearHistoryCache ) {
+  // We will do this in two passes. First, get the shorter alarm lists of enunciated and active alarms so that
+  // the page comes up and displays faster. Then initiate a message to get the historical alarms - which
+  // typically can be VERY long.
+  pageXHR = postJson({"jsonrpc":"2.0","id":"getAlarms","method":"getAlarms","params": [{"alarmList": "enunciated"} ] },
+    function (data) {
+
+      var result = data['enunciated'];
+      var enunciatedCount = result.length;
+
+      if (result) {
+        if (result.length == 0) {
+          while (enunciatedAlarms.length > 0) {
+            enunciatedAlarms.pop();
+          }
+          $('#enunciatedAlarms').hide();
+          $('#NoAlarmsEnu').show();
+        }
+        else if ((enunciatedAlarms.length == 0) || (result[0].date != enunciatedAlarms[0])) {
+          while (enunciatedAlarms.length > 0) {
+            enunciatedAlarms.pop();
+          }
+          iRow = 0;
+          for (key in result) {
+            alarmRec = result[key];
+            var d = utcToLocalDate(alarmRec.date)
+            var s = dateToString(d);
+            enunciatedAlarms.push([s, alarmRec.name, alarmRec.alarm, alarmRec.description]);
+            $("#enunciatedAlarms").proptable('setRowCustomCss', iRow, alarmcss);
+            iRow = iRow + 1;
+          }
+          $('#enunciatedAlarms').show();
+          $('#NoAlarmsEnu').hide();
+        }
+      }
+      else {
+        while (enunciatedAlarms.length > 0) {
+          enunciatedAlarms.pop();
+        }
+      }
+      $("#enunciatedAlarms").proptable('render');
+
+      result = data['active'];
+      var activeCount = result.length;
+
+      if (enunciatedCount == activeCount)
+	  {
+	      $('#activeAlarms').hide();
+          $('#NoAlarmsAct').show();
+	  }
+	  else{
+
+      if (result) {
+        if (result.length == 0) {
+          while (activeAlarms.length > 0) {
+            activeAlarms.pop();
+          }
+          $('#activeAlarms').hide();
+          $('#NoAlarmsAct').show();
+        }
+        else if ((activeAlarms.length == 0) || (result[0].date != activeAlarms[0])) {
+          while (activeAlarms.length > 0) {
+            activeAlarms.pop();
+          }
+          iRow = 0;
+          for (key in result) {
+            alarmRec = result[key];
+            var d = utcToLocalDate(alarmRec.date);
+            var s = dateToString(d);
+            activeAlarms.push([s, alarmRec.name, alarmRec.alarm, alarmRec.description]);
+            $("#activeAlarms").proptable('setRowCustomCss', iRow, warncss);    //changed the color from alarmcss(red) to yellowish
+            iRow = iRow + 1;
+          }
+          $('#activeAlarms').show();
+          $('#NoAlarmsAct').hide();
+        }
+      }
+      else {
+        while (activeAlarms.length > 0) {
+          activeAlarms.pop();
+        }
+      }
+      $("#activeAlarms").proptable('render');
+ 	  }
+
+      // initiate the next request to get the historical alarms. (after a little breather)
+      pageSetTimeout(function() { getHistoryAlarms( blClearHistoryCache ); }, 100 )
+    },
+    jsonError
+  );
+}
+
+// This is called by getActiveAlarms in a "chained" kind of way.
+function getHistoryAlarms( blClearCache ) {
+
+  pageXHR = postJson({"jsonrpc":"2.0","id":"getAlarms","method":"getAlarms", "params":[{"alarmList":"history", "clearHistoryAlarmCache": blClearCache }]},
+    function(data) {
+
+      result = data['history'];
+
+      if (result.length == 0) {
+        while(alarmHistory.length > 0) { alarmHistory.pop(); }
+        $('#alarmHistory').hide();
+        $('#NoAlarmsHis').show();
+        $("#alarmHistory").proptable('render');
+      }
+      else if (result == "NoNewAlarms") {
+        i = "NothingToDoHere"
+      }
+      else if ((alarmHistory.length == 0) || (result[0].date != alarmHistory[0])) {
+        while(alarmHistory.length > 0) { alarmHistory.pop(); }
+        for (key in result) {
+          alarmRec = result[key];
+          var d = utcToLocalDate(alarmRec.date);
+          var s = dateToString(d);
+          alarmHistory.push([s, getAction(alarmRec.action), alarmRec.name, alarmRec.alarm, alarmRec.description]);
+        }
+        $('#alarmHistory').show();
+        $('#NoAlarmsHis').hide();
+        $("#alarmHistory").proptable('render');
+      }
+
+      // Refresh the page every 15 seconds
+      pageSetTimeout(function () {getActiveAlarms( false );}, 15000);
+    },
+    jsonError
+  );
+}
+
+// We want to clear the history alarms cache and get alarms on the initial page rendering
+getActiveAlarms( true );
+
+//# sourceURL=pageAlarms.html
+
+</script>
+

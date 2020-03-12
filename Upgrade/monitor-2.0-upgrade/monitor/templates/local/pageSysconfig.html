@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+
+#showHideCheckbox {
+}
+#showHideLabel {
+  padding-left: 5px;
+}
+
+
+input#systemSettingsList-2-1:readonly{
+
+size:7;
+}
+input#systemSettingsList-3-1:readonly{
+
+size:7;
+}
+input#systemSettingsList-4-1:readonly{
+
+size:7;
+}
+
+</style>
+
+
+<div id="systemAccordion" class="accordion">
+
+
+<h3>Site Information</h3>
+    <div style="overflow: hidden">
+      <table class="conf__table">
+        <tr>
+          <td>Site Name&nbsp;</td>
+          <td><input type="text" size="25" id="siteName" value="{{siteStatus.name}}"></td>
+        </tr>
+        <tr>
+          <td>Address&nbsp;</td>
+          <td><textarea rows="4" cols="28" id="siteAddress">{{siteStatus['address']}} </textarea></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        {% if session.can_edit_system %}
+        <tr>
+          <td>&nbsp;</td>
+          <td><button id="siteInfoUpdate">Save</button></td>
+        </tr>
+        {% endif %}
+      </table>
+    </div>
+
+
+
+<h3>Time/Date</h3>
+    <div style="overflow: hidden">
+      <table class="conf__table">
+        <tr>
+          <td>Timezone&nbsp;</td>
+          <td>
+            <select id="timezone"></select>
+          </td>
+	  <td><space></space>(NOTE - If Timezone is changed please adjust the Time manually !!!)</td>
+        </tr>
+        <tr>
+          <td>Date&nbsp;</td>
+          <td><input type="text" id="datepicker"></td>
+        </tr>
+        <tr>
+          <td>Time&nbsp;</td>
+          <td>
+            <select id="timehour" />&nbsp;:&nbsp;<select id="timeminute" />
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+        {% if session.can_edit_system %}
+
+          <td>&nbsp;</td>
+          <td><button id="timeDateUpdate">Save</button></td>
+        {% endif %}
+        </tr>
+      </table>
+
+    </div>
+
+<h3>System Settings</h3>
+    <div style="overflow: hidden">
+      <p><button id="resetAlarms" >Clear Alarm Log</button>&nbsp;&nbsp;&nbsp;<button id="resetLogs">Clear Data Logs</button>&nbsp;&nbsp;&nbsp;<button id="useExternal">Use External Speaker</button>&nbsp;&nbsp;&nbsp;<button id="useInternal">Use Internal Speaker (Default)</button></p>
+      <p onclick="var $e = $('#alarmChimeEnable').click();">
+        <input type="checkbox" id="alarmChimeEnable"
+        {% if systemSettings.alarmChimeEnable %}
+        checked=\"checked\"
+        {% endif %}
+          onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Enable Alarm Chime
+      </p>
+      <p><button id="testAlarmChime" >Test Alarm Chime</button>&nbsp</p>
+      <p onclick="var $e = $('#alarmChimeSnoozeEnable').click();">
+        <input type="checkbox" id="alarmChimeSnoozeEnable"
+        {% if systemSettings.alarmChimeSnoozeEnable %}
+        checked=\"checked\"
+        {% endif %}
+          onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Enable Alarm Chime Snooze
+      </p>
+
+      <div id="systemSettingsList">
+      </div>
+      {% if session.can_edit_system %}
+        <p><button id="systemSettingsUpdate">Save</button></p>
+      {% endif %}
+    </div>
+
+<!-- Made change to allow remote changing of Ethernet settings - becauuse it's needed and we have a confirmation dialog -->
+<h3>Ethernet Configuration</h3>
+    <div style="overflow: hidden">
+      <table class="conf__table">
+        <tr>
+          <td>Host Name&nbsp;</td>
+          <td><input type="text" size="20" id="hostname" value="{{ethernet.hostname}}"></td>
+          <td></td>
+        </tr>
+        <tr onclick="var $e = $('#dhcp').click();">
+          <td colspan="3"><input type="checkbox" id="dhcp"
+            {% if ethernet.dhcp %}
+              checked=\"checked\"
+            {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Enable DHCP</td>
+        </tr>
+      </table>
+
+      <table id="ethernetConfiguration" class="conf__table">
+        <tr>
+          <td>IP Address&nbsp;</td>
+          <td><input type="text" size="20" id="address" value="{{ethernet.address}}"></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Subnet&nbsp;</td>
+          <td><input type="text" size="20" id="netmask" value="{{ethernet.netmask}}"></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Gateway&nbsp;</td>
+          <td><input type="text" size="20" id="gateway" value="{{ethernet.gateway}}"></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>DNS Server&nbsp;</td>
+          <td><input type="text" size="50" id="dnsaddress" value="{{ethernet.dnsaddress}}"></td>
+          <td>(If two DNS server addresses are necessary, place a space between the two addresses)</td>
+        </tr>
+        <tr>
+          <td colspan="3">Changes to the Ethernet configuration settings require a reboot.</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td><button id="ethernetupdate">Save</button></td>
+        </tr>
+      </table>
+    </div>
+
+<div id="deviceFilePickerDialog">
+  <select id="deviceFilePicker" class="image-picker">
+    {% for filename in imageFiles %}
+       <option data-img-src='{{imagePath}}/{{filename}}' value="{{filename}}">{{filename}}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<h3>Com Network Configuration</h3>
+    <div style="overflow: hidden">
+    <p><button id="networkAdd" >Add</button>&nbsp;<button id="networkDelete" >Remove</button></p>
+
+    <div id="networkList"></div>
+    <p><button id="networkListSave">Save</button></p>
+    </div>
+
+<h3>Devices</h3>
+    <div style="overflow: hidden">
+    <p><button id="deviceAdd" >Add</button>&nbsp;<button id="deviceDelete" >Remove</button></p>
+
+    <div id="deviceList"></div>
+    <p><button id="deviceListSave">Save</button></p>
+    </div>
+
+<h3>Annunciated Alarm Filters</h3>
+    <div style="overflow: hidden">
+<!--  FUTURE EDITING --->
+<!--    <p><button id="deviceAdd" >Add</button>&nbsp;<button id="deviceDelete" >Remove</button></p> -->
+      <table>
+        <tr onclick="var $e = $('#EnunciatedAlarmFilterEnableCBox').click();">
+          <td colspan="2"><input type="checkbox" id="EnunciatedAlarmFilterEnableCBox" {% if enunciatedAlarmFilters.enunciatedAlarmFiltersActive %} checked=\"checked\" {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Enable Annunciated Alarm Filters</td>
+        </tr>
+        <tr>
+          <td>&nbsp;<font color="blue">NOTE: When a filter is enabled, these alarms WILL be annunciated. Also, for App Name, * = ALL.</font></td>
+        </tr>
+      </table>
+      <div id="enunciatedAlarmsFilterTypesList"></div>
+      <table>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
+        <td><button id="enunciatedAlarmsFilterTypesListSave">Save</button></td>
+      </table>
+    </div>
+
+{% if e2Settings|length > 0 %}
+<h3>E2 Settings</h3>
+    <div style="overflow: hidden">
+      <table class="conf__table">
+        <tr onclick="var $e = $('#E2GetAlarmsCBox').click();">
+          <td colspan="2"><input type="checkbox" id="E2GetAlarmsCBox" {% if e2Settings.E2GetAlarms %} checked=\"checked\" {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;<label>Enable E2 Alarm Retrieval</label></td>
+        </tr>
+<!--
+        <tr onclick="var $e = $('#E2GetAdvisoryOrAnnunciatorLogCBox').click();">
+          <td colspan="2"><input type="checkbox" id="E2GetAdvisoryOrAnnunciatorLogCBox" {% if e2Settings.E2GetAdvisoryOrAnnunciatorLog %} checked=\"checked\" {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Retrieve E2 Annunciator Alarms (uncheck = Unit Alarms)</td>
+        </tr>
+-->
+        <tr>
+          <td>E2 Alarm Retrieval Interval (seconds)&nbsp;</td>
+          <td><input type="text" size="4" id="E2alarmCycleTimeEField" value="{{e2Settings.E2alarmCycleTime}}"></td>
+        </tr>
+        <tr>
+          <td>E2 Alarm Priority Filter (0-100)&nbsp;</td>
+          <td><input type="text" size="4" id="E2AlarmPriorityFilterEField" value="{{e2Settings.E2AlarmPriorityFilter}}"></td>
+        </tr>
+        <tr>
+          <td><strong>ADVANCED:</strong> E2 Device Offline Alarm Delay (minutes)&nbsp;</td>
+          <td><input type="text" size="4" id="E2DevOfflineAlmDelayEField" value="{{e2Settings.E2DevOfflineAlmDelay}}"></td>
+        </tr>
+        <tr>
+          <td><strong>ADVANCED:</strong> E2 Device Offline Return To Normal Delay (minutes)&nbsp;</td>
+          <td><input type="text" size="4" id="E2DevOfflineRTNDelayEField" value="{{e2Settings.E2DevOfflineRTNDelay}}"></td>
+        </tr>
+        <tr>
+          <td><strong>ADVANCED:</strong> E2 Number Of Values Per Message (5-15)&nbsp;</td>
+          <td><input type="text" size="2" id="E2MaxValsPerMsgEField" value="{{e2Settings.E2MaxValsPerMsg}}"></td>
+        </tr>
+        <tr>
+          <td><strong>ADVANCED:</strong> E2 Inter-Message Delay (300-1000 milliseconds)&nbsp;</td>
+          <td><input type="text" size="4" id="E2DelayBetweenMsgsMSEField" value="{{e2Settings.E2DelayBetweenMsgsMS}}"></td>
+        </tr>
+      </table>
+      <table id="E2AlarmFilteringTable">
+
+<!---
+        <tr onclick="var $e = $('#E2AlarmFilterNoticeCBox').click();">
+          <td colspan="2"><input type="checkbox" id="E2AlarmFilterNoticeCBox" {% if e2Settings.E2AlarmFilterNotice %} checked=\"checked\" {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Suppress E2 Alarm "Notices"</td>
+        </tr>
+        <tr onclick="var $e = $('#E2AlarmFilterFailCBox').click();">
+          <td colspan="2"><input type="checkbox" id="E2AlarmFilterFailCBox" {% if e2Settings.E2AlarmFilterFail %} checked=\"checked\" {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Suppress E2 Alarm "Fail"</td>
+        </tr>
+        <tr onclick="var $e = $('#E2AlarmFilterAlarmCBox').click();">
+          <td colspan="2"><input type="checkbox" id="E2AlarmFilterAlarmCBox" {% if e2Settings.E2AlarmFilterAlarm %} checked=\"checked\" {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Suppress E2 Alarm "Alarm"</td>
+        </tr>
+        <tr onclick="var $e = $('#E2AlarmFilterRTNCBox').click();">
+          <td colspan="2"><input type="checkbox" id="E2AlarmFilterRTNCBox" {% if e2Settings.E2AlarmFilterRTN %} checked=\"checked\" {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();">&nbsp;Suppress E2 Alarm "RTN"</td>
+        </tr>
+-->
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td><button id="E2Settingsupdate">Save</button></td>
+        </tr>
+      </table>
+    </div>
+{% endif %}
+
+<h3>Email Server Configuration</h3>
+  <div style="overflow: hidden">
+    <div id="servers">
+        <ul id="DevStatusTabs" class="forEmailServers" style="padding-left:0px" >
+          <li><a href="#" name="tab1">Email Server Details</a></li>
+        </ul>
+        <div id="tabContent" style="margin:0px;clear:both">
+            <div id="tab1">
+                <div>
+                  <table id="emailAlarmsConfiguration" class="conf__table">
+                    <tr onclick="var $e = $('#defaultServer').click();">
+                      <td><b>Use Hunter Liberty Email Server&nbsp;</b></td>
+                      <td><input id="defaultServer" type="checkbox" {% if emailSettings.emailServerRecs[0].defaultServer %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[0] || window.event; e.stopPropagation();"></td>
+                    </tr>
+                    <tr>
+                      <td>From Email Address&nbsp;</td>
+                      <td><input id="fromAddress1" type="text" size="25" value="{{emailSettings.emailServerRecs[1].fromaddress}}" {% if emailSettings.emailServerRecs[0].defaultServer %} disabled {% endif %}></td>
+                    </tr>
+                    <tr>
+                      <td>SMTP Server Address&nbsp;</td>
+                      <td><input id="smtpserver1" type="text" size="25" value="{{emailSettings.emailServerRecs[1].smtpserver}}" {% if emailSettings.emailServerRecs[0].defaultServer %} disabled {% endif %}></td>
+                    </tr>
+                    <tr>
+                      <td>SMTP Server Port&nbsp;</td>
+                      <td><input id="smtpport1" type="text" size="5" value="{{emailSettings.emailServerRecs[1].smtpport}}" {% if emailSettings.emailServerRecs[0].defaultServer %} disabled {% endif %}></td>
+                    </tr>
+                    <tr onclick="var $e = $('#enableTls1').click();">
+                      <td>Enable TLS&nbsp;</td>
+                      <td><input id="enableTls1" type="checkbox" {% if emailSettings.emailServerRecs[1].enabletls %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[0] || window.event; e.stopPropagation();" {% if emailSettings.emailServerRecs[0].defaultServer %} disabled {% endif %}></td>
+                    </tr>
+                    <tr onclick="var $e = $('#enableAuthentication').click();">
+                      <td>Enable Authentication&nbsp;</td>
+                      <td><input id="enableAuthentication1" type="checkbox" {% if emailSettings.emailServerRecs[1].enableauthentication %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[0] || window.event; e.stopPropagation();" {% if emailSettings.emailServerRecs[0].defaultServer %} disabled {% endif %}></td>
+                    </tr>
+                    <tr>
+                      <td>Account Name:</td>
+                      <td><input id="authaccount1" type="text" size="25" value="{{emailSettings.emailServerRecs[1].authaccount}}" {% if emailSettings.emailServerRecs[0].defaultServer %} disabled {% endif %}></td>
+                    </tr>
+                    <tr>
+                      <td>Password:</td>
+                      <td><input id="authpassword1" type="password" size="25" value="{{emailSettings.emailServerRecs[1].authpassword}}" {% if emailSettings.emailServerRecs[0].defaultServer %} disabled {% endif %}></td>
+                      {% if session.can_edit_system %}
+                        <tr>
+                          <td></td>
+                          <td>
+                            <input type="checkbox" id="showHideCheckbox1" {% if emailSettings.emailServerRecs[0].defaultServer %} disabled {% endif %} / >
+                            <label for="showHideCheckbox1" id="showHideLabel">Show Password</label>
+                          </td>
+                        </tr>
+                      {% endif %}
+                    </tr>
+                  </table>
+                </div>
+            </div>
+            <br>
+            <table id="saveButtons">
+              <tr>
+                <td>&nbsp;</td>
+                <td><button id="saveEmailServer">Save</button></td>
+              </tr>
+            </table>
+        </div>
+    </div>
+  </div>
+<h3>Alarm Email Receivers</h3>
+  <div style="overflow: hidden">
+    <table onclick="var $e = $('#enableAlarmEmail').click();" class="conf__table">
+      <tr>
+        <td>
+          <input id="enableAlarmEmail" type="checkbox"
+                 {% if emailSettings.enablealarmemail %}
+                 checked="checked"
+                 {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();" >
+          &nbsp;Enable Alarm Email
+        </td>
+      </tr>
+    </table>
+    <table id="emailAlarmsRecipients" class="emailReceive__table">
+      <thead>
+        <tr>
+          <td width="80"></td>
+          <td>Email Address</td>
+<!--           <td>Email Server</td> -->
+          <td>Annunciated</br>Alarms</td>
+          <td>Alarm</br>Reports</td>
+          <td></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>email 1:</td>
+          <td><input id="recipient1" type="text" size="25" value="{{emailSettings.emailAddrRecs[0].toaddress}}"></td>
+<!--           <td><select id="emailserverId1" value="{{emailSettings.emailAddrRecs[0].emailservername}}"></select></td> -->
+          <td><input id="enableEnun1" type="checkbox" {% if emailSettings.emailAddrRecs[0].enableemail %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[0] || window.event; e.stopPropagation();"></td>
+          <td><input id="enableAlmRpt1" type="checkbox" {% if emailSettings.emailAddrRecs[0].enablealarmreport %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[0] || window.event; e.stopPropagation();"></td>
+          <td><button id="sendTestEmail1" class="sendTestEmailBtn">Send Test Email</button></td>
+        </tr>
+        <tr>
+          <td>email 2:</td>
+          <td><input id="recipient2" type="text" size="25" value="{{emailSettings.emailAddrRecs[1].toaddress}}"></td>
+<!--           <td><select id="emailserverId2" value="{{emailSettings.emailAddrRecs[1].emailservername}}"></select></td> -->
+          <td><input id="enableEnun2" type="checkbox" {% if emailSettings.emailAddrRecs[1].enableemail %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[1] || window.event; e.stopPropagation();"></td>
+          <td><input id="enableAlmRpt2" type="checkbox" {% if emailSettings.emailAddrRecs[1].enablealarmreport %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[1] || window.event; e.stopPropagation();"></td>
+          <td><button id="sendTestEmail2" class="sendTestEmailBtn">Send Test Email</button></td>
+        </tr>
+        <tr>
+          <td>email 3:</td>
+          <td><input id="recipient3" type="text" size="25" value="{{emailSettings.emailAddrRecs[2].toaddress}}"></td>
+<!--           <td><select id="emailserverId3" value="{{emailSettings.emailAddrRecs[2].emailservername}}"></select></td> -->
+          <td><input id="enableEnun3" type="checkbox" {% if emailSettings.emailAddrRecs[2].enableemail %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[2] || window.event; e.stopPropagation();"></td>
+          <td><input id="enableAlmRpt3" type="checkbox" {% if emailSettings.emailAddrRecs[2].enablealarmreport %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[2] || window.event; e.stopPropagation();"></td>
+          <td><button id="sendTestEmail3" class="sendTestEmailBtn">Send Test Email</button></td>
+        </tr>
+        <tr>
+          <td>email 4:</td>
+          <td><input id="recipient4" type="text" size="25" value="{{emailSettings.emailAddrRecs[3].toaddress}}"></td>
+<!--           <td><select id="emailserverId4" value="{{emailSettings.emailAddrRecs[3].emailservername}}"></select></td> -->
+          <td><input id="enableEnun4" type="checkbox" {% if emailSettings.emailAddrRecs[3].enableemail %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[3] || window.event; e.stopPropagation();"></td>
+          <td><input id="enableAlmRpt4" type="checkbox" {% if emailSettings.emailAddrRecs[3].enablealarmreport %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[3] || window.event; e.stopPropagation();"></td>
+          <td><button id="sendTestEmail4" class="sendTestEmailBtn">Send Test Email</button></td>
+        </tr>
+        <tr>
+          <td>email 5:</td>
+          <td><input id="recipient5" type="text" size="25" value="{{emailSettings.emailAddrRecs[4].toaddress}}"></td>
+<!--           <td><select id="emailserverId5" value="{{emailSettings.emailAddrRecs[4].emailservername}}"></select></td> -->
+          <td><input id="enableEnun5" type="checkbox" {% if emailSettings.emailAddrRecs[4].enableemail %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[4] || window.event; e.stopPropagation();"></td>
+          <td><input id="enableAlmRpt5" type="checkbox" {% if emailSettings.emailAddrRecs[4].enablealarmreport %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[4] || window.event; e.stopPropagation();"></td>
+          <td><button id="sendTestEmail5" class="sendTestEmailBtn">Send Test Email</button></td>
+        </tr>
+        <tr>
+          <td>email 6:</td>
+          <td><input id="recipient6" type="text" size="25" value="{{emailSettings.emailAddrRecs[5].toaddress}}"></td>
+<!--           <td><select id="emailserverId6" value="{{emailSettings.emailAddrRecs[5].emailservername}}"></select></td> -->
+          <td><input id="enableEnun6" type="checkbox" {% if emailSettings.emailAddrRecs[5].enableemail %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[5] || window.event; e.stopPropagation();"></td>
+          <td><input id="enableAlmRpt6" type="checkbox" {% if emailSettings.emailAddrRecs[5].enablealarmreport %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[5] || window.event; e.stopPropagation();"></td>
+          <td><button id="sendTestEmail6" class="sendTestEmailBtn">Send Test Email</button></td>
+        </tr>
+
+
+      </tbody>
+
+      <tr>
+        <td></td>
+        <td><strong>Email Alarm Report</strong></td>
+        <td><select id="alarmReportsPerDay" />&nbsp;</td>
+        <td>&nbsp; times per day.</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><strong>Email Alarm Retry Delay</strong></td>
+        <td><input id="emailRetryDelay" type="text" size="3" value="{{emailSettings.emailretrydelay}}"></td>
+        <td>&nbsp; minutes.</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <br><br>
+    <table id="saveButtons">
+      <tr>
+        <td>&nbsp;</td>
+        <td><button id="saveEmailAddress">Save</button></td>
+      </tr>
+    </table>
+  </div>
+
+<h3 id = "statusEmailTab" >Alarm Status and HeartBeat Receivers</h3>
+<div id ="statusEmailDiv" style="overflow: hidden">
+<!--     <table onclick="var $e = $('#enableAlarmEmail').click();" class="conf__table">
+      <tr>
+        <td>
+          <input id="enableAlarmEmail" type="checkbox"
+                 {% if emailSettings.enablealarmemail %}
+                 checked="checked"
+                 {% endif %}
+            onclick="var e = arguments[0] || window.event; e.stopPropagation();" >
+          &nbsp;Enable Alarm Email
+        </td>
+      </tr>
+    </table> -->
+    <table id="emailAlarmsRecipients" class="emailReceive__table">
+      <thead>
+        <tr>
+          <td width="80"></td>
+          <td>Email Address</td>
+<!--           <td>Email Server</td> -->
+          <td>Enuciated</br>Alarms</td>
+          <td>Alarm</br>Reports</td>
+          <td></td>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td>email 1:</td>
+          <td><input id="recipient7" type="text" size="25" value="{{emailSettings.emailAddrRecs[6].toaddress}}"></td>
+<!--           <td><select id="emailserverId7" value="{{emailSettings.emailAddrRecs[6].emailservername}}"></select></td> -->
+          <td><input id="enableEnun7" type="checkbox" {% if emailSettings.emailAddrRecs[6].enableemail %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[6] || window.event; e.stopPropagation();"></td>
+          <td><input id="enableAlmRpt7" type="checkbox" {% if emailSettings.emailAddrRecs[6].enablealarmreport %} checked=\"checked\" {% endif %}
+                        onclick="var e = arguments[6] || window.event; e.stopPropagation();"></td>
+          <td><button id="sendTestEmail7" class="sendTestEmailBtn">Send Test Email</button></td>
+        </tr>
+
+      </tbody>
+
+      <tr>
+        <td></td>
+        <td><strong>Email Status Report</strong></td>
+        <td><select id="statusReportsPerHour" />&nbsp;</td>
+        <td>&nbsp; times per hour.</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><strong>Email Alarm Retry Delay</strong></td>
+        <td><input id="emailRetryDelay1" type="text" size="3" value="{{emailSettings.emailretrydelay}}"></td>
+        <td>&nbsp; minutes.</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <br><br>
+    <table id="saveButtons">
+      <tr>
+        <td>&nbsp;</td>
+        <td><button id="saveEmailAddress1">Save</button></td>
+      </tr>
+    </table>
+  </div>
+
+
+</div> <!-- id="systemAccordion" class="accordion"> -->
+
+<!-- Error dialog for test email -->
+<div id="SendTestEmailErrorPopupDlg" title="Send Email Error">
+  <table style="width: 90%">
+    <tr><td></td></tr>
+    <tr><td>Error.</td></tr>
+    <tr><td></td></tr>
+  </table>
+</div>
+
+<!-- Option to reboot Popup -->
+<div id="EthernetRebootSystemConfirmDialog" title="Reboot System?">
+  <table style="width: 90%">
+    <tr><td>Saved Ethernet changes require a reboot to take effect.</td></tr>
+    <tr><td></td></tr>
+    <tr><td>Do you wish to reboot the system NOW?</td></tr>
+  </table>
+</div>
+
+<!-- Device List Error Dialog -->
+<div id="saveErrorDlg" title="Save Error" style="width: 50%">
+  <table>
+    <tr><td></td></tr>
+    <tr><td></td></tr>
+  </table>
+</div>
+
+{% if ctx.osKeybd %}
+<div id="numpadDialog">
+    <div id="numpad"></div>
+</div>
+<div id="keypadDialog">
+    <div id="keypad"></div>
+</div>
+{% endif %}
+
+
+<script>
+
+(function() {
+
+    var e2Settings = {{e2Settings|safe }};
+    var deviceTypes = {{ deviceTypes|safe}};
+    var networkTypes = {{ networkTypes|safe }};
+	console.log(networkTypes);
+    var ethernet = {{ ethernet|tojson }};
+    var systemSettings = {{ systemSettings|safe }};
+    var siteStatus = {{siteStatus|tojson}};
+    var timeInfo = {{timeInfo|safe}};
+    var devices = {{devices|tojson}};
+    var networks = {{networks|tojson}};
+    var emailSettings = {{emailSettings|tojson}};
+    var enunciatedAlarmFilters = {{enunciatedAlarmFilters|tojson}};
+    var newSystemSettings = systemSettings;  // Holds saved systemSettings
+
+
+    // Used for displaying lists
+    var deviceList = [];  // contains the list of devices defined by the user for the device tab table.
+    var deviceTypeList = []; // contains the type of devices for the drop down selection in the device configuration tab
+    var networkList = []; // contains List of networks defined by the user for the network tab table
+    var networkTypeList = []; // List of network types for network drop down selection in network configuration tab
+    var networkConnectionPortList = [];   // Contains the ports avaiable for each type of network connection (e.g. COM3,COM4. Not needed for E2)
+    var networkNames1 = ["E2 Ethernet", "AKSC255","COM4", "COM5", "SiteSupervisor"];
+    var placeHolders = {
+    "name": "Less Than 20 Characters"
+  };
+    var systemSettingsList = [];
+    var E2SettingsList = [];
+    var enunciatedAlarmsFilterTypesList = [];
+    var networkNames = []; // Holds the user defined network names - which are in a selection list in the device configuration tab
+
+    pageWaiting('done')
+
+    var username = sessionStorage.getItem('username')
+	//console.log("username = ", username)
+      if ( username == "huntlib")
+      { // Successful login
+          $("#statusEmailDiv").show();
+          $("#statusEmailTab").show();
+      }
+      else {
+          $("#statusEmailDiv").hide();
+        $("#statusEmailTab").hide();
+      }
+
+
+    // List devices (Device)
+    var row = 1
+    for (var key in devices) {
+        deviceRec = devices[key];
+        if (deviceRec.deviceTypeName == "E2 Device") {
+            // If an E2 device, we need to remove the :<port number> from the device address. This is written automatically.
+            var colonLoc = deviceRec.networkAddress.lastIndexOf(":");
+            if (colonLoc >= 0) {
+                deviceRec.networkAddress = deviceRec.networkAddress.substring(0, colonLoc);
+            }
+        }
+        deviceList.push([false, deviceRec.deviceTypeName, deviceRec.name, deviceRec.network, deviceRec.networkAddress, deviceRec.image])
+    }
+
+    var key;
+    // List devicetypes
+    // We want to add an empty selection so that the user knows they must select something on a new device.
+    deviceTypeList.push("---");
+    for (key in deviceTypes) {
+        deviceTypeList.push(deviceTypes[key]);
+    }
+
+    // List networks (Device Network Configuration)
+    for (key in networks) {
+        networkRec = networks[key];
+        networkList.push([false, networkRec.typeName, networkRec.name, networkRec.connection]);
+    }
+
+    // List networktypes
+    for (key in networkTypes['types']) {
+        // Create the list of network types
+        networkTypeList.push(networkTypes['types'][key]);
+    }
+
+    // List network type connection options
+    // Loop through the network type list and create a single list of network port connections for UI purposes only.
+    for (key in networkTypeList) {
+        netType = networkTypeList[key];
+        if (netType !== "---") {
+            // Loop through connection port options for the network type and add to list if unique.
+            netTypePorts = networkTypes['ports'][netType];
+            for (var portKey in netTypePorts) {
+                // Loop through networkConnectionPortList to make sure we don't add a duplicate...
+                addPortInfo = netTypePorts[portKey];
+                var pushEntry = true;
+                for (var portListEntry in networkConnectionPortList) {
+                    if (addPortInfo == networkConnectionPortList[portListEntry]) {
+                        pushEntry = false
+                    }
+                }
+                if (pushEntry) networkConnectionPortList.push(addPortInfo)
+            }
+        }
+    }
+
+    // System settings
+    // NOTE: Tempearture and Pressure display units are NOT stored in the database. They are in session memory (not Flask Session)
+    systemSettingsList.push(['Temperature Display Units', displayUnitSetting["temperature"], '', 'Degrees C or F.']);
+    systemSettingsList.push(['Pressure Display Units', displayUnitSetting["pressure"], '', 'PSI, kPa or Pa.']);
+    systemSettingsList.push(['Log Cycle', '{{systemSettings.loggingCycleTime}}', 'seconds', 'Time between values recorded.']);
+    systemSettingsList.push(['Log Duration', '{{systemSettings.loggingDurationDays}}', 'days', 'Duration that logs are stored.']);
+    systemSettingsList.push(['Alarm Cycle', '{{systemSettings.alarmCycleTime}}', 'seconds', 'Time between checking for device alarms.']);
+    systemSettingsList.push(['Alarm Duration', '{{systemSettings.alarmDurationDays}}', 'days', 'Duration that alarms are stored.']);
+    systemSettingsList.push(['Alarm Chime Interval', '{{systemSettings.alarmChimeInterval}}', '2 - 3600 seconds', 'Number of seconds between alarm chime.']);
+    systemSettingsList.push(['Alarm Chime Volume', '{{systemSettings.alarmChimeVolume}}', '1 - 50', 'Volume setting for alarm.']);
+    systemSettingsList.push(['Alarm Chime Snooze Mins', '{{systemSettings.alarmChimeSnoozeMins}}', '0 - 60', 'Number of minutes when alarm snooze is pressed']);
+    systemSettingsList.push(['Enable LEO Cloud', '{{systemSettings.enableLeoCloud}}', '0-Disable, Contact Hunter Liberty', ' This Enables The LEO Cloud Feature']);
+    systemSettingsList.push(['Enter Time Server Details', '{{systemSettings.timeServer}}', 'NA - Default', 'This is only used if LEO sits inside a firewall.']);
+    //systemSettingsList.push(['Store Chain ID', '{{systemSettings.chainId}}', 'Integer Value', 'Chain Id for the Store Chain if using LEO Cloud']);
+    //systemSettingsList.push(['Store Marker ID', '{{systemSettings.storeMarkerId}}', 'Integer Value', 'Store Marker Id for the Store if using LEO Cloud']);
+
+    $("#siteInfoUpdate").button({icons: {primary: "icon icon-save"}}).click(function (event) {
+        pageWaiting();
+        pageXHR = postJson({
+                "jsonrpc": "2.0", "id": "setSiteInfo", "method": "setSiteInfo",
+                "params": [{name: $("#siteName").val(), address: $("#siteAddress").val()}]
+            },
+            function (data) {
+                setTimeout(function () {
+                    pageWaiting('done');
+                }, 4000);
+            }, jsonError);
+        event.preventDefault();
+    });
+
+
+    // Fill enunciated alarm filters table
+    for (var key1 in enunciatedAlarmFilters) { // Loop for device types
+        uDevTypeRec = enunciatedAlarmFilters[key1];
+        for (var key2 in uDevTypeRec) { // Loop for alarmTypes
+            devType = key2
+            almTypeRec = uDevTypeRec[key2]
+            for (var key3 in almTypeRec.alarmTypes) { // Loop for alarms
+                almType = key3
+                alarmList = almTypeRec.alarmTypes[key3]
+                for (var key4 in alarmList.alarms) { // Loop for alarms
+                    alarmRec = alarmList.alarms[key4]  // Concatenates all alarms - separated with commas
+                    enunciatedAlarmsFilterTypesList.push([alarmRec.enable, devType, almType, alarmRec.appName, alarmRec.alarm])
+                }
+            }
+        }
+    }
+
+
+    //////////////////////////////////////////////////////////
+    // Networks
+    //////////////////////////////////////////////////////////
+
+    $("#networkList").edittable({
+        name: 'networkList',
+        data: networkList,
+        columns: [{type: 'checkbox', header: ''},
+            {type: 'select', options: networkTypeList, header: 'Network Type'},
+            {type: 'select', options: networkNames1, header: 'Name'}, 
+            //{type: 'text', header: 'Description'},
+            {type: 'select', options: networkConnectionPortList, header: 'Connection Info'}
+        ],
+        change: function (row, col, c) {
+            if (col == 1 && c == "E2 Network") {
+                // User just selected E2 Network. We need to disable the connection information and fill with NOT USED
+                networkList[row][2] = "E2 Ethernet"
+                networkList[row][3] = networkTypes.ports["E2 Network"][0]
+                networkList[row][col] = c;
+            }
+            else if (col == 1 && c == "AKSC255") {
+                // User just selected E2 Network. We need to disable the connection information and fill with NOT USED
+                networkList[row][2] = "AKSC255"
+                networkList[row][3] = networkTypes.ports["AKSC255"][0]
+                networkList[row][col] = c;
+            }
+            else if (col == 1 && c == "SiteSupervisor") {
+                // User just selected E2 Network. We need to disable the connection information and fill with NOT USED
+                networkList[row][2] = "SiteSupervisor"
+                networkList[row][3] = networkTypes.ports["SiteSupervisor"][0]
+                networkList[row][col] = c;
+            }
+            else if (col == 1 && (c == "Modbus ASCII") || (c == "Modbus RTU")) {
+                if (c == "Modbus ASCII") {
+                    //networkList[row][2] = "MB ASCII"
+                    mbPortList = networkTypes.ports["Modbus ASCII"]
+                } else {
+                    networkList[row][2] = "MB RTU"
+                    mbPortList = networkTypes.ports["Modbus RTU"]
+                }
+                // Generate list of communication port settings. Set field to list, then create list, then fill.
+                networkList[row][col] = c;
+					if (networkList[row][2] == "COM4")
+					{
+                networkList[row][3] = mbPortList[0];
+					}
+					else 
+					{
+                networkList[row][3] = networkTypes.ports["Modbus ASCII"][1];
+					}
+                //networkList[row][3] = mbPortList[0] // Default to first entry in the list.
+            }
+            $("#networkList").edittable('render');
+        },
+        textFocus: function ($el, row, col) {
+            {% if ctx.osKeybd %}
+                showkeypad($el, $("#networkList").edittable('getColumnHeader', col));
+            {% endif %}
+        }
+
+    });
+    $("#networkList").edittable('render');
+
+
+    $("#networkAdd").button({icons: {primary: "icon icon-plus"}}).click(function (event) {
+        networkList.push([false, networkTypeList[0], 'New Network', '']);
+        $("#networkList").edittable('render');
+    });
+
+    $("#networkDelete").button({icons: {primary: "icon icon-trash"}}).click(function (event) {
+        var idx = 0;
+        while (idx < networkList.length) {
+            if (networkList[idx][0]) networkList.splice(idx, 1); else idx++;
+        }
+        $("#networkList").edittable('render');
+    });
+
+    $("#networkListSave").button({icons: {primary: "icon icon-save"}}).click(function (event) {
+        pageWaiting();
+
+        var newdata = [];
+
+        for (var idx = 0; idx < networkList.length; idx++) {
+            if (networkList[idx][1] == "---") {
+                pageWaiting('done');
+                blError = 1
+                $("#saveErrorDlg").html("Please select a network type");
+                $("#saveErrorDlg").dialog("open");
+                event.preventDefault();
+            }
+            newdata.push({
+                "typeName": networkList[idx][1],
+                "name": networkList[idx][2],
+                "description": "",
+                "connection": networkList[idx][3],
+            });
+        }
+
+        pageXHR = postJson({"jsonrpc": "2.0", "id": "setNetworks", "method": "setNetworks", "params": [newdata]},
+            function (data) {
+                setTimeout(function () {
+                    updateNetworkNames();
+                    pageWaiting('done');
+                }, 2000);
+            }, jsonError);
+        event.preventDefault();
+    });
+
+
+    //////////////////////////////////////////////////////////
+    // Devices
+    //////////////////////////////////////////////////////////
+    $("#deviceFilePickerDialog").dialog({
+        modal: true,
+        autoOpen: false,
+        resizable: false,
+        draggable: false,
+        width: "auto",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog("close");
+            }
+        },
+        open: function () {
+            var height = $(window).height();
+            if ($(this).parent().height() > height) {
+                $(this).height(height * 0.65);
+            }
+            $(this).dialog({position: "center"});
+        },
+        close: function () {
+            window.scrollTo(0, 0);
+        }
+    });
+
+    var _col;
+    var _val;
+    var $deviceFilePicker = $('#deviceFilePicker');
+    $deviceFilePicker.imagepicker({
+        clicked: function () {
+            deviceList[_row][_col] = $(this).val();
+            $("#deviceList").edittable('render');
+            $("#deviceFilePickerDialog").dialog("close");
+        }, show_label: true
+    });
+    deviceImage = $deviceFilePicker.val();
+
+
+    var fileClick = function (id, row, col, val) {
+        _row = row;
+        _col = col;
+
+        var title = deviceList[row][2] + " Image";
+
+        $("#deviceFilePicker").val(val);
+
+        $("#deviceFilePickerDialog").dialog("option", "title", title);
+        $("#deviceFilePickerDialog").dialog("open");
+    }
+
+
+    $("#deviceList").edittable({
+        name: 'deviceList',
+        data: deviceList,
+        columns: [{type: 'checkbox', header: ''},
+            {type: 'select', options: deviceTypeList, header: 'Device Type'},
+            {type: 'text', header: 'Device Name', placeholder:'Less Than 20 Characters'},
+            //{type: 'text', header: 'Description',placeholder: placeHolders.name},
+            {type: 'select', options: networkTypeList, header: 'Network'},
+            {type: 'text', header: 'Address', placeholder:'Enter Device Address'},
+            {type: 'file', header: 'Image', click: fileClick}
+        ],
+        change: function (row, col, c) {
+            if (col == 1) {
+                if (c === "E2 Device") {
+                    // User just selected E2 Network. We need to do the following:
+                    // 1) Set the name to readonly. 2) Autofill the network to E2 Network
+                    // 3) Add the E2.png image information.
+                    deviceList[row][col + 1] = "<auto-detect>"
+                    $("#deviceList").edittable('setCustomOptions', row, col + 1, {'readonly': true});
+                    deviceList[row][col + 2] = "E2 Ethernet";
+                    $("#deviceList").edittable('setCustomCss', row, col + 3, {'readonly': true});
+                    deviceList[row][col + 4] = "E2.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                }
+                else if (c == "AKSC255") {
+                    // User just selected E2 Network. We need to do the following:
+                    // 1) Set the name to readonly. 2) Autofill the network to E2 Network
+                    // 3) Add the E2.png image information.
+                    deviceList[row][col + 1] = "<auto-detect>"
+                    $("#deviceList").edittable('setCustomOptions', row, col + 1, {'readonly': true});
+                    deviceList[row][col + 2] = "AKSC255";
+                    $("#deviceList").edittable('setCustomCss', row, col + 3, {'readonly': true});
+                    deviceList[row][col + 4] = "AKSC255.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                }
+                else if (c == "SiteSupervisor") {
+                    // User just selected E2 Network. We need to do the following:
+                    // 1) Set the name to readonly. 2) Autofill the network to E2 Network
+                    // 3) Add the E2.png image information.
+                    deviceList[row][col + 1] = "<auto-detect>"
+                    $("#deviceList").edittable('setCustomOptions', row, col + 1, {'readonly': true});
+                    deviceList[row][col + 2] = "SiteSupervisor";
+                    $("#deviceList").edittable('setCustomCss', row, col + 3, {'readonly': true});
+                    deviceList[row][col + 4] = "SiteSupervisor.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                }
+				else if (c =="LAE BIT25B1S3WH-8TM" || c == "LAE BIT25B1S3WH-7TM" || c =="LAE BIT25B1S3W-1JW"){
+					deviceList[row][col + 4] = "bit25.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                    $("#deviceList").edittable('setPlaceHolder', row, col + 2, {'readonly': false});
+				
+				}
+				else if ( c == "LAE BR1-28C1Q5W-B" || c =="LAE BR1-28C1S5WH-BVS")
+				{
+					deviceList[row][col + 4] = "br1-28.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                    $("#deviceList").edittable('setPlaceHolder', row, col + 2, {'readonly': false});
+				}
+				else if ( c == "LAE AT1-5BS2U-BG")
+				{
+					deviceList[row][col + 4] = "at1-5.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                    $("#deviceList").edittable('setPlaceHolder', row, col + 2, {'readonly': false});
+					}
+				else if ( c == "LAE AR2-5C14W-BG")
+				{
+					deviceList[row][col + 4] = "ar2-5.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                    $("#deviceList").edittable('setPlaceHolder', row, col + 2, {'readonly': false});
+					}
+
+				else if ( c == "EVCO-EV3224")
+				{
+					deviceList[row][col + 4] = "EVCO-EV3224.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                    $("#deviceList").edittable('setPlaceHolder', row, col + 2, {'readonly': false});
+				}
+				else if ( c == "HLC TSTAT")
+				{
+					deviceList[row][col + 4] = "hlctstat.png";
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': true});
+                    $("#deviceList").edittable('setPlaceHolder', row, col + 2, {'readonly': false});
+					}
+                else {
+                    $("#deviceList").edittable('setCustomCss', row, col + 1, {'readonly': false});
+                    $("#deviceList").edittable('setCustomCss', row, col + 3, {'readonly': false});
+                    $("#deviceList").edittable('setCustomCss', row, col + 4, {'readonly': false});
+                    $("#deviceList").edittable('setPlaceHolder', row, col + 2, {'readonly': false});
+					}
+            }
+            $("#deviceList").edittable('render');
+        },
+
+        textFocus: function ($el, row, col) {
+            {% if ctx.osKeybd %}
+                showkeypad($el, $("#deviceList").edittable('getColumnHeader', col));
+            {% endif %}
+        }
+    });
+
+// Get the deviceList from a rest call
+    function refreshDeviceList() {
+        var deviceNames = [];
+
+        pageXHR = postJson({"jsonrpc": "2.0", "id": "GetDeviceList", "method": "getDevices"},
+            function (data) {
+                var result = data;
+
+                // Clear out current deviceList.
+                while (deviceList.length > 0) {
+                    deviceList.pop();
+                }
+
+                row = 1
+                for (devName in data) {
+                    // Loop through devices
+                    deviceRec = result[devName];
+                    if (deviceRec.deviceTypeName == "E2 Device") {
+                        // If the device is E2, we need to keep the device name as readonly.
+                        $("#deviceList").edittable('setCustomOptions', row, 2, {'readonly': true});
+
+                        // We need to remove the :<port number> from the device address. This is written automatically.
+                        var colonLoc = deviceRec.networkAddress.lastIndexOf(":");
+                        if (colonLoc >= 0) {
+                            deviceRec.networkAddress = deviceRec.networkAddress.substring(0, colonLoc);
+                        }
+                    }
+                    if (deviceRec.deviceTypeName == "AKSC255") {
+                        // If the device is E2, we need to keep the device name as readonly.
+                        $("#deviceList").edittable('setCustomOptions', row, 2, {'readonly': true});
+
+                        // We need to remove the :<port number> from the device address. This is written automatically.
+                        var colonLoc = deviceRec.networkAddress.lastIndexOf(":");
+						console.log(colonLoc);
+                        if (colonLoc >= 0) {
+                            deviceRec.networkAddress = deviceRec.networkAddress.substring(0, colonLoc);
+                        }
+                    }
+                    else {
+                        // If NOT an E2 Device, allow user to set the name
+                        $("#deviceList").edittable('setCustomOptions', row, 2, {'readonly': false});
+                    }
+                    deviceList.push([false, deviceRec.deviceTypeName, deviceRec.name, deviceRec.network, deviceRec.networkAddress, deviceRec.image])
+                    row = row + 1
+                }
+                $("#deviceList").edittable('render');
+                pageWaiting('done');
+            },
+            jsonError
+        );
+    }
+
+// Update the network names list in the "add device" list
+    function updateNetworkNames() {
+        networkNames.push("---"); // We want the first name empty to force the user to set.
+        for (var idx = 0; idx < networkList.length; idx++) {
+            networkNames.push(networkList[idx][2]);
+        }
+        $("#deviceList").edittable('setColumnOptions',3, networkNames);
+        $("#deviceList").edittable('render');
+    }
+
+    updateNetworkNames();
+
+    $("#deviceAdd").button({icons: {primary: "icon icon-plus"}}).click(function (event) {
+        deviceList.push([false, deviceTypeList[0], 'New Device', networkNames[0], '', '']);
+        $("#deviceList").edittable('render');
+    });
+
+    $("#deviceDelete").button({icons: {primary: "icon icon-trash"}}).click(function (event) {
+        var idx = 0;
+        while (idx < deviceList.length) {
+            if (deviceList[idx][0]) deviceList.splice(idx, 1); else idx++;
+        }
+        console.log(deviceList);
+        $("#deviceList").edittable('render');
+    });
+
+    $("#deviceListSave").button({icons: {primary: "icon icon-save"}}).click(function (event) {
+        pageWaiting();
+        var countLAE = 0;
+        var newdata = [];
+        var blError = 0;
+        var check4DuplicateNamesArray = [] // List of device names. Device names need to be unique across the system.
+        var check4DuplicateAddresses = {}  // networkTypeKey:[networkAddressForNetworkType,...]
+
+
+
+        for (var idx = 0; idx < deviceList.length; idx++) 
+             {
+
+              if (deviceList[idx][1] !== "E2 Device")
+			  {
+                   countLAE = countLAE + 1;
+			  }
+
+
+             }
+
+
+
+        if  (countLAE <=14)
+       {
+        // We want to validate some data before we save. Save if no errors.
+        for (var idx = 0; idx < deviceList.length; idx++) {
+            // We will create an array of user defined device names so that we can check for duplicate name error.
+            console.log(deviceList);
+            if (deviceList[idx][1] === "---") {
+                blError = 1;
+                strError = "Please select a device type"
+            }
+            else if ([idx][3] === "---") {
+                blError = 1;
+                strError = "Please select the proper network type"
+            }
+            else if (deviceList[idx][4].length === 0) {  // Need an IP Address
+                blError = 1;
+                strError = "Address cannot be blank"
+            }
+            else if ((deviceList[idx][3] === "E2 Network") && (deviceList[idx][1] !== "E2 Device")) {
+                blError = 1;
+                strError = "E2 Device and E2 Network Selection Do Not Match"
+            }
+            else if ((deviceList[idx][3] === "AKSC255") && (deviceList[idx][1] !== "AKSC255")) {
+                blError = 1;
+                strError = "Danfoss AKSC255 Device and AKSC255 Network Selection Do Not Match"
+            }
+            else {
+                // Let's check for duplicate names or addresses.
+
+                // Let's nake sure the current network address is unique
+                networkType = deviceList[idx][3];
+                networkAddress = deviceList[idx][4];
+                if (check4DuplicateAddresses.hasOwnProperty(networkType) === false) {
+                    // We haven't seen this networkType before. Add it.
+                    check4DuplicateAddresses[networkType] = []
+                }
+
+                if (check4DuplicateAddresses[networkType].indexOf(networkAddress) >= 0) {
+                    blError = 1;
+                    strError = "Two devices on network: " + networkType + " have the same address: " + networkAddress;
+                }
+                else {
+                    check4DuplicateAddresses[networkType] = networkAddress; // Add name to list of device names.
+                }
+
+                // Let's see if the current device name is in the list of device names
+                deviceName = deviceList[idx][2];
+                if (check4DuplicateNamesArray.indexOf(deviceName) >= 0) {
+                    blError = 1;
+                    strError = "Two devices have the same name: " + deviceName;
+                }
+                else {
+                    check4DuplicateNamesArray.push(deviceName); // Add name to list of device names.
+                }
+            }
+
+            if (blError === 0) {
+                newdata.push({
+                    "deviceTypeName": deviceList[idx][1],
+                    "name": deviceList[idx][2],
+                    "description": " ",
+                    "network": deviceList[idx][3],
+                    "networkAddress": deviceList[idx][4],
+                    "image": deviceList[idx][5]
+                });
+            }
+            else {
+                pageWaiting('done');
+                $("#saveErrorDlg").html(strError);
+                $("#saveErrorDlg").dialog("open");
+                event.preventDefault();
+            }
+        }
+
+        // If there are no errors, write the settings and refresh the devices list.
+        if (blError == 0) {
+            pageXHR = postJson({
+                    "jsonrpc": "2.0", "id": "setDevices", "method": "setDevices",
+                    "params": [newdata]
+                },
+                function (data) {
+                    // If we did not get error
+                    if (data.search("Did Not Respond") < 0) {
+                        // device list updated
+                        setTimeout(function () {
+                            refreshDeviceList();
+                        }, 7000);
+                    }
+                    else {
+                        pageWaiting('done');
+                        $("#saveErrorDlg").html(data);
+                        $("#saveErrorDlg").dialog("open");
+                        event.preventDefault();
+                    }
+                }, jsonError);
+
+
+            event.preventDefault();
+        }
+        else {
+            pageWaiting('done');
+        }
+         }
+
+        else{
+                strError = "Please make sure you did not have a combination of  more than 14 LAE devices";
+                pageWaiting('done');
+                $("#saveErrorDlg").html(strError);
+                $("#saveErrorDlg").dialog("open");
+                event.preventDefault();
+
+	}
+    });
+
+// Dialog For device address data entry error in device list
+    $(function () {
+
+        $("#saveErrorDlg").dialog({
+            autoOpen: false,
+            modal: true,
+            resizable: false,
+            draggable: false,
+            width: "auto",
+            buttons: {
+                "OK": function () {
+                    $(this).dialog("close");
+                },
+            }
+        });
+
+    });
+
+    //////////////////////////////////////////////////////////
+    // Date and Time
+    //////////////////////////////////////////////////////////
+
+    var output = [];
+
+    for (var key in timeInfo.timeZoneList) {
+        if (timeInfo.timeZoneList.hasOwnProperty(key)) {
+            output.push('<option value="' + key + '">' + timeInfo.timeZoneList[key] + '</option>');
+        }
+    }
+    // timeInfo.currentTime is in UTC, but in order for utcToLocalDate to work properly, it needs to be in ISO 8601 time/date format
+    var utcdate = timeInfo.currentTime + "Z";
+    var localDate = utcToLocalDate(utcdate);
+    var timeZone = timeInfo.timeZone;
+    $("#timezone").html(output.join('')).val(timeZone);
+
+
+    $("#datepicker").datepicker({
+//    {% if ctx.osKeybd %}
+            //      beforeShow: function(element, object) {setTimeout(function(){ $('.ui-datepicker-title').niceSelect(); }, 250);},
+            //      onChangeMonthYear: function() {setTimeout(function(){ $('.ui-datepicker-title').niceSelect(); }, 250);},
+            //    {% endif %}
+        showAnim: "",
+        changeMonth: true,
+        changeYear: true
+    });
+    $("#datepicker").val(localDate.toLocaleString().split(' ')[0].replace(",", ""));
+
+    var hoursList = [];
+    for (var i = 0; i < 24; i++) {
+        var s = i.toString();
+        hoursList.push('<option value="' + s + '">' + s + '</option>');
+    }
+    $('#timehour').html(hoursList.join('')).val(localDate.getHours());
+
+    // Build drop down list for the number of alarm reports per day.
+    var alarmReportsPerDayList = [];
+    var alarmReportsPerDayOptions = [0, 1, 2, 3, 4, 6, 8, 12, 24];
+    for (var i = 0; i < alarmReportsPerDayOptions.length; i++) {
+        var s = alarmReportsPerDayOptions[i].toString();
+        alarmReportsPerDayList.push('<option value="' + s + '">' + s + '</option>');
+    }
+
+    var statusReportsPerDayList = [];
+    for (var i = 0; i < 60; i++) {
+        var s = i.toString();
+        var pad = i < 10 ? "0" : "";
+        statusReportsPerDayList.push('<option value="' + s + '">' + pad + s + '</option>');
+    }
+
+
+  var minutesList = [];
+  for (var i = 0; i < 60; i++) {
+    var s = i.toString();
+    var pad = i < 10 ? "0" : "";
+    minutesList.push('<option value="' + s + '">' + pad + s + '</option>');
+  }
+  $('#timeminute').html(minutesList.join('')).val(localDate.getMinutes());
+
+  $("#timeDateUpdate").button({icons: {primary: "icon icon-save"}}).click(function (event) {
+    pageWaiting();
+    // First let's get the raw date.
+    var newTime = (new Date($("#datepicker").val() + " " + $('#timehour').val() + ":" + $('#timeminute').val()));
+    var timeZone = $("#timezone").val();
+
+    momNewDate = moment( $("#datepicker").val(), "MM-DD-YYYY");
+    momNewDateISO = momNewDate.toISOString();
+    // Remove timezone stuff.
+    strDateISO = momNewDateISO.substring( 0, momNewDateISO.indexOf("T") );
+	var timehour = $('#timehour').val();
+    var timeminute = $('#timeminute').val()
+    if (timehour.length == 1)
+       {
+       timehour = "0" + timehour;
+       }
+      if (timeminute.length == 1)
+      {
+        timeminute = "0" + timeminute;
+
+       }
+    newTime = strDateISO + " " + timehour + ":" + timeminute;   
+    console.log("Try newTime:", newTime, "timeZone:", timeZone )
+    momNewTime = moment.tz( newTime, timeZone );
+    console.log("momNewTime:", momNewTime);
+    momNewTimeUTC = momNewTime.utc().format( 'YYYY-MM-DD HH:mm:ss' );
+    console.log("momNewTime:", momNewTimeUTC);
+    currentTime = momNewTimeUTC;
+
+    //put UTC time into divUTC
+    //momUtc = moment.utc().format('YYYY-MM-DD HH:mm:ss');
+    //console.log( "mom-UTC:", momUtc );
+
+    //get text from divUTC and convert to local timezone
+    //localTime = new Date();
+    //momLocalTime = moment(localTime).format('YYYY-MM-DD HH:mm:ss');
+    //console.log( "mom-localTime:", momLocalTime );
+
+    //get text from divUTC and conver to local timezone
+    //sendTime = newTime;
+    //momSendTime = moment(sendTime).format('YYYY-MM-DD HH:mm:ss');
+    //console.log( "mom-sendTime:", momSendTime );
+
+    //momNY = moment.tz('America/New_York').format('YYYY-MM-DD HH:mm:ss');
+    //console.log( "mom-NY:", momNY );
+
+    //momPhx = moment.tz('America/Phoenix').format('YYYY-MM-DD HH:mm:ss');
+    //console.log( "mom-Phx:", momPhx );
+
+    //momLA = moment.tz('America/Los_Angeles').format('YYYY-MM-DD HH:mm:ss');
+    //console.log( "mom-LA:", momLA );
+
+    //momentNewTime = moment.tz(timeZone).format('YYYY-MM-DD HH:mm:ss');
+    //console.log( "memNew:", momentNewTime );
+
+    //momUtc = moment.utc(momentNewTime).format('YYYY-MM-DD HH:mm:ss');
+    //currentTime = momUtc;
+    console.log( "JSON CALL --> currentTime:", currentTime, "timeZone:", timeZone);
+
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "setSiteCurrentTime", "method": "setSiteCurrentTime",
+        "params": [{"currentTime": currentTime, "timeZone": timeZone}]
+      },
+      function (data) {
+        setTimeout(function () {
+          pageWaiting('done');
+        }, 3000);
+      }, jsonError);
+    event.preventDefault();
+  });
+
+  //////////////////////////////////////////////////////////
+  // System Settings
+  //////////////////////////////////////////////////////////
+
+  $('#resetLogs').button({icons: {primary: "icon icon-close"}}).click(function (event) {
+    pageWaiting();
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "deleteAllLogs", "method": "deleteAllLogs",
+      "params": []
+    }, function (data) {
+      setTimeout(function () {
+        pageWaiting('done');
+      }, 2000);
+    }, jsonError);
+    event.preventDefault();
+  });
+
+  $('#resetAlarms').button({icons: {primary: "icon icon-close"}}).click(function (event) {
+    pageWaiting();
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "deleteAllAlarms", "method": "deleteAllAlarms",
+      "params": []
+    }, function (data) {
+      setTimeout(function () {
+        pageWaiting('done');
+      }, 2000);
+    }, jsonError);
+    event.preventDefault();
+  });
+  $('#useExternal').button({icons: {primary: "icon icon-close"}}).click(function (event) {
+    pageWaiting();
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "useExternal", "method": "useExternal",
+      "params": {"method":"external"}
+    }, function (data) {
+      setTimeout(function () {
+        pageWaiting('done');
+      }, 2000);
+    }, jsonError);
+    event.preventDefault();
+  });
+  
+  $('#useInternal').button({icons: {primary: "icon icon-close"}}).click(function (event) {
+    pageWaiting();
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "useExternal", "method": "useExternal",
+      "params": {"method":"internal"}
+    }, function (data) {
+      setTimeout(function () {
+        pageWaiting('done');
+      }, 2000);
+    }, jsonError);
+    event.preventDefault();
+  });
+
+  $('#testAlarmChime').button({icons: {primary: "icon icon-close"}}).click(function (event) {
+    pageWaiting();
+    // console.log("Volume:", newSystemSettings.alarmChimeVolume );
+    if ( typeof( newSystemSettings.alarmChimeVolume ) === "string" ) {
+      intAlarmVol = parseFloat( newSystemSettings.alarmChimeVolume );
+    }
+    else {
+      intAlarmVol = newSystemSettings.alarmChimeVolume;
+    }
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "testAlarmChime", "method": "actions",
+      "params": [{"action":"PlayAlarmChime", "volume":intAlarmVol }]
+      }, function (data) {
+      setTimeout(function () {
+        pageWaiting('done');
+      }, 2000);
+    }, jsonError);
+    event.preventDefault();
+  });
+
+
+
+  $("#systemSettingsList").proptable({
+    name: 'systemSettingsList',
+    data: systemSettingsList,
+    columns: [{readonly: true, header: 'System Setting'},
+      {type: 'text', header: 'Value', size: 7},
+      {readonly: true, header: 'Units'},
+      {readonly: true, header: 'Description'}],
+    textFocus: function ($el, row, col) {
+      {% if ctx.osKeybd %}
+        shownumpad($el, systemSettingsList[row][0], systemSettingsList[row][2]);
+      {% endif %}
+    }
+
+  });
+
+  // Adjust proptable for temperature and pressure drop down lists.
+  $("#systemSettingsList").proptable('setCustomType', 0, 1, 'select');
+  $("#systemSettingsList").proptable('setCustomType', 1, 1, 'select');
+  $("#systemSettingsList").proptable('setCustomOptions', 0, 1, displayUnitTypes.temperature);
+  $("#systemSettingsList").proptable('setCustomOptions', 1, 1, displayUnitTypes.pressure);
+  $("#systemSettingsList").proptable('setRowCustomCss', 2,{readonly: true});
+  $("#systemSettingsList").proptable('setRowCustomCss', 3,{readonly: true});
+  $("#systemSettingsList").proptable('setRowCustomCss', 4,{readonly: true});
+  $("#systemSettingsList").proptable('render');
+  $('#systemSettingsList-2-1').prop('readonly', true);
+  $('#systemSettingsList-3-1').prop('readonly', true);
+  $('#systemSettingsList-4-1').prop('readonly', true);
+
+  function alarmChimeSnoozeEnable() {
+    $("#alarmChimeSnoozeEnable").find("input").prop("disabled", $("#alarmChimeSnoozeEnable").is(':checked'));
+  }
+
+  alarmChimeSnoozeEnable();
+  $("#alarmChimeSnoozeEnable").click(function () {
+    alarmChimeSnoozeEnable();
+  })
+
+  function alarmChimeEnable() {
+    $("#alarmChimeEnable").find("input").prop("disabled", $("#alarmChimeEnable").is(':checked'));
+  }
+
+  alarmChimeEnable();
+  $("#alarmChimeEnable").click(function () {
+    alarmChimeEnable();
+  })
+
+
+  $("#systemSettingsUpdate").button({icons: {primary: "icon icon-save"}}).click(function (event) {
+    pageWaiting();
+
+    // Update session  memory with temperature unit settings
+    displayUnitSetting["temperature"] = systemSettingsList[0][1];
+    displayUnitSetting["pressure"] = systemSettingsList[1][1];
+    displayUnitMatchDeltaToTemperature();
+    displayUnitStoreSettings();
+    updateUnitGlyph();
+
+    // Update system settings that are stored in the database.
+    newSystemSettings["loggingCycleTime"] = systemSettingsList[2][1];
+    newSystemSettings["loggingDurationDays"] = systemSettingsList[3][1];
+    newSystemSettings["alarmCycleTime"] = systemSettingsList[4][1];
+    newSystemSettings["alarmDurationDays"] = systemSettingsList[5][1];
+    newSystemSettings["alarmChimeInterval"] = systemSettingsList[6][1];
+    newSystemSettings["alarmChimeVolume"] = systemSettingsList[7][1];
+    newSystemSettings["alarmChimeSnoozeMins"] = systemSettingsList[8][1];
+    newSystemSettings["enableLeoCloud"] = systemSettingsList[9][1];
+    newSystemSettings["timeServer"] = String(systemSettingsList[10][1]);
+    //newSystemSettings["chainId"] = systemSettingsList[10][1];
+    //newSystemSettings["storeMarkerId"] = systemSettingsList[11][1];
+    if ($("#alarmChimeEnable").is(':checked'))
+      newSystemSettings["alarmChimeEnable"] = 1
+    else
+      newSystemSettings["alarmChimeEnable"] = 0
+
+    if ($("#alarmChimeSnoozeEnable").is(':checked'))
+      newSystemSettings["alarmChimeSnoozeEnable"] = 1
+    else
+      newSystemSettings["alarmChimeSnoozeEnable"] = 0
+
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "setSystemSettings", "method": "setSystemSettings",
+        "params": [newSystemSettings]
+      },
+      function (data) {
+        setTimeout(function () {
+          pageWaiting('done');
+        }, 4000);
+      }, jsonError);
+    event.preventDefault();
+  });
+
+  //////////////////////////////////////////////////////////
+  // Alarm Email Configuration
+  //////////////////////////////////////////////////////////
+  // Build drop down list for each of the email servers names
+  var emailServerNamesList = [];
+  for (var i = 0; i < emailSettings.emailServerRecs.length; i++) {
+    var s = emailSettings.emailServerRecs[i].emailservername;
+    emailServerNamesList.push('<option value="' + s + '">' + s + '</option>');
+  }
+
+  for (var i = 0; i < emailSettings.emailAddrRecs.length; i++) {
+    // Set the server name for each address
+    strId = "#emailserverId" + (i + 1).toString();
+    $(strId).html(emailServerNamesList.join('')).val(emailSettings.emailAddrRecs[i].emailservername);
+  }
+  // Based upon the email addresses, enable or disable the testsend email buttons.
+  configureTestEmailButtons();
+
+  $("#alarmReportsPerDay").html(alarmReportsPerDayList.join('')).val(emailSettings.alarmReportsPerDay);
+  $("#statusReportsPerHour").html(statusReportsPerDayList.join('')).val(emailSettings.statusReportsPerHour);
+  $("#emailRetryDelay").val(emailSettings.emailretrydelay);
+  $("#emailRetryDelay1").val(emailSettings.emailretrydelay);
+
+  // enable alarm email checkbox function
+  $("#enableAlarmEmail").click(function () {
+    configureTestEmailButtons();
+  });
+  
+    $("#enableAlarmEmail1").click(function () {
+    configureTestEmailButtons();
+  });
+
+  // I would like to do the following functionatliy, but I could not get it to work reliably. The button would
+  // change color, but the button action was not enabled. So at this time, we are not doing this.
+  function configureTestEmailButtons() {
+    if ( 0 ) {
+      // Toggle the ability to send the test email based upon whether the email enable is set.
+      if (($("#enableAlarmEmail").is(':checked'))) {
+        // check email address for each button. If not no address, disable the test button.
+        for (i = 0; i < emailSettings.emailAddrRecs.length; ++i) {
+          strId = "#sendTestEmail" + (i + 1).toString();
+          if (emailSettings.emailAddrRecs[i].toaddress.length === 0) $(strId).disable(); else $(strId).enable();
+        }
+      }
+      else {
+        for (i = 0; i < emailSettings.emailAddrRecs.length; ++i) {
+          strId = "#sendTestEmail" + (i + 1).toString();
+          $(strId).disable();
+        }
+      }
+    }
+  }
+  
+    function configureTestEmailButtons1() {
+    if ( 0 ) {
+      // Toggle the ability to send the test email based upon whether the email enable is set.
+      if (($("#enableAlarmEmail").is(':checked'))) {
+        // check email address for each button. If not no address, disable the test button.
+          strId = "#sendTestEmail7"
+          if (emailSettings.emailAddrRecs[6].toaddress.length === 0) $(strId).disable(); else $(strId).enable();
+        }
+      }
+      else {
+        
+          strId = "#sendTestEmail7";
+          $(strId).disable();
+        }
+      }
+
+
+  function showPasswordCheckbox( iNum ) {
+    strPW = "#authpassword" + iNum.toString();
+    if ($(strPW).attr("type") === "password") $(strPW).attr("type", "text"); else $(strPW).attr("type", "password");
+  }
+
+{% if session.can_edit_system %}
+  $("#showHideCheckbox1").click(function() { showPasswordCheckbox( 1 ) } );
+  $("#showHideCheckbox2").click(function() { showPasswordCheckbox( 2 ) } );
+  $("#showHideCheckbox3").click(function() { showPasswordCheckbox( 3 ) } );
+{%  endif  %}
+  // Save ALL email address settings
+  $("#saveEmailAddress").button({icons: {primary: "icon icon-save"}}).click(function (event) {
+    pageWaiting();
+
+    // We will update only the parameters that are releated to the Email Address/Receiver settings, but
+    // the interface requires a write of the entire emailSettings structure.
+
+    // First, get the "general" (not multiple record) fields.
+    emailSettings.enablealarmemail = $("#enableAlarmEmail").is(':checked') ? 1 : 0;
+    emailSettings.alarmReportsPerDay = $("#alarmReportsPerDay").val();
+    emailSettings.emailretrydelay = $("#emailRetryDelay").val();
+
+    // Next, get all the multiple record information
+    for ( i = 0; i < emailSettings.emailAddrRecs.length -1; ++i) {
+      strRecNum = (i+1).toString();  // One based record number
+      addrId = "#recipient" + strRecNum;
+      srvrId = "#emailserverId" + strRecNum;
+      enableEnunId = "#enableEnun" + strRecNum;
+      enableAlmRptId  = "#enableAlmRpt" + strRecNum;
+
+      emailSettings.emailAddrRecs[i].toaddress = $( addrId ).val();
+      emailSettings.emailAddrRecs[i].emailservername = "Server 1"; //$( srvrId ).val();
+      emailSettings.emailAddrRecs[i].enableemail = $( enableEnunId ).is(':checked') ? 1 : 0;
+      emailSettings.emailAddrRecs[i].enablealarmreport = $( enableAlmRptId ).is(':checked') ? 1 : 0;
+    }
+
+    configureTestEmailButtons(); // Update the send test email buttons based upon what the user saved.
+
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "setEmailSettings", "method": "setEmailSettings",
+      "params": { "emailSettings" : emailSettings }
+    }, function (data) {
+      setTimeout(function () {
+        pageWaiting('done');
+      }, 1000);
+    }, jsonError);
+    event.preventDefault();
+  });
+
+    $("#saveEmailAddress1").button({icons: {primary: "icon icon-save"}}).click(function (event) {
+    pageWaiting();
+
+    // We will update only the parameters that are releated to the Email Address/Receiver settings, but
+    // the interface requires a write of the entire emailSettings structure.
+
+    // First, get the "general" (not multiple record) fields.
+   // emailSettings.enablealarmemail = $("#enableAlarmEmail").is(':checked') ? 1 : 0;
+    emailSettings.statusReportsPerHour = $("#statusReportsPerHour").val();
+    emailSettings.emailretrydelay = $("#emailRetryDelay").val();
+
+    // Next, get all the multiple record information
+     // strRecNum = (7).toString();  // One based record number
+      addrId = "#recipient7";
+      srvrId = "#emailserverId7";
+      enableEnunId = "#enableEnun7";
+      enableAlmRptId  = "#enableAlmRpt7";
+
+      emailSettings.emailAddrRecs[6].toaddress = $( addrId ).val();
+      emailSettings.emailAddrRecs[6].emailservername = "Server 1"; //$( srvrId ).val();
+      emailSettings.emailAddrRecs[6].enableemail = $( enableEnunId ).is(':checked') ? 1 : 0;
+      emailSettings.emailAddrRecs[6].enablealarmreport = $( enableAlmRptId ).is(':checked') ? 1 : 0;
+ 
+
+    configureTestEmailButtons1(); // Update the send test email buttons based upon what the user saved.
+
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "setEmailSettings", "method": "setEmailSettings",
+      "params": { "emailSettings" : emailSettings }
+    }, function (data) {
+      setTimeout(function () {
+        pageWaiting('done');
+      }, 1000);
+    }, jsonError);
+    event.preventDefault();
+  });
+
+
+  $("#defaultServer").click(function () {
+    showHideEmailServerInputs();
+  });
+
+  function showHideEmailServerInputs()
+  {
+      strRecNum = (1).toString();  // One based record number for id names
+      fromAddrId  = "#fromAddress" + strRecNum;
+      srvrId = "#smtpserver" + strRecNum;
+      portId = "#smtpport" + strRecNum;
+      tlsId= "#enableTls" + strRecNum;
+      defaultServer= "#defaultServer";
+      authId = "#enableAuthentication" + strRecNum;
+      authAcctId = "#authaccount" + strRecNum;
+      authPassId = "#authpassword" + strRecNum;
+  if ($( defaultServer ).is(':checked'))
+    {
+
+       $(fromAddrId).disable();
+       $(srvrId).disable();
+       $(portId).disable();
+       $(tlsId).disable();
+       $(authId).disable();
+       $(authAcctId).disable();
+       $(authPassId).disable();
+//       $(fromAddrId).disable();
+    }
+  else
+    {
+       $(fromAddrId).enable();
+       $(srvrId).enable();
+       $(portId).enable();
+       $(tlsId).enable();
+       $(authId).enable();
+       $(authAcctId).enable();
+       $(authPassId).enable();
+//       $(fromAddrId).disable();
+    }
+  }
+  
+
+  // Save ALL email server settings
+  $("#saveEmailServer").button({icons: {primary: "icon icon-save"}}).click(function (event) {
+    pageWaiting();
+
+    // Get all the multiple record email server information
+//    for ( i = 0; i < emailSettings.emailServerRecs.length; ++i) {
+      strRecNum = (1).toString();  // One based record number for id names
+      fromAddrId  = "#fromAddress" + strRecNum;
+      srvrId = "#smtpserver" + strRecNum;
+      portId = "#smtpport" + strRecNum;
+      tlsId= "#enableTls" + strRecNum;
+      defaultServer= "#defaultServer";
+      authId = "#enableAuthentication" + strRecNum;
+      authAcctId = "#authaccount" + strRecNum;
+      authPassId = "#authpassword" + strRecNum;
+
+      emailSettings.emailServerRecs[1].fromaddress = $( fromAddrId ).val();
+      emailSettings.emailServerRecs[1].smtpserver = $( srvrId ).val();
+      emailSettings.emailServerRecs[1].smtpport = $( portId ).val();
+      emailSettings.emailServerRecs[1].enabletls = $( tlsId ).is(':checked') ? 1 : 0;
+      emailSettings.emailServerRecs[1].enableauthentication = $( authId ).is(':checked') ? 1 : 0;
+      emailSettings.emailServerRecs[1].authaccount = $( authAcctId ).val();
+      emailSettings.emailServerRecs[1].authpassword = $( authPassId ).val();
+      emailSettings.emailServerRecs[1].defaultServer = $( defaultServer ).is(':checked') ? 0 : 1;
+      emailSettings.emailServerRecs[0].defaultServer = $( defaultServer ).is(':checked') ? 1 : 0;
+//    }
+
+    pageXHR = postJson({"jsonrpc": "2.0", "id": "setEmailSettings", "method": "setEmailSettings",
+      "params": { "emailSettings" : emailSettings }
+    }, function (data) {
+      setTimeout(function () {
+        pageWaiting('done');
+      }, 1000);
+    }, jsonError);
+    event.preventDefault();
+  });
+
+  $('.sendTestEmailBtn').button();
+  $('#sendTestEmail1').button({icons: {primary: "icon icon-check"}}).click(function (event) {
+    sendTestEmailClick(0);
+  });
+  $('#sendTestEmail2').button({icons: {primary: "icon icon-check"}}).click(function (event) {
+    sendTestEmailClick(1);
+  });
+  $('#sendTestEmail3').button({icons: {primary: "icon icon-check"}}).click(function (event) {
+    sendTestEmailClick(2);
+  });
+  $('#sendTestEmail4').button({icons: {primary: "icon icon-check"}}).click(function (event) {
+    sendTestEmailClick(3);
+  });
+  $('#sendTestEmail5').button({icons: {primary: "icon icon-check"}}).click(function (event) {
+    sendTestEmailClick(4);
+  });
+  $('#sendTestEmail6').button({icons: {primary: "icon icon-check"}}).click(function (event) {
+    sendTestEmailClick(5);
+  });
+  
+   $('#sendTestEmail7').button({icons: {primary: "icon icon-check"}}).click(function (event) {
+    sendTestEmailClick(6);
+  });
+
+  function sendTestEmailClick( iAddressIndex ) {
+    if (emailSettings.enablealarmemail > 0 ) {
+      if (emailSettings.emailAddrRecs[iAddressIndex].toaddress.length > 0) {
+        pageWaiting();
+        pageXHR = postJson({
+            "jsonrpc": "2.0", "id": "sendTestEmail", "method": "sendTestEmail",
+            "params": {
+              "emailtype": 2, "toaddress": emailSettings.emailAddrRecs[iAddressIndex].toaddress,
+              "emailservername": emailSettings.emailAddrRecs[iAddressIndex].emailservername
+            }
+          },
+          function (data) {
+            setTimeout(function () {
+              pageWaiting('done');
+            }, 2000);
+          }, jsonError);
+        event.preventDefault();
+      }
+      else {
+        $("#SendTestEmailErrorPopupDlg").text( "Email Address is not specified or has not been saved.");
+        $("#SendTestEmailErrorPopupDlg").dialog("open");
+      }
+    }
+    else {
+      $("#SendTestEmailErrorPopupDlg").text( "Please check the Enable Alarm Email checkbox and press the Save button.");
+      $("#SendTestEmailErrorPopupDlg").dialog("open");
+    }
+  }
+
+    // Dialog Box Error - for test email
+  $(function() {
+
+    $("#SendTestEmailErrorPopupDlg").dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        draggable: false,
+        width: "auto",
+        buttons: {
+            "OK": function() { $(this).dialog( "close" ); },
+          }
+     });
+  });
+
+
+  // Tab management
+  $(document).ready(function() {
+      $("#tabContent").find("[id^='tab']").hide(); // Hide all content
+      $("#DevStatusTabs li:first").attr("id","current"); // Activate the first tab
+      $("#tabContent #tab1").fadeIn(); // Show first tab's content
+      $('#DevStatusTabs a').click(function(e) {
+          e.preventDefault();
+          if ($(this).closest("li").attr("id") == "current"){ //detection for current tab
+           return;
+          }
+          else{
+            $("#tabContent").find("[id^='tab']").hide(); // Hide all content
+            $("#DevStatusTabs li").attr("id",""); //Reset id's
+            $(this).parent().attr("id","current"); // Activate this
+            $('#' + $(this).attr('name')).fadeIn(); // Show content for the current tab
+          }
+      });
+  });
+  // END SCRIPT FOR TABS
+
+  //////////////////////////////////////////////////////////
+  // Enunciated Alarm Filter Configuration
+  //////////////////////////////////////////////////////////
+
+  $("#enunciatedAlarmsFilterTypesList").proptable({ name: 'enunciatedAlarmsFilterTypesList',
+    data: enunciatedAlarmsFilterTypesList,
+    customCss: { width:'99%'},
+    columns: [
+              { type: 'checkbox', header: 'Enable'},
+              { readonly: true, header: 'Device Group'},
+              { readonly: true, header: 'Alarm Category'},
+              { readonly: true, header: 'App Name'},
+              { readonly: true, header: 'Alarm String', size:7},
+              ],
+    change: function (row, col, c) {
+    }
+  });
+
+  $("#enunciatedAlarmsFilterTypesList").proptable('render');
+
+
+  // Save enunciated alarm filters
+  $("#enunciatedAlarmsFilterTypesListSave").button({icons: { primary: "icon icon-save"}}).click(function( event ) {
+    pageWaiting();
+
+    // For this release, we are simply updating the enable states.
+    for (var idx = 0; idx < enunciatedAlarmsFilterTypesList.length; idx++) {
+      // Find the corresponding record in the enunciatedAlarmFilters.enunciatedAlarmFilters list.
+      updateAlarmFilters = enunciatedAlarmFilters.enunciatedAlarmFilters
+      for (var uIdx = 0; uIdx < updateAlarmFilters.length; uIdx++) {
+        if ( ( updateAlarmFilters[uIdx].groupType == enunciatedAlarmsFilterTypesList[idx][1] ) &&
+             ( updateAlarmFilters[uIdx].alarmType == enunciatedAlarmsFilterTypesList[idx][2] ) &&
+             ( updateAlarmFilters[uIdx].appName == enunciatedAlarmsFilterTypesList[idx][3] ) ) {
+
+          if ( enunciatedAlarmsFilterTypesList[idx][0] ) {
+            updateAlarmFilters[uIdx].enable = 1
+          }
+          else {
+            updateAlarmFilters[uIdx].enable = 0
+          }
+        }
+      }
+    }
+    pageXHR = postJson({"jsonrpc":"2.0","id":"setEnunciatedAlarmFilters","method":"setEnunciatedAlarmFilters",
+      "params":[ updateAlarmFilters, $("#EnunciatedAlarmFilterEnableCBox").is(':checked') ? 1 : 0  ] },
+
+      function(data) {
+        // If we did not get error
+        pageWaiting('done');
+        event.preventDefault();
+      }, jsonError);
+
+    event.preventDefault();
+  });
+
+
+  //////////////////////////////////////////////////////////
+  // Ethernet
+  //////////////////////////////////////////////////////////
+
+  function dhcpEnableClick() {
+    $("#ethernetConfiguration").find("input").prop("disabled", $("#dhcp").is(':checked'));
+  }
+  dhcpEnableClick();
+  $("#dhcp").click(function() { dhcpEnableClick(); })
+
+  function getOctet(ip) {
+    var spl = ip.split('.');
+    return [parseInt(spl[0]), parseInt(spl[1]), parseInt(spl[2]), parseInt(spl[3])];
+  }
+
+  function getNetwork(address, netmask) {
+    try {
+      var octaddr = getOctet(address); var octnm = getOctet(netmask); var octnw = [];
+      for (var i = 0; i < 4; i++)
+        octnw.push(octaddr[i] & octnm[i]);
+      return octnw[0].toString() + '.' + octnw[1].toString() + '.' + octnw[2].toString() + '.' + octnw[3].toString();
+    }
+    catch(e) {
+      return "0.0.0.0";
+    }
+  }
+
+
+  // Ethernet save button. Need to pop up option to reboot.
+  $('#ethernetupdate').button({icons: { primary: "icon icon-save"}}).click(function (event) {
+    pageWaiting();
+
+    pageXHR = postJson({"jsonrpc":"2.0","id":"setEthernetSettings","method":"setEthernetSettings",
+      "params":[{ "hostname": $("#hostname").val(),
+                  "dhcp": $("#dhcp").is(':checked'),
+                  "address": $("#address").val(),
+                  "netmask": $("#netmask").val(),
+                  "network": getNetwork($("#address").val(), $("#netmask").val()),
+                  "gateway": $("#gateway").val(), "dnsaddress" : $("#dnsaddress").val(),
+                  }] }, function(data) {
+                            setTimeout(function() { pageWaiting('done'); $("#EthernetRebootSystemConfirmDialog").dialog( "open" );}, 2000); },
+                            jsonError);
+
+    event.preventDefault();
+    });
+
+    // Dialog Box Reboot System confirmation
+  $(function() {
+
+    $("#EthernetRebootSystemConfirmDialog").dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        draggable: false,
+        width: "auto",
+        buttons: {
+            "Yes - Reboot NOW": function() { pageWaiting(); RebootSystem() },
+            "No - Reboot LATER": function() { $(this).dialog( "close" ); },
+          }
+     });
+  });
+
+  function RebootSystem() {
+    pageXHR = postJson({"jsonrpc":"2.0","id":"restartSystem","method":"restartSystem",
+      "params":[{"rebootType": "rebooted system from web interface", "rebootUser": "{{session.username}}" }] },
+      function(data) { setTimeout(function() { pageWaiting('done');}, 1500); }, jsonError);
+      event.preventDefault();
+  }
+
+  //////////////////////////////////////////////////////////
+  // E2 Settings
+
+  function E2AlarmEnableClick() {
+    $("#E2AlarmFilteringTable").find("input").prop("disabled", $("#E2GetAlarms").is(':checked'));
+  }
+  E2AlarmEnableClick();
+  $("#E2GetAlarms").click(function() { E2AlarmEnableClick(); })
+
+  $('#E2Settingsupdate').button({icons: { primary: "icon icon-save"}}).click(function (event) {
+    pageWaiting();
+
+
+    pageXHR = postJson({"jsonrpc":"2.0","id":"setE2Settings","method":"setE2Settings",
+      "params":[{ "E2GetAlarms": $("#E2GetAlarmsCBox").is(':checked'),
+                  "E2alarmCycleTime": $("#E2alarmCycleTimeEField").val(),
+                  "E2GetAdvisoryOrAnnunciatorLog": $("#E2GetAdvisoryOrAnnunciatorLogCBox").is(':checked'),
+                  "E2AlarmPriorityFilter": $("#E2AlarmPriorityFilterEField").val(),
+                  "E2AlarmFilterNotice": $("#E2AlarmFilterNoticeCBox").is(':checked'),
+                  "E2AlarmFilterFail": $("#E2AlarmFilterFailCBox").is(':checked'),
+                  "E2AlarmFilterAlarm": $("#E2AlarmFilterAlarmCBox").is(':checked'),
+                  "E2AlarmFilterRTN": $("#E2AlarmFilterRTNCBox").is(':checked'),
+                  "E2DevOfflineAlmDelay": $("#E2DevOfflineAlmDelayEField").val(),
+                  "E2DevOfflineRTNDelay": $("#E2DevOfflineRTNDelayEField").val(),
+                  "E2MaxValsPerMsg": $("#E2MaxValsPerMsgEField").val(),
+                  "E2DelayBetweenMsgsMS": $("#E2DelayBetweenMsgsMSEField").val()
+                  }] }, function(data) { setTimeout(function() { pageWaiting('done');}, 2000); }, jsonError);
+
+    event.preventDefault();
+    });
+
+
+  //////////////////////////////////////////////////////////
+  // Accordion
+  var accordion_active = 0;
+  if ('active_accordion' in sessionStorage)
+    accordion_active = parseInt(sessionStorage.active_accordion);
+
+  $( "#systemAccordion" ).accordion( { heightStyle: "content", collapsible: true, active: accordion_active,
+    {% if ctx.localhost %}
+      animate: false,
+    {% else %}
+      animate: true,
+    {% endif %}
+      activate: function(event, ui) {
+        var opt = $(this).accordion('option', 'active');
+        sessionStorage.active_accordion = opt;
+      },
+    } );
+
+  pageClose = function() {
+  {% if ctx.osKeybd %}
+    $('#numpadDialog').dialog('close');
+    $('#numpadDialog').dialog('destroy').remove();
+    $('#keypadDialog').dialog('close');
+    $('#keypadDialog').dialog('destroy').remove();
+  {% endif %}
+    $("#deviceFilePickerDialog").dialog("close");
+    $('#deviceFilePickerDialog').dialog('destroy').remove();
+  }
+
+{% if ctx.osKeybd %}
+
+  //////////////////////////////////////////////////////////
+  // touch selects
+//    $('#timezone').touchselect({width: '65%'});
+    $('table select').niceSelect();
+    $('#timehour, #timeminute, #alarmEmailPerDay', '#alarmEmailDelay' ).niceSelect({width: '8%'});
+
+//    $('#alarmEmailPerDay').touchselect({width: '30px'});
+//    $('#alarmEmailDelay').touchselect({width: '30px'});
+
+//    function updateDeviceListTouchSelect() { $('#deviceList select').touchselect({width: '100%', minWidth: '12%'}); }
+//    function updateSelectListTouchSelect() { $('#networkList select').touchselect({width: '100%', minWidth: '150'}); }
+//    function updateDeviceListTouchSelect() { } // do nothing
+//    function updateDeviceListTouchSelect() { $('#deviceList select').touchselect(); }
+//    function updateSelectListTouchSelect() { $('#networkList select').touchselect(); }
+
+//    updateDeviceListTouchSelect();
+//    updateSelectListTouchSelect();
+
+  //////////////////////////////////////////////////////////
+  // keyboards
+
+    $('#siteName').click(function () { showkeypad($(this), 'Site Name'); } );
+    $('#siteAddress').click(function () { showkeypad($(this), 'Address'); } );
+
+    for ( i = 0; i < emailSettings.emailAddrRecs.length; ++i) {
+      strId = "#recipient" + (i+1).toString();
+      $( strId ).click(function () { showkeypad($(this), 'To Email Address'); } );
+    }
+
+    for ( i = 0; i < emailSettings.emailServerRecs.length; ++i) {
+      strId = "#fromAddress" + (i+1).toString();
+      $( strId ).click(function () { showkeypad($(this), 'From Email Address'); } );
+      strId = "#smtpserver" + (i+1).toString();
+      $( strId ).click(function () { showkeypad($(this), 'SMTP Server Address'); } );
+      strId = "#smtpport" + (i+1).toString();
+      $( strId ).click(function () { showkeypad($(this), 'SMTP Server Port'); } );
+      strId = "#authaccount" + (i+1).toString();
+      $( strId ).click(function () { showkeypad($(this), 'Account Name'); } );
+      strId = "#authpassword" + (i+1).toString();
+      $( strId ).click(function () { showkeypad($(this), 'Password'); } );
+    }
+
+    $('#hostname').click(function () { showkeypad($(this), 'Host Name'); } );
+    $('#address').click(function () { showkeypad($(this), 'IP Address'); } );
+    $('#netmask').click(function () { showkeypad($(this), 'Subnet'); } );
+    $('#gateway').click(function () { showkeypad($(this), 'Gateway'); } );
+    $('#dnsaddress').click(function () { showkeypad($(this), 'DNS Server'); } );
+
+    $('#E2alarmCycleTimeEField').click(function () { showkeypad($(this), 'E2 Alarm Retrieval Interval (secs)'); } );
+    $('#E2AlarmPriorityFilterEField').click(function () { showkeypad($(this), 'E2 Alarm Prioirty Filter (0-100)'); } );
+    $('#E2DevOfflineAlmDelayEField').click(function () { shownumpad($(this),'E2 Device Offline Alarm Delay (mins)'); } );
+    $('#E2DevOfflineRTNDelayEField').click(function () { shownumpad($(this),'E2 Device Offline Return To Normal Delay (mins)'); } );
+    $('#E2MaxValsPerMsgEField').click(function ()      { shownumpad($(this),'ADVANCED: E2 Max Values Per Message (5-15)'); } );
+    $('#E2DelayBetweenMsgsMSEField').click(function () { shownumpad($(this),'ADVANCED: E2 Inter-message Delay (milliseconds)'); } );
+
+    var _numpadTarget = null;
+
+    $('#numpad').numpad();
+
+    $("#numpadDialog").dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        draggable: false,
+        width: "auto",
+        buttons: {
+            "OK": function() {
+              $("#numpadDialog").dialog( "close" );
+              var value = $('#numpad').numpad('getValue');
+              if (value.length > 0) {
+                _numpadTarget.val(value);
+                _numpadTarget.trigger('change');
+              }
+            },
+            "Cancel": function() {
+              $("#numpadDialog").dialog( "close" );
+            }
+        },
+        close: function() {
+          window.scrollTo(0,0);
+        }
+    });
+
+
+    function shownumpad(target, prop, unit) {
+      _numpadTarget = target;
+      target.blur();
+      $('#numpad').numpad('target', _numpadTarget);
+      $('#numpad').numpad('title', prop);
+      $('#numpad').numpad('unit', unit);
+      $('#numpad').numpad('show');
+
+      $('#numpadDialog').dialog('option', 'title', prop);
+      $("#numpadDialog").dialog('open');
+    }
+
+
+    var _keypadTarget = null;
+
+    $('#keypadDialog').dialog({
+      autoOpen: false,
+      modal: true,
+      resizable: false,
+      draggable: false,
+      width: 'auto',
+      close: function() {
+        window.scrollTo(0,0);
+      }
+    });
+
+    $('#keypad').keypad({ done: function (ok, value) {
+      $('#keypadDialog').dialog('close');
+          if (ok) {
+        _keypadTarget.val(value);
+        _keypadTarget.trigger('change');
+      }
+      $('.ui-dialog-titlebar').show();
+    } });
+
+
+
+    function showkeypad(target, title) {
+      _keypadTarget = target;
+      target.blur();
+      var $keypad = $('#keypad');
+      $keypad.keypad('target', _keypadTarget);
+      $keypad.keypad('title', title);
+      $keypad.keypad('show');
+
+      $('.ui-dialog-titlebar').hide();
+      $('#keypadDialog').dialog('open');
+    }
+
+{% endif %}
+   }());
+
+//# sourceURL=pageSysconfig.html
+
+</script>
+
+

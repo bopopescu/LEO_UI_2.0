@@ -1,0 +1,44 @@
+
+.proptable input:not([type=checkbox]) {
+  padding: 2px;
+  border: none;
+  width: 100%;
+  box-sizing: border-box;  
+}
+
+.proptable select {
+  padding: 0px;
+  width: 100%;
+  /*border: none;*/
+  /*outline:0px;*/
+}
+
+.proptable input[type=checkbox] {
+  border: none;
+  width: 40px;
+}
+
+.proptable .readonly {
+  padding: 0px 7px;
+}
+
+.proptable table {
+  border-collapse: collapse;  
+}
+
+.proptable td {
+  border: 1px solid #d4ccb0;
+  padding: 0;
+  background-color: white;
+  position: relative;
+
+}
+
+.proptable th {
+  background-color: #f6f3ec;
+  border: 1px solid #d4ccb0;
+  padding: 1px 7px;
+  text-align: center;
+}
+
+
