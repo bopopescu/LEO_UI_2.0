@@ -464,7 +464,7 @@ def upgradeDatabasesCheck():
     cur = conn.cursor()
 
     # Get Database Table Names
-    strSQL = 'select name from sqlite_master where type = "table"'
+    strSQL = 'select name from sqlite_main where type = "table"'
     cur.execute(strSQL)
     dbTableNames = cur.fetchall()  # Get the list of table names for this database
     # dbTableNames = [[str(item) for item in results] for results in cur.fetchall()]
